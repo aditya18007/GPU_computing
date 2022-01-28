@@ -1,0 +1,1 @@
+Time elapsed on GPU = 4.9449 milliseconds.
