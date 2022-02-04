@@ -1,0 +1,92 @@
+\documentclass[11pt, oneside]{article}   	% use "amsart" instead of "article" for AMSLaTeX format
+
+\usepackage{float}
+
+\usepackage{geometry}                		% See geometry.pdf to learn the layout options. There are lots.
+\geometry{letterpaper}                   		% ... or a4paper or a5paper or ... 
+%\geometry{landscape}                		% Activate for rotated page geometry
+\usepackage[parfill]{parskip}    			% Activate to begin paragraphs with an empty line rather than an indent
+\usepackage{graphicx}				% Use pdf, png, jpg, or epsÂ§ with pdflatex; use eps in DVI mode
+								% TeX will automatically convert eps --> pdf in pdflatex		
+\usepackage{amssymb}
+\usepackage{mathtools}
+\usepackage{enumerate}
+\usepackage{tikz}
+\usepackage{listings}
+\usepackage{color}
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+\lstset{frame=tb,
+  language=C++,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\small\ttfamily},
+  numbers=none,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=4
+}
+
+\usetikzlibrary{arrows}
+%\usepackage[demo]{graphicx}
+\usepackage{caption}
+\usepackage{subcaption}
+\def\firstcircle{(90:1.75cm) circle (2.5cm)}
+\def\secondcircle{(210:1.75cm) circle (2.5cm)}
+\def\thirdcircle{(330:1.75cm) circle (2.5cm)}
+
+%SetFonts
+
+%SetFonts
+\begin{document}
+\title{GPU Computing CSE 560 (Winter 2022) - Lab 2} 
+\author{Aditya Singh Rathore - \texttt{2018007}}
+\date{February 4, 2022}							% Activate to display a given date or no date
+
+
+\maketitle
+
+\section*{Constant Memory : Task}
+
+\begin{lstlisting}
+// initialize1.cu
+__global__ void initialize1(float* C){
+    int i = blockDim.x*blockIdx.x + threadIdx.x;
+    if(i < LENGTH){
+        C[i] = A[i] + B[i];
+    }
+}
+//...
+\end{lstlisting}
+
+\begin{lstlisting}
+// initialize2.cu
+__global__ void initialize2(float *C){
+    int i = blockDim.x*blockIdx.x + threadIdx.x;
+    if(i < LENGTH){
+        C[i] = A[blockIdx.x] + B[blockIdx.x];
+    }
+//...
+\end{lstlisting}
+\begin{tabular}{ |p{3cm}||p{3cm}|  }
+ \hline
+ \multicolumn{2}{|c|}{Code was tested on Nvidia 1050 Ti} \\
+ \hline
+ Code & Execution Time\\
+ \hline
+ initialize1.cu   & 0.00989895 ms\\
+ initialize2.cu   & 0.00919106 ms\\
+ \hline
+\end{tabular} \\
+\textbf{initialize2.cu is faster. }\\
+The constant memory is cached. In \emph{initialize2.cu}, all threads in the warp will be reading same A[blockIdx.x] and B[blockIdx.x] as blockIdx.x is same for all of them, which is available in cache. 
+\\
+In \emph{initialize1.cu}, each threads will be reading different A[i] and B[i] which will lead to cache misses and lead comparatively larger execution time.
+\end{document}  
