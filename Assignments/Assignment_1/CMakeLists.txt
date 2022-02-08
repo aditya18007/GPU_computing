@@ -4,7 +4,7 @@ project(Assignment01 LANGUAGES CUDA CXX)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
 
-find_package(CUDAToolkit)
+find_package(CUDAToolkit REQUIRED)
 
 set(SOURCES 
 		src/main.cpp

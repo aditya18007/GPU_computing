@@ -5152,8 +5152,6 @@ enum { __value = 1};
 typedef __true_type __type; 
 # 244
 }; 
-# 261 "/usr/include/c++/8/bits/cpp_type_traits.h" 3
-template<> struct __is_integer< __int128_t>  { enum { __value = 1}; typedef __true_type __type; }; template<> struct __is_integer< __uint128_t>  { enum { __value = 1}; typedef __true_type __type; }; 
 # 278 "/usr/include/c++/8/bits/cpp_type_traits.h" 3
 template< class _Tp> 
 # 279
@@ -7910,8 +7908,6 @@ constexpr float abs(float __x)
 constexpr long double abs(long double __x) 
 # 79
 { return __builtin_fabsl(__x); } 
-# 84
-constexpr __int128_t abs(__int128_t __x) { return (__x >= (0)) ? __x : (-__x); } 
 # 107 "/usr/include/c++/8/bits/std_abs.h" 3
 }
 # 108
@@ -17646,9 +17642,7 @@ unexpected_handler get_unexpected() noexcept;
 void unexpected() __attribute((__noreturn__)); 
 # 102 "/usr/include/c++/8/exception" 3
 bool uncaught_exception() noexcept __attribute((__pure__)); 
-# 107
-int uncaught_exceptions() noexcept __attribute((__pure__)); 
-# 111
+# 111 "/usr/include/c++/8/exception" 3
 }
 # 113
 namespace __gnu_cxx { 
@@ -18213,14 +18207,6 @@ template<> struct __is_integral_helper< long long>  : public true_type {
 # 269
 template<> struct __is_integral_helper< unsigned long long>  : public true_type { 
 # 270
-}; 
-# 276
-template<> struct __is_integral_helper< __int128_t>  : public true_type { 
-# 277
-}; 
-# 280
-template<> struct __is_integral_helper< __uint128_t>  : public true_type { 
-# 281
 }; 
 # 312 "/usr/include/c++/8/type_traits" 3
 template< class _Tp> 
@@ -19498,10 +19484,6 @@ typedef unsigned long __type; };
 template<> struct __make_unsigned< long long>  { 
 # 1524
 typedef unsigned long long __type; }; 
-# 1528
-template<> struct __make_unsigned< __int128_t>  { 
-# 1529
-typedef __uint128_t __type; }; 
 # 1548 "/usr/include/c++/8/type_traits" 3
 template< class _Tp, bool 
 # 1549
@@ -19594,10 +19576,6 @@ typedef signed long __type; };
 template<> struct __make_signed< unsigned long long>  { 
 # 1628
 typedef signed long long __type; }; 
-# 1632
-template<> struct __make_signed< __uint128_t>  { 
-# 1633
-typedef __int128_t __type; }; 
 # 1652 "/usr/include/c++/8/type_traits" 3
 template< class _Tp, bool 
 # 1653
@@ -20200,9 +20178,7 @@ template< class _Tp> using result_of_t = typename result_of< _Tp> ::type;
 template< bool _Cond, class _Tp = void> using __enable_if_t = typename enable_if< _Cond, _Tp> ::type; 
 # 2318
 template< class ...> using __void_t = void; 
-# 2323
-template< class ...> using void_t = void; 
-# 2327
+# 2327 "/usr/include/c++/8/type_traits" 3
 template< class _Default, class _AlwaysVoid, 
 # 2328
 template< class ...>  class _Op, class ..._Args> 
@@ -20316,107 +20292,7 @@ template< class _Tp>
 struct __is_nothrow_swappable : public __is_nothrow_swappable_impl< _Tp> ::type { 
 # 2458
 }; 
-# 2465
-template< class _Tp> 
-# 2466
-struct is_swappable : public __is_swappable_impl< _Tp> ::type { 
-# 2468
-}; 
-# 2471
-template< class _Tp> 
-# 2472
-struct is_nothrow_swappable : public __is_nothrow_swappable_impl< _Tp> ::type { 
-# 2474
-}; 
-# 2478
-template< class _Tp> constexpr bool 
-# 2479
-is_swappable_v = (is_swappable< _Tp> ::value); 
-# 2483
-template< class _Tp> constexpr bool 
-# 2484
-is_nothrow_swappable_v = (is_nothrow_swappable< _Tp> ::value); 
-# 2488
-namespace __swappable_with_details { 
-# 2489
-using std::swap;
-# 2491
-struct __do_is_swappable_with_impl { 
-# 2493
-template< class _Tp, class _Up, class 
-# 2494
- = __decltype((swap(std::declval< _Tp> (), std::declval< _Up> ()))), class 
-# 2496
- = __decltype((swap(std::declval< _Up> (), std::declval< _Tp> ())))> static true_type 
-# 2493
-__test(int); 
-# 2499
-template< class , class > static false_type __test(...); 
-# 2501
-}; 
-# 2503
-struct __do_is_nothrow_swappable_with_impl { 
-# 2505
-template< class _Tp, class _Up> static __bool_constant< noexcept(swap(std::declval< _Tp> (), std::declval< _Up> ())) && noexcept(swap(std::declval< _Up> (), std::declval< _Tp> ()))>  __test(int); 
-# 2512
-template< class , class > static false_type __test(...); 
-# 2514
-}; 
-# 2516
-}
-# 2518
-template< class _Tp, class _Up> 
-# 2519
-struct __is_swappable_with_impl : public __swappable_with_details::__do_is_swappable_with_impl { 
-# 2522
-typedef __decltype((__test< _Tp, _Up> (0))) type; 
-# 2523
-}; 
-# 2526
-template< class _Tp> 
-# 2527
-struct __is_swappable_with_impl< _Tp &, _Tp &>  : public __swappable_details::__do_is_swappable_impl { 
-# 2530
-typedef __decltype((__test< _Tp &> (0))) type; 
-# 2531
-}; 
-# 2533
-template< class _Tp, class _Up> 
-# 2534
-struct __is_nothrow_swappable_with_impl : public __swappable_with_details::__do_is_nothrow_swappable_with_impl { 
-# 2537
-typedef __decltype((__test< _Tp, _Up> (0))) type; 
-# 2538
-}; 
-# 2541
-template< class _Tp> 
-# 2542
-struct __is_nothrow_swappable_with_impl< _Tp &, _Tp &>  : public __swappable_details::__do_is_nothrow_swappable_impl { 
-# 2545
-typedef __decltype((__test< _Tp &> (0))) type; 
-# 2546
-}; 
-# 2549
-template< class _Tp, class _Up> 
-# 2550
-struct is_swappable_with : public __is_swappable_with_impl< _Tp, _Up> ::type { 
-# 2552
-}; 
-# 2555
-template< class _Tp, class _Up> 
-# 2556
-struct is_nothrow_swappable_with : public __is_nothrow_swappable_with_impl< _Tp, _Up> ::type { 
-# 2558
-}; 
-# 2562
-template< class _Tp, class _Up> constexpr bool 
-# 2563
-is_swappable_with_v = (is_swappable_with< _Tp, _Up> ::value); 
-# 2567
-template< class _Tp, class _Up> constexpr bool 
-# 2568
-is_nothrow_swappable_with_v = (is_nothrow_swappable_with< _Tp, _Up> ::value); 
-# 2576
+# 2576 "/usr/include/c++/8/type_traits" 3
 template< class _Result, class _Ret, class  = void> 
 # 2577
 struct __is_invocable_impl : public false_type { }; 
@@ -21224,16 +21100,11 @@ operator>=(const pair< _T1, _T2>  &__x, const pair< _T1, _T2>  &__y)
 # 480
 { return !(__x < __y); } 
 # 486
-template< class _T1, class _T2> inline typename enable_if< __and_< __is_swappable< _T1> , __is_swappable< _T2> > ::value> ::type 
+template< class _T1, class _T2> inline void 
 # 495
 swap(pair< _T1, _T2>  &__x, pair< _T1, _T2>  &__y) noexcept(noexcept((__x.swap(__y)))) 
 # 497
 { (__x.swap(__y)); } 
-# 500
-template < typename _T1, typename _T2 >
-    typename enable_if < ! __and_ < __is_swappable < _T1 >,
-          __is_swappable < _T2 > > :: value > :: type
-    swap ( pair < _T1, _T2 > &, pair < _T1, _T2 > & ) = delete;
 # 521 "/usr/include/c++/8/bits/stl_pair.h" 3
 template< class _T1, class _T2> constexpr pair< typename __decay_and_strip< _T1> ::__type, typename __decay_and_strip< _T2> ::__type>  
 # 524
@@ -30961,10 +30832,6 @@ template<> struct hash< unsigned>  : public __hash_base< unsigned long, unsigned
 template<> struct hash< unsigned long>  : public __hash_base< unsigned long, unsigned long>  { size_t operator()(unsigned long __val) const noexcept { return static_cast< size_t>(__val); } }; 
 # 166
 template<> struct hash< unsigned long long>  : public __hash_base< unsigned long, unsigned long long>  { size_t operator()(unsigned long long __val) const noexcept { return static_cast< size_t>(__val); } }; 
-# 169
-template<> struct hash< __int128_t>  : public __hash_base< unsigned long, __int128_t>  { size_t operator()(__int128_t __val) const noexcept { return static_cast< size_t>(__val); } }; 
-# 170
-template<> struct hash< __uint128_t>  : public __hash_base< unsigned long, __uint128_t>  { size_t operator()(__uint128_t __val) const noexcept { return static_cast< size_t>(__val); } }; 
 # 187 "/usr/include/c++/8/bits/functional_hash.h" 3
 struct _Hash_impl { 
 # 190
@@ -42115,31 +41982,197 @@ extern wostream wclog;
 static ios_base::Init __ioinit; 
 # 77
 }
-# 5 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
-void sample_kernel() ;
-#if 0
-# 6
+# 6 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu.h"
+void adaptiveEqualizationGPU(unsigned char * img_in, unsigned char * img_out, int width, int height); 
+# 5 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/utils.h"
+cudaError_t my_errno; 
+# 16 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/utils.h"
+template< class T> class GPU_array; 
+# 19
+template< class T> class CPU_array; 
+# 22
+template< class T> 
+# 23
+class CPU_array { 
+# 25
+const size_t m_size; 
+# 26
+T *m_data; 
+# 29
+public: CPU_array(size_t n) : m_size(n), m_data(new T [n]) 
+# 31
+{ } 
+# 33
+CPU_array(GPU_array< T>  &gpu_arr) : m_size((gpu_arr.get_size())), m_data(new T [(gpu_arr.get_size())]) 
+# 35
 { 
-# 7
-int tx = (__device_builtin_variable_threadIdx.x) + ((__device_builtin_variable_blockDim.x) * (__device_builtin_variable_blockIdx.x)); 
-# 8
-tx++; 
-# 9
+# 36
+my_errno = cudaMemcpy(m_data, (gpu_arr.arr()), (m_size) * sizeof(T), cudaMemcpyDeviceToHost); if (my_errno != (cudaSuccess)) { (((((std::cerr << ("File : "))) << ("/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/utils.h"))) << ('\n')); (((std::cerr << ("Function : "))) << __func__) << '\n'; (((((std::cerr << ("Line : "))) << (36))) << ('\n')); (((((std::cerr << ("Cuda error : "))) << (cudaGetErrorString(my_errno)))) << (" !\n\n")); exit(1); 
+# 36 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/utils.h"
+}  
+# 37
+} 
+# 39
+~CPU_array() { 
+# 40
+delete [] (m_data); 
+# 41
+} 
+# 43
+T *arr() { 
+# 44
+return m_data; 
+# 45
+} 
+# 47
+T &operator()(int i) { 
+# 48
+return (m_data)[i]; 
+# 49
+} 
+# 51
+size_t get_size() { 
+# 52
+return m_size; 
+# 53
+} 
+# 54
+}; 
+# 56
+template< class T> 
+# 57
+class GPU_array { 
+# 59
+const size_t m_size; 
+# 60
+T *m_data; 
+# 63
+public: GPU_array(size_t n) : m_size(n) { 
+# 64
+my_errno = cudaMalloc((void **)(&(m_data)), (m_size) * sizeof(T)); if (my_errno != (cudaSuccess)) { (((((std::cerr << ("File : "))) << ("/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/utils.h"))) << ('\n')); (((std::cerr << ("Function : "))) << __func__) << '\n'; (((((std::cerr << ("Line : "))) << (64))) << ('\n')); (((((std::cerr << ("Cuda error : "))) << (cudaGetErrorString(my_errno)))) << (" !\n\n")); exit(1); 
+# 64 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/utils.h"
+}  
+# 65
+} 
+# 67
+GPU_array(CPU_array< T>  &cpu_arr) : m_size((cpu_arr.get_size())) { 
+# 68
+my_errno = cudaMalloc((void **)(&(m_data)), (m_size) * sizeof(T)); if (my_errno != (cudaSuccess)) { (((((std::cerr << ("File : "))) << ("/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/utils.h"))) << ('\n')); (((std::cerr << ("Function : "))) << __func__) << '\n'; (((((std::cerr << ("Line : "))) << (68))) << ('\n')); (((((std::cerr << ("Cuda error : "))) << (cudaGetErrorString(my_errno)))) << (" !\n\n")); exit(1); 
+# 68 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/utils.h"
+}  
+# 69
+my_errno = cudaMemcpy(m_data, (cpu_arr.arr()), (m_size) * sizeof(T), cudaMemcpyHostToDevice); if (my_errno != (cudaSuccess)) { (((((std::cerr << ("File : "))) << ("/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/utils.h"))) << ('\n')); (((std::cerr << ("Function : "))) << __func__) << '\n'; (((((std::cerr << ("Line : "))) << (69))) << ('\n')); (((((std::cerr << ("Cuda error : "))) << (cudaGetErrorString(my_errno)))) << (" !\n\n")); exit(1); 
+# 69 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/utils.h"
+}  
+# 70
+} 
+# 72
+~GPU_array() { 
+# 73
+my_errno = cudaFree(m_data); if (my_errno != (cudaSuccess)) { (((((std::cerr << ("File : "))) << ("/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/utils.h"))) << ('\n')); (((std::cerr << ("Function : "))) << __func__) << '\n'; (((((std::cerr << ("Line : "))) << (73))) << ('\n')); (((((std::cerr << ("Cuda error : "))) << (cudaGetErrorString(my_errno)))) << (" !\n\n")); exit(1); 
+# 73 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/utils.h"
+}  
+# 74
+} 
+# 75
+T *arr() { 
+# 76
+return m_data; 
+# 77
+} 
+# 78
+size_t get_size() { 
+# 79
+return m_size; 
+# 80
+} 
+# 81
+}; 
+# 7 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
+static int width; 
+# 8 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
+static int heigth; 
+# 10 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
+static int pixels_per_tile; 
+# 11 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
+static int ntiles_x; 
+# 12 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
+static int ntiles_y; 
+# 14 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
+void ahe_GPU(unsigned char *img_out) ;
+#if 0
+# 15
+{ 
+# 16
+int x = ((__device_builtin_variable_blockDim.x) * (__device_builtin_variable_blockIdx.x)) + (__device_builtin_variable_threadIdx.x); 
+# 17
+int y = ((__device_builtin_variable_blockDim.y) * (__device_builtin_variable_blockIdx.y)) + (__device_builtin_variable_threadIdx.y); 
+# 18
+(img_out[x + (y * width)]) = (255); 
+# 19
 } 
 #endif
-# 11 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
-extern "C" void run_sampleKernel() 
-# 12
-{ 
-# 13
-(__cudaPushCallConfiguration(1024, 1024)) ? (void)0 : sample_kernel(); 
-# 14
+# 21 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
+extern "C" void run_ahe_GPU(unsigned char *img_in, unsigned char *img_out, int width_, int height_) { 
+# 22
+int pixels_per_tile_ = (1024 * 1024); 
+# 23
+int ntiles_x_ = width_ / 1024; 
+# 24
+int ntiles_y_ = height_ / 1024; 
+# 26
+my_errno = cudaMemcpyToSymbol(&width, &width_, sizeof width_); if (my_errno != (cudaSuccess)) { (((((std::cerr << ("File : "))) << ("/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"))) << ('\n')); (((((std::cerr << ("Function : "))) << __func__)) << ('\n')); (((((std::cerr << ("Line : "))) << (26))) << ('\n')); (((((std::cerr << ("Cuda error : "))) << (cudaGetErrorString(my_errno)))) << (" !\n\n")); exit(1); 
+# 26 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
+}  
+# 27
+my_errno = cudaMemcpyToSymbol(&heigth, &height_, sizeof height_); if (my_errno != (cudaSuccess)) { (((((std::cerr << ("File : "))) << ("/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"))) << ('\n')); (((((std::cerr << ("Function : "))) << __func__)) << ('\n')); (((((std::cerr << ("Line : "))) << (27))) << ('\n')); (((((std::cerr << ("Cuda error : "))) << (cudaGetErrorString(my_errno)))) << (" !\n\n")); exit(1); 
+# 27 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
+}  
+# 28
+my_errno = cudaMemcpyToSymbol(&pixels_per_tile, &pixels_per_tile_, sizeof pixels_per_tile_); if (my_errno != (cudaSuccess)) { (((((std::cerr << ("File : "))) << ("/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"))) << ('\n')); (((((std::cerr << ("Function : "))) << __func__)) << ('\n')); (((((std::cerr << ("Line : "))) << (28))) << ('\n')); (((((std::cerr << ("Cuda error : "))) << (cudaGetErrorString(my_errno)))) << (" !\n\n")); exit(1); 
+# 28 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
+}  
+# 29
+my_errno = cudaMemcpyToSymbol(&ntiles_x, &ntiles_x_, sizeof width); if (my_errno != (cudaSuccess)) { (((((std::cerr << ("File : "))) << ("/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"))) << ('\n')); (((((std::cerr << ("Function : "))) << __func__)) << ('\n')); (((((std::cerr << ("Line : "))) << (29))) << ('\n')); (((((std::cerr << ("Cuda error : "))) << (cudaGetErrorString(my_errno)))) << (" !\n\n")); exit(1); 
+# 29 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
+}  
+# 30
+my_errno = cudaMemcpyToSymbol(&ntiles_y, &ntiles_y_, sizeof width); if (my_errno != (cudaSuccess)) { (((((std::cerr << ("File : "))) << ("/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"))) << ('\n')); (((((std::cerr << ("Function : "))) << __func__)) << ('\n')); (((((std::cerr << ("Line : "))) << (30))) << ('\n')); (((((std::cerr << ("Cuda error : "))) << (cudaGetErrorString(my_errno)))) << (" !\n\n")); exit(1); 
+# 30 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
+}  
+# 32
+int num_threads_x = 16; 
+# 33
+int num_threads_y = 16; 
+# 34
+dim3 block_shape = dim3(num_threads_x, num_threads_y); 
+# 36
+int num_blocks_x = (width_ / num_threads_x) + 1; 
+# 37
+int num_blocks_y = (height_ / num_threads_y) + 1; 
+# 39
+dim3 grid_shape = dim3(num_blocks_x, num_blocks_y); 
+# 41
+unsigned char *d_img_out; 
+# 42
+auto img_size_bytes = (height_ * width_) * sizeof(unsigned char); 
+# 43
+my_errno = cudaMalloc(&d_img_out, img_size_bytes); if (my_errno != (cudaSuccess)) { (((((std::cerr << ("File : "))) << ("/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"))) << ('\n')); (((((std::cerr << ("Function : "))) << __func__)) << ('\n')); (((((std::cerr << ("Line : "))) << (43))) << ('\n')); (((((std::cerr << ("Cuda error : "))) << (cudaGetErrorString(my_errno)))) << (" !\n\n")); exit(1); 
+# 43 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
+}  
+# 45
+(__cudaPushCallConfiguration(grid_shape, block_shape)) ? (void)0 : ahe_GPU(d_img_out); 
+# 46
 cudaDeviceSynchronize(); 
-# 15
+# 47
+my_errno = cudaMemcpy(img_out, d_img_out, img_size_bytes, cudaMemcpyHostToDevice); if (my_errno != (cudaSuccess)) { (((((std::cerr << ("File : "))) << ("/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"))) << ('\n')); (((((std::cerr << ("Function : "))) << __func__)) << ('\n')); (((((std::cerr << ("Line : "))) << (47))) << ('\n')); (((((std::cerr << ("Cuda error : "))) << (cudaGetErrorString(my_errno)))) << (" !\n\n")); exit(1); 
+# 47 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
+}  
+# 49
 } 
 
 # 1 "ahe_gpu_kernels.cudafe1.stub.c"
-#define _NV_ANON_NAMESPACE _GLOBAL__N__23_ahe_gpu_kernels_cpp1_ii_14175c78
+#define _NV_ANON_NAMESPACE _GLOBAL__N__23_ahe_gpu_kernels_cpp1_ii_fb3f3be4
 # 1 "ahe_gpu_kernels.cudafe1.stub.c"
 #include "ahe_gpu_kernels.cudafe1.stub.c"
 # 1 "ahe_gpu_kernels.cudafe1.stub.c"
