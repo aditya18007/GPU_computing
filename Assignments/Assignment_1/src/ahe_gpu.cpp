@@ -3,9 +3,9 @@
 
 #include <iostream>
 
-extern "C" void run_sampleKernel();
+extern "C" void run_ahe_GPU(unsigned char* img_in, unsigned char* img_out, int width, int height);
 
 void adaptiveEqualizationGPU(unsigned char* img_in, unsigned char* img_out, int width, int height)
 {
-  run_sampleKernel(); // Remove me!
+  run_ahe_GPU(img_in,img_out, width, height);
 }
