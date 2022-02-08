@@ -42093,24 +42093,24 @@ static int width[1];
 # 8 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
 static int heigth[1]; 
 # 10 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
-static int pixels_per_tile[1]; 
-# 11 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
 static int ntiles_x[1]; 
-# 12 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
+# 11 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
 static int ntiles_y[1]; 
-# 14 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
-void ahe_GPU(unsigned char *img_out) ;
+# 13 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
+void ahe_GPU(unsigned char *img_in, unsigned char *img_out) ;
 #if 0
-# 15
+# 14
 { 
-# 16
+# 15
 int x = ((__device_builtin_variable_blockDim.x) * (__device_builtin_variable_blockIdx.x)) + (__device_builtin_variable_threadIdx.x); 
-# 17
+# 16
 int y = ((__device_builtin_variable_blockDim.y) * (__device_builtin_variable_blockIdx.y)) + (__device_builtin_variable_threadIdx.y); 
-# 18
+# 17
 if ((x < (width[0])) && (y < (heigth[0]))) { 
+# 18
+int i = x + (y * (width[0])); 
 # 19
-(img_out[x + (y * (width[0]))]) = (255); 
+(img_out[i]) = (img_in[i]); 
 # 20
 }  
 # 21
@@ -42118,8 +42118,6 @@ if ((x < (width[0])) && (y < (heigth[0]))) {
 #endif
 # 23 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
 extern "C" void run_ahe_GPU(unsigned char *img_in, unsigned char *img_out, int width_, int height_) { 
-# 24
-int pixels_per_tile_ = (1024 * 1024); 
 # 25
 int ntiles_x_ = width_ / 1024; 
 # 26
@@ -42133,54 +42131,64 @@ my_errno = cudaMemcpyToSymbol(heigth, &height_, sizeof height_); if (my_errno !=
 # 29 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
 }  
 # 30
-my_errno = cudaMemcpyToSymbol(pixels_per_tile, &pixels_per_tile_, sizeof pixels_per_tile_); if (my_errno != (cudaSuccess)) { (((((std::cerr << ("File : "))) << ("/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"))) << ('\n')); (((((std::cerr << ("Function : "))) << __func__)) << ('\n')); (((((std::cerr << ("Line : "))) << (30))) << ('\n')); (((((std::cerr << ("Cuda error : "))) << (cudaGetErrorString(my_errno)))) << (" !\n\n")); exit(1); 
+my_errno = cudaMemcpyToSymbol(ntiles_x, &ntiles_x_, sizeof ntiles_x_); if (my_errno != (cudaSuccess)) { (((((std::cerr << ("File : "))) << ("/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"))) << ('\n')); (((((std::cerr << ("Function : "))) << __func__)) << ('\n')); (((((std::cerr << ("Line : "))) << (30))) << ('\n')); (((((std::cerr << ("Cuda error : "))) << (cudaGetErrorString(my_errno)))) << (" !\n\n")); exit(1); 
 # 30 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
 }  
 # 31
-my_errno = cudaMemcpyToSymbol(ntiles_x, &ntiles_x_, sizeof width); if (my_errno != (cudaSuccess)) { (((((std::cerr << ("File : "))) << ("/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"))) << ('\n')); (((((std::cerr << ("Function : "))) << __func__)) << ('\n')); (((((std::cerr << ("Line : "))) << (31))) << ('\n')); (((((std::cerr << ("Cuda error : "))) << (cudaGetErrorString(my_errno)))) << (" !\n\n")); exit(1); 
+my_errno = cudaMemcpyToSymbol(ntiles_y, &ntiles_y_, sizeof ntiles_y_); if (my_errno != (cudaSuccess)) { (((((std::cerr << ("File : "))) << ("/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"))) << ('\n')); (((((std::cerr << ("Function : "))) << __func__)) << ('\n')); (((((std::cerr << ("Line : "))) << (31))) << ('\n')); (((((std::cerr << ("Cuda error : "))) << (cudaGetErrorString(my_errno)))) << (" !\n\n")); exit(1); 
 # 31 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
 }  
-# 32
-my_errno = cudaMemcpyToSymbol(ntiles_y, &ntiles_y_, sizeof width); if (my_errno != (cudaSuccess)) { (((((std::cerr << ("File : "))) << ("/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"))) << ('\n')); (((((std::cerr << ("Function : "))) << __func__)) << ('\n')); (((((std::cerr << ("Line : "))) << (32))) << ('\n')); (((((std::cerr << ("Cuda error : "))) << (cudaGetErrorString(my_errno)))) << (" !\n\n")); exit(1); 
-# 32 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
-}  
-# 34
-int num_threads_x = 16; 
-# 35
-int num_threads_y = 16; 
-# 36
-dim3 block_shape = dim3(num_threads_x, num_threads_y, 1); 
-# 38
-int num_blocks_x = (width_ / num_threads_x) + 1; 
-# 39
-int num_blocks_y = (height_ / num_threads_y) + 1; 
-# 41
-dim3 grid_shape = dim3(num_blocks_x, num_blocks_y, 1); 
-# 43
-unsigned char *d_img_out; 
-# 44
+# 33
 auto img_size_bytes = (height_ * width_) * sizeof(unsigned char); 
-# 45
-my_errno = cudaMalloc((void **)(&d_img_out), img_size_bytes); if (my_errno != (cudaSuccess)) { (((((std::cerr << ("File : "))) << ("/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"))) << ('\n')); (((((std::cerr << ("Function : "))) << __func__)) << ('\n')); (((((std::cerr << ("Line : "))) << (45))) << ('\n')); (((((std::cerr << ("Cuda error : "))) << (cudaGetErrorString(my_errno)))) << (" !\n\n")); exit(1); 
-# 45 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
+# 35
+unsigned char *d_img_in; 
+# 36
+my_errno = cudaMalloc((void **)(&d_img_in), img_size_bytes); if (my_errno != (cudaSuccess)) { (((((std::cerr << ("File : "))) << ("/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"))) << ('\n')); (((((std::cerr << ("Function : "))) << __func__)) << ('\n')); (((((std::cerr << ("Line : "))) << (36))) << ('\n')); (((((std::cerr << ("Cuda error : "))) << (cudaGetErrorString(my_errno)))) << (" !\n\n")); exit(1); 
+# 36 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
 }  
+# 37
+my_errno = cudaMemcpy((void *)d_img_in, (void *)img_in, img_size_bytes, cudaMemcpyHostToDevice); if (my_errno != (cudaSuccess)) { (((((std::cerr << ("File : "))) << ("/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"))) << ('\n')); (((((std::cerr << ("Function : "))) << __func__)) << ('\n')); (((((std::cerr << ("Line : "))) << (37))) << ('\n')); (((((std::cerr << ("Cuda error : "))) << (cudaGetErrorString(my_errno)))) << (" !\n\n")); exit(1); 
+# 37 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
+}  
+# 39
+unsigned char *d_img_out; 
+# 40
+my_errno = cudaMalloc((void **)(&d_img_out), img_size_bytes); if (my_errno != (cudaSuccess)) { (((((std::cerr << ("File : "))) << ("/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"))) << ('\n')); (((((std::cerr << ("Function : "))) << __func__)) << ('\n')); (((((std::cerr << ("Line : "))) << (40))) << ('\n')); (((((std::cerr << ("Cuda error : "))) << (cudaGetErrorString(my_errno)))) << (" !\n\n")); exit(1); 
+# 40 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
+}  
+# 42
+int num_threads_x = 16; 
+# 43
+int num_threads_y = 16; 
+# 44
+dim3 block_shape = dim3(num_threads_x, num_threads_y, 1); 
 # 46
-(__cudaPushCallConfiguration(grid_shape, block_shape)) ? (void)0 : ahe_GPU(d_img_out); 
+int num_blocks_x = (width_ / num_threads_x) + 1; 
 # 47
-cudaDeviceSynchronize(); 
+int num_blocks_y = (height_ / num_threads_y) + 1; 
 # 48
-my_errno = cudaMemcpy((void *)img_out, (void *)d_img_out, img_size_bytes, cudaMemcpyDeviceToHost); if (my_errno != (cudaSuccess)) { (((((std::cerr << ("File : "))) << ("/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"))) << ('\n')); (((((std::cerr << ("Function : "))) << __func__)) << ('\n')); (((((std::cerr << ("Line : "))) << (48))) << ('\n')); (((((std::cerr << ("Cuda error : "))) << (cudaGetErrorString(my_errno)))) << (" !\n\n")); exit(1); 
-# 48 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
-}  
-# 49
-my_errno = cudaFree(d_img_out); if (my_errno != (cudaSuccess)) { (((((std::cerr << ("File : "))) << ("/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"))) << ('\n')); (((((std::cerr << ("Function : "))) << __func__)) << ('\n')); (((((std::cerr << ("Line : "))) << (49))) << ('\n')); (((((std::cerr << ("Cuda error : "))) << (cudaGetErrorString(my_errno)))) << (" !\n\n")); exit(1); 
-# 49 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
-}  
+dim3 grid_shape = dim3(num_blocks_x, num_blocks_y, 1); 
 # 50
+(__cudaPushCallConfiguration(grid_shape, block_shape)) ? (void)0 : ahe_GPU(d_img_in, d_img_out); 
+# 51
+cudaDeviceSynchronize(); 
+# 53
+my_errno = cudaMemcpy((void *)img_out, (void *)d_img_out, img_size_bytes, cudaMemcpyDeviceToHost); if (my_errno != (cudaSuccess)) { (((((std::cerr << ("File : "))) << ("/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"))) << ('\n')); (((((std::cerr << ("Function : "))) << __func__)) << ('\n')); (((((std::cerr << ("Line : "))) << (53))) << ('\n')); (((((std::cerr << ("Cuda error : "))) << (cudaGetErrorString(my_errno)))) << (" !\n\n")); exit(1); 
+# 53 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
+}  
+# 54
+my_errno = cudaFree(d_img_in); if (my_errno != (cudaSuccess)) { (((((std::cerr << ("File : "))) << ("/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"))) << ('\n')); (((((std::cerr << ("Function : "))) << __func__)) << ('\n')); (((((std::cerr << ("Line : "))) << (54))) << ('\n')); (((((std::cerr << ("Cuda error : "))) << (cudaGetErrorString(my_errno)))) << (" !\n\n")); exit(1); 
+# 54 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
+}  
+# 55
+my_errno = cudaFree(d_img_out); if (my_errno != (cudaSuccess)) { (((((std::cerr << ("File : "))) << ("/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"))) << ('\n')); (((((std::cerr << ("Function : "))) << __func__)) << ('\n')); (((((std::cerr << ("Line : "))) << (55))) << ('\n')); (((((std::cerr << ("Cuda error : "))) << (cudaGetErrorString(my_errno)))) << (" !\n\n")); exit(1); 
+# 55 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
+}  
+# 56
 } 
 
 # 1 "ahe_gpu_kernels.cudafe1.stub.c"
-#define _NV_ANON_NAMESPACE _GLOBAL__N__23_ahe_gpu_kernels_cpp1_ii_fb3f3be4
+#define _NV_ANON_NAMESPACE _GLOBAL__N__23_ahe_gpu_kernels_cpp1_ii_a08274fe
 # 1 "ahe_gpu_kernels.cudafe1.stub.c"
 #include "ahe_gpu_kernels.cudafe1.stub.c"
 # 1 "ahe_gpu_kernels.cudafe1.stub.c"
