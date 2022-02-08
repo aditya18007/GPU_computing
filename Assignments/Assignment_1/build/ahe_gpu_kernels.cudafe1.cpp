@@ -20984,7 +20984,7 @@ pair(std::pair< _U1, _U2>  &&__p) : first(std::forward< _U1> ((__p.first))), sec
 # 372
 { } 
 # 374
-template< class ..._Args1, class ..._Args2> pair(std::piecewise_construct_t, tuple< _Args1...> , tuple< _Args2...> ); 
+template< class ..._Args1, class ..._Args2> inline pair(std::piecewise_construct_t, tuple< _Args1...> , tuple< _Args2...> ); 
 # 378
 pair &operator=(typename conditional< __and_< is_copy_assignable< _T1> , is_copy_assignable< _T2> > ::value, const pair &, const std::__nonesuch_no_braces &> ::type 
 # 381
@@ -21056,7 +21056,7 @@ swap(second, __p.second);
 # 434
 private: template< class ..._Args1, std::size_t ..._Indexes1, class ...
 # 435
-_Args2, std::size_t ..._Indexes2> 
+_Args2, std::size_t ..._Indexes2> inline 
 # 434
 pair(tuple< _Args1...>  &, tuple< _Args2...>  &, _Index_tuple< _Indexes1...> , _Index_tuple< _Indexes2...> ); 
 # 439
@@ -41986,108 +41986,6226 @@ static ios_base::Init __ioinit;
 void adaptiveEqualizationGPU(unsigned char * img_in, unsigned char * img_out, int width, int height); 
 # 5 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/utils.h"
 cudaError_t my_errno; 
-# 16 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/utils.h"
-template< class T> class GPU_array; 
-# 19
-template< class T> class CPU_array; 
-# 22
-template< class T> 
-# 23
-class CPU_array { 
-# 25
-const size_t m_size; 
-# 26
-T *m_data; 
-# 29
-public: CPU_array(size_t n) : m_size(n), m_data(new T [n]) 
-# 31
-{ } 
-# 33
-CPU_array(GPU_array< T>  &gpu_arr) : m_size((gpu_arr.get_size())), m_data(new T [(gpu_arr.get_size())]) 
-# 35
-{ 
-# 36
-my_errno = cudaMemcpy(m_data, (gpu_arr.arr()), (m_size) * sizeof(T), cudaMemcpyDeviceToHost); if (my_errno != (cudaSuccess)) { (((((std::cerr << ("File : "))) << ("/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/utils.h"))) << ('\n')); (((std::cerr << ("Function : "))) << __func__) << '\n'; (((((std::cerr << ("Line : "))) << (36))) << ('\n')); (((((std::cerr << ("Cuda error : "))) << (cudaGetErrorString(my_errno)))) << (" !\n\n")); exit(1); 
-# 36 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/utils.h"
-}  
-# 37
-} 
-# 39
-~CPU_array() { 
-# 40
-delete [] (m_data); 
-# 41
-} 
-# 43
-T *arr() { 
-# 44
-return m_data; 
-# 45
-} 
+# 40 "/usr/include/c++/8/ext/aligned_buffer.h" 3
+namespace __gnu_cxx { 
+# 46
+template< class _Tp> 
 # 47
-T &operator()(int i) { 
-# 48
-return (m_data)[i]; 
-# 49
-} 
-# 51
-size_t get_size() { 
-# 52
-return m_size; 
-# 53
-} 
+struct __aligned_membuf { 
 # 54
-}; 
+struct _Tp2 { _Tp _M_t; }; 
 # 56
-template< class T> 
-# 57
-class GPU_array { 
-# 59
-const size_t m_size; 
-# 60
-T *m_data; 
-# 63
-public: GPU_array(size_t n) : m_size(n) { 
+alignas(__alignof__(_Tp2::_M_t)) unsigned char _M_storage[sizeof(_Tp)]; 
+# 58
+__aligned_membuf() = default;
+# 61
+__aligned_membuf(std::nullptr_t) { } 
 # 64
-my_errno = cudaMalloc((void **)(&(m_data)), (m_size) * sizeof(T)); if (my_errno != (cudaSuccess)) { (((((std::cerr << ("File : "))) << ("/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/utils.h"))) << ('\n')); (((std::cerr << ("Function : "))) << __func__) << '\n'; (((((std::cerr << ("Line : "))) << (64))) << ('\n')); (((((std::cerr << ("Cuda error : "))) << (cudaGetErrorString(my_errno)))) << (" !\n\n")); exit(1); 
-# 64 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/utils.h"
-}  
+void *_M_addr() noexcept 
 # 65
-} 
-# 67
-GPU_array(CPU_array< T>  &cpu_arr) : m_size((cpu_arr.get_size())) { 
+{ return static_cast< void *>(&(_M_storage)); } 
 # 68
-my_errno = cudaMalloc((void **)(&(m_data)), (m_size) * sizeof(T)); if (my_errno != (cudaSuccess)) { (((((std::cerr << ("File : "))) << ("/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/utils.h"))) << ('\n')); (((std::cerr << ("Function : "))) << __func__) << '\n'; (((((std::cerr << ("Line : "))) << (68))) << ('\n')); (((((std::cerr << ("Cuda error : "))) << (cudaGetErrorString(my_errno)))) << (" !\n\n")); exit(1); 
-# 68 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/utils.h"
-}  
+const void *_M_addr() const noexcept 
 # 69
-my_errno = cudaMemcpy(m_data, (cpu_arr.arr()), (m_size) * sizeof(T), cudaMemcpyHostToDevice); if (my_errno != (cudaSuccess)) { (((((std::cerr << ("File : "))) << ("/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/utils.h"))) << ('\n')); (((std::cerr << ("Function : "))) << __func__) << '\n'; (((((std::cerr << ("Line : "))) << (69))) << ('\n')); (((((std::cerr << ("Cuda error : "))) << (cudaGetErrorString(my_errno)))) << (" !\n\n")); exit(1); 
-# 69 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/utils.h"
-}  
-# 70
-} 
+{ return static_cast< const void *>(&(_M_storage)); } 
 # 72
-~GPU_array() { 
+_Tp *_M_ptr() noexcept 
 # 73
-my_errno = cudaFree(m_data); if (my_errno != (cudaSuccess)) { (((((std::cerr << ("File : "))) << ("/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/utils.h"))) << ('\n')); (((std::cerr << ("Function : "))) << __func__) << '\n'; (((((std::cerr << ("Line : "))) << (73))) << ('\n')); (((((std::cerr << ("Cuda error : "))) << (cudaGetErrorString(my_errno)))) << (" !\n\n")); exit(1); 
-# 73 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/utils.h"
+{ return static_cast< _Tp *>(_M_addr()); } 
+# 76
+const _Tp *_M_ptr() const noexcept 
+# 77
+{ return static_cast< const _Tp *>(_M_addr()); } 
+# 78
+}; 
+# 89 "/usr/include/c++/8/ext/aligned_buffer.h" 3
+template< class _Tp> 
+# 90
+struct __aligned_buffer : public std::aligned_storage< sizeof(_Tp), __alignof__(_Tp)>  { 
+# 94
+typename std::aligned_storage< sizeof(_Tp), __alignof__(_Tp)> ::type _M_storage; 
+# 96
+__aligned_buffer() = default;
+# 99
+__aligned_buffer(std::nullptr_t) { } 
+# 102
+void *_M_addr() noexcept 
+# 103
+{ 
+# 104
+return static_cast< void *>(&(_M_storage)); 
+# 105
+} 
+# 108
+const void *_M_addr() const noexcept 
+# 109
+{ 
+# 110
+return static_cast< const void *>(&(_M_storage)); 
+# 111
+} 
+# 114
+_Tp *_M_ptr() noexcept 
+# 115
+{ return static_cast< _Tp *>(_M_addr()); } 
+# 118
+const _Tp *_M_ptr() const noexcept 
+# 119
+{ return static_cast< const _Tp *>(_M_addr()); } 
+# 120
+}; 
+# 123
+}
+# 75 "/usr/include/c++/8/bits/stl_tree.h" 3
+namespace std __attribute((__visibility__("default"))) { 
+# 99 "/usr/include/c++/8/bits/stl_tree.h" 3
+enum _Rb_tree_color { _S_red, _S_black}; 
+# 101
+struct _Rb_tree_node_base { 
+# 103
+typedef _Rb_tree_node_base *_Base_ptr; 
+# 104
+typedef const _Rb_tree_node_base *_Const_Base_ptr; 
+# 106
+_Rb_tree_color _M_color; 
+# 107
+_Base_ptr _M_parent; 
+# 108
+_Base_ptr _M_left; 
+# 109
+_Base_ptr _M_right; 
+# 112
+static _Base_ptr _S_minimum(_Base_ptr __x) noexcept 
+# 113
+{ 
+# 114
+while ((__x->_M_left) != (0)) { __x = (__x->_M_left); }  
+# 115
+return __x; 
+# 116
+} 
+# 119
+static _Const_Base_ptr _S_minimum(_Const_Base_ptr __x) noexcept 
+# 120
+{ 
+# 121
+while ((__x->_M_left) != (0)) { __x = (__x->_M_left); }  
+# 122
+return __x; 
+# 123
+} 
+# 126
+static _Base_ptr _S_maximum(_Base_ptr __x) noexcept 
+# 127
+{ 
+# 128
+while ((__x->_M_right) != (0)) { __x = (__x->_M_right); }  
+# 129
+return __x; 
+# 130
+} 
+# 133
+static _Const_Base_ptr _S_maximum(_Const_Base_ptr __x) noexcept 
+# 134
+{ 
+# 135
+while ((__x->_M_right) != (0)) { __x = (__x->_M_right); }  
+# 136
+return __x; 
+# 137
+} 
+# 138
+}; 
+# 141
+template< class _Key_compare> 
+# 142
+struct _Rb_tree_key_compare { 
+# 144
+_Key_compare _M_key_compare; 
+# 146
+_Rb_tree_key_compare() noexcept(is_nothrow_default_constructible< _Key_compare> ::value) : _M_key_compare() 
+# 150
+{ } 
+# 152
+_Rb_tree_key_compare(const _Key_compare &__comp) : _M_key_compare(__comp) 
+# 154
+{ } 
+# 158
+_Rb_tree_key_compare(const _Rb_tree_key_compare &) = default;
+# 160
+_Rb_tree_key_compare(_Rb_tree_key_compare &&__x) noexcept(is_nothrow_copy_constructible< _Key_compare> ::value) : _M_key_compare(__x._M_key_compare) 
+# 163
+{ } 
+# 165
+}; 
+# 168
+struct _Rb_tree_header { 
+# 170
+_Rb_tree_node_base _M_header; 
+# 171
+size_t _M_node_count; 
+# 173
+_Rb_tree_header() noexcept 
+# 174
+{ 
+# 175
+((_M_header)._M_color) = _S_red; 
+# 176
+this->_M_reset(); 
+# 177
+} 
+# 180
+_Rb_tree_header(_Rb_tree_header &&__x) noexcept 
+# 181
+{ 
+# 182
+if (((__x._M_header)._M_parent) != (nullptr)) { 
+# 183
+this->_M_move_data(__x); } else 
+# 185
+{ 
+# 186
+((_M_header)._M_color) = _S_red; 
+# 187
+this->_M_reset(); 
+# 188
 }  
+# 189
+} 
+# 193
+void _M_move_data(_Rb_tree_header &__from) 
+# 194
+{ 
+# 195
+((_M_header)._M_color) = ((__from._M_header)._M_color); 
+# 196
+((_M_header)._M_parent) = ((__from._M_header)._M_parent); 
+# 197
+((_M_header)._M_left) = ((__from._M_header)._M_left); 
+# 198
+((_M_header)._M_right) = ((__from._M_header)._M_right); 
+# 199
+(((_M_header)._M_parent)->_M_parent) = (&(_M_header)); 
+# 200
+(_M_node_count) = (__from._M_node_count); 
+# 202
+__from._M_reset(); 
+# 203
+} 
+# 206
+void _M_reset() 
+# 207
+{ 
+# 208
+((_M_header)._M_parent) = (0); 
+# 209
+((_M_header)._M_left) = (&(_M_header)); 
+# 210
+((_M_header)._M_right) = (&(_M_header)); 
+# 211
+(_M_node_count) = (0); 
+# 212
+} 
+# 213
+}; 
+# 215
+template< class _Val> 
+# 216
+struct _Rb_tree_node : public _Rb_tree_node_base { 
+# 218
+typedef _Rb_tree_node *_Link_type; 
+# 231 "/usr/include/c++/8/bits/stl_tree.h" 3
+__gnu_cxx::__aligned_membuf< _Val>  _M_storage; 
+# 234
+_Val *_M_valptr() 
+# 235
+{ return ((_M_storage)._M_ptr()); } 
+# 238
+const _Val *_M_valptr() const 
+# 239
+{ return ((_M_storage)._M_ptr()); } 
+# 241
+}; 
+# 243
+__attribute((__pure__)) _Rb_tree_node_base *
+# 244
+_Rb_tree_increment(_Rb_tree_node_base * __x) throw(); 
+# 246
+__attribute((__pure__)) const _Rb_tree_node_base *
+# 247
+_Rb_tree_increment(const _Rb_tree_node_base * __x) throw(); 
+# 249
+__attribute((__pure__)) _Rb_tree_node_base *
+# 250
+_Rb_tree_decrement(_Rb_tree_node_base * __x) throw(); 
+# 252
+__attribute((__pure__)) const _Rb_tree_node_base *
+# 253
+_Rb_tree_decrement(const _Rb_tree_node_base * __x) throw(); 
+# 255
+template< class _Tp> 
+# 256
+struct _Rb_tree_iterator { 
+# 258
+typedef _Tp value_type; 
+# 259
+typedef _Tp &reference; 
+# 260
+typedef _Tp *pointer; 
+# 262
+typedef bidirectional_iterator_tag iterator_category; 
+# 263
+typedef ptrdiff_t difference_type; 
+# 265
+typedef _Rb_tree_iterator _Self; 
+# 266
+typedef _Rb_tree_node_base::_Base_ptr _Base_ptr; 
+# 267
+typedef _Rb_tree_node< _Tp>  *_Link_type; 
+# 269
+_Rb_tree_iterator() noexcept : _M_node() 
+# 270
+{ } 
+# 273
+explicit _Rb_tree_iterator(_Base_ptr __x) noexcept : _M_node(__x) 
+# 274
+{ } 
+# 277
+reference operator*() const noexcept 
+# 278
+{ return *((static_cast< _Link_type>(_M_node))->_M_valptr()); } 
+# 281
+pointer operator->() const noexcept 
+# 282
+{ return ((static_cast< _Link_type>(_M_node))->_M_valptr()); } 
+# 285
+_Self &operator++() noexcept 
+# 286
+{ 
+# 287
+(_M_node) = _Rb_tree_increment(_M_node); 
+# 288
+return *this; 
+# 289
+} 
+# 292
+_Self operator++(int) noexcept 
+# 293
+{ 
+# 294
+_Self __tmp = *this; 
+# 295
+(_M_node) = _Rb_tree_increment(_M_node); 
+# 296
+return __tmp; 
+# 297
+} 
+# 300
+_Self &operator--() noexcept 
+# 301
+{ 
+# 302
+(_M_node) = _Rb_tree_decrement(_M_node); 
+# 303
+return *this; 
+# 304
+} 
+# 307
+_Self operator--(int) noexcept 
+# 308
+{ 
+# 309
+_Self __tmp = *this; 
+# 310
+(_M_node) = _Rb_tree_decrement(_M_node); 
+# 311
+return __tmp; 
+# 312
+} 
+# 315
+bool operator==(const _Self &__x) const noexcept 
+# 316
+{ return (_M_node) == (__x._M_node); } 
+# 319
+bool operator!=(const _Self &__x) const noexcept 
+# 320
+{ return (_M_node) != (__x._M_node); } 
+# 322
+_Base_ptr _M_node; 
+# 323
+}; 
+# 325
+template< class _Tp> 
+# 326
+struct _Rb_tree_const_iterator { 
+# 328
+typedef _Tp value_type; 
+# 329
+typedef const _Tp &reference; 
+# 330
+typedef const _Tp *pointer; 
+# 332
+typedef _Rb_tree_iterator< _Tp>  iterator; 
+# 334
+typedef bidirectional_iterator_tag iterator_category; 
+# 335
+typedef ptrdiff_t difference_type; 
+# 337
+typedef _Rb_tree_const_iterator _Self; 
+# 338
+typedef _Rb_tree_node_base::_Const_Base_ptr _Base_ptr; 
+# 339
+typedef const _Rb_tree_node< _Tp>  *_Link_type; 
+# 341
+_Rb_tree_const_iterator() noexcept : _M_node() 
+# 342
+{ } 
+# 345
+explicit _Rb_tree_const_iterator(_Base_ptr __x) noexcept : _M_node(__x) 
+# 346
+{ } 
+# 348
+_Rb_tree_const_iterator(const iterator &__it) noexcept : _M_node(((__it._M_node))) 
+# 349
+{ } 
+# 352
+iterator _M_const_cast() const noexcept 
+# 353
+{ return ((_Rb_tree_iterator< _Tp> )(const_cast< typename _Rb_tree_iterator< _Tp> ::_Base_ptr>(_M_node))); } 
+# 356
+reference operator*() const noexcept 
+# 357
+{ return *((static_cast< _Link_type>(_M_node))->_M_valptr()); } 
+# 360
+pointer operator->() const noexcept 
+# 361
+{ return ((static_cast< _Link_type>(_M_node))->_M_valptr()); } 
+# 364
+_Self &operator++() noexcept 
+# 365
+{ 
+# 366
+(_M_node) = _Rb_tree_increment(_M_node); 
+# 367
+return *this; 
+# 368
+} 
+# 371
+_Self operator++(int) noexcept 
+# 372
+{ 
+# 373
+_Self __tmp = *this; 
+# 374
+(_M_node) = _Rb_tree_increment(_M_node); 
+# 375
+return __tmp; 
+# 376
+} 
+# 379
+_Self &operator--() noexcept 
+# 380
+{ 
+# 381
+(_M_node) = _Rb_tree_decrement(_M_node); 
+# 382
+return *this; 
+# 383
+} 
+# 386
+_Self operator--(int) noexcept 
+# 387
+{ 
+# 388
+_Self __tmp = *this; 
+# 389
+(_M_node) = _Rb_tree_decrement(_M_node); 
+# 390
+return __tmp; 
+# 391
+} 
+# 394
+bool operator==(const _Self &__x) const noexcept 
+# 395
+{ return (_M_node) == (__x._M_node); } 
+# 398
+bool operator!=(const _Self &__x) const noexcept 
+# 399
+{ return (_M_node) != (__x._M_node); } 
+# 401
+_Base_ptr _M_node; 
+# 402
+}; 
+# 404
+template< class _Val> inline bool 
+# 406
+operator==(const _Rb_tree_iterator< _Val>  &__x, const _Rb_tree_const_iterator< _Val>  &
+# 407
+__y) noexcept 
+# 408
+{ return (__x._M_node) == (__y._M_node); } 
+# 410
+template< class _Val> inline bool 
+# 412
+operator!=(const _Rb_tree_iterator< _Val>  &__x, const _Rb_tree_const_iterator< _Val>  &
+# 413
+__y) noexcept 
+# 414
+{ return (__x._M_node) != (__y._M_node); } 
+# 417
+void _Rb_tree_insert_and_rebalance(const bool __insert_left, _Rb_tree_node_base * __x, _Rb_tree_node_base * __p, _Rb_tree_node_base & __header) throw(); 
+# 423
+_Rb_tree_node_base *_Rb_tree_rebalance_for_erase(_Rb_tree_node_base *const __z, _Rb_tree_node_base & __header) throw(); 
+# 427
+template< class _Cmp, class _SfinaeType, class  = __void_t< > > 
+# 428
+struct __has_is_transparent { 
+# 429
+}; 
+# 431
+template< class _Cmp, class _SfinaeType> 
+# 432
+struct __has_is_transparent< _Cmp, _SfinaeType, __void_t< typename _Cmp::is_transparent> >  { 
+# 434
+typedef void type; }; 
+# 442
+template< class _Key, class _Val, class _KeyOfValue, class 
+# 443
+_Compare, class _Alloc = allocator< _Val> > 
+# 444
+class _Rb_tree { 
+# 447
+typedef typename __gnu_cxx::__alloc_traits< _Alloc> ::template rebind< _Rb_tree_node< _Val> > ::other _Node_allocator; 
+# 449
+typedef __gnu_cxx::__alloc_traits< typename __gnu_cxx::__alloc_traits< _Alloc> ::template rebind< _Rb_tree_node< _Val> > ::other>  _Alloc_traits; 
+# 452
+protected: typedef _Rb_tree_node_base *_Base_ptr; 
+# 453
+typedef const _Rb_tree_node_base *_Const_Base_ptr; 
+# 454
+typedef _Rb_tree_node< _Val>  *_Link_type; 
+# 455
+typedef const _Rb_tree_node< _Val>  *_Const_Link_type; 
+# 460
+private: struct _Reuse_or_alloc_node { 
+# 462
+_Reuse_or_alloc_node(_Rb_tree &__t) : _M_root(__t._M_root()), _M_nodes(__t._M_rightmost()), _M_t(__t) 
+# 464
+{ 
+# 465
+if (_M_root) 
+# 466
+{ 
+# 467
+((_M_root)->_M_parent) = (0); 
+# 469
+if ((_M_nodes)->_M_left) { 
+# 470
+(_M_nodes) = ((_M_nodes)->_M_left); }  
+# 471
+} else { 
+# 473
+(_M_nodes) = (0); }  
+# 474
+} 
+# 477
+_Reuse_or_alloc_node(const _Reuse_or_alloc_node &) = delete;
+# 480
+~_Reuse_or_alloc_node() 
+# 481
+{ (_M_t)._M_erase(static_cast< _Link_type>(_M_root)); } 
+# 483
+template< class _Arg> _Link_type 
+# 488
+operator()(_Arg &&__arg) 
+# 490
+{ 
+# 491
+_Link_type __node = static_cast< _Link_type>(_M_extract()); 
+# 492
+if (__node) 
+# 493
+{ 
+# 494
+(_M_t)._M_destroy_node(__node); 
+# 495
+((_M_t)._M_construct_node(__node, std::forward< _Arg> (__arg))); 
+# 496
+return __node; 
+# 497
+}  
+# 499
+return ((_M_t)._M_create_node(std::forward< _Arg> (__arg))); 
+# 500
+} 
+# 504
+private: _Base_ptr _M_extract() 
+# 505
+{ 
+# 506
+if (!(_M_nodes)) { 
+# 507
+return _M_nodes; }  
+# 509
+_Base_ptr __node = _M_nodes; 
+# 510
+(_M_nodes) = ((_M_nodes)->_M_parent); 
+# 511
+if (_M_nodes) 
+# 512
+{ 
+# 513
+if (((_M_nodes)->_M_right) == __node) 
+# 514
+{ 
+# 515
+((_M_nodes)->_M_right) = (0); 
+# 517
+if ((_M_nodes)->_M_left) 
+# 518
+{ 
+# 519
+(_M_nodes) = ((_M_nodes)->_M_left); 
+# 521
+while ((_M_nodes)->_M_right) { 
+# 522
+(_M_nodes) = ((_M_nodes)->_M_right); }  
+# 524
+if ((_M_nodes)->_M_left) { 
+# 525
+(_M_nodes) = ((_M_nodes)->_M_left); }  
+# 526
+}  
+# 527
+} else { 
+# 529
+((_M_nodes)->_M_left) = (0); }  
+# 530
+} else { 
+# 532
+(_M_root) = (0); }  
+# 534
+return __node; 
+# 535
+} 
+# 537
+_Base_ptr _M_root; 
+# 538
+_Base_ptr _M_nodes; 
+# 539
+_Rb_tree &_M_t; 
+# 540
+}; 
+# 544
+struct _Alloc_node { 
+# 546
+_Alloc_node(_Rb_tree &__t) : _M_t(__t) 
+# 547
+{ } 
+# 549
+template< class _Arg> _Link_type 
+# 554
+operator()(_Arg &&__arg) const 
+# 556
+{ return ((_M_t)._M_create_node(std::forward< _Arg> (__arg))); } 
+# 559
+private: _Rb_tree &_M_t; 
+# 560
+}; 
+# 563
+public: typedef _Key key_type; 
+# 564
+typedef _Val value_type; 
+# 565
+typedef value_type *pointer; 
+# 566
+typedef const value_type *const_pointer; 
+# 567
+typedef value_type &reference; 
+# 568
+typedef const value_type &const_reference; 
+# 569
+typedef size_t size_type; 
+# 570
+typedef ptrdiff_t difference_type; 
+# 571
+typedef _Alloc allocator_type; 
+# 574
+_Node_allocator &_M_get_Node_allocator() noexcept 
+# 575
+{ return this->_M_impl; } 
+# 578
+const _Node_allocator &_M_get_Node_allocator() const noexcept 
+# 579
+{ return this->_M_impl; } 
+# 582
+allocator_type get_allocator() const noexcept 
+# 583
+{ return (allocator_type)_M_get_Node_allocator(); } 
+# 587
+protected: _Link_type _M_get_node() 
+# 588
+{ return _Alloc_traits::allocate(_M_get_Node_allocator(), 1); } 
+# 591
+void _M_put_node(_Link_type __p) noexcept 
+# 592
+{ _Alloc_traits::deallocate(_M_get_Node_allocator(), __p, 1); } 
+# 619 "/usr/include/c++/8/bits/stl_tree.h" 3
+template< class ..._Args> void 
+# 621
+_M_construct_node(_Link_type __node, _Args &&...__args) 
+# 622
+{ 
+# 623
+try 
+# 624
+{ 
+# 625
+::new (__node) _Rb_tree_node< _Val> ; 
+# 626
+_Alloc_traits::construct(_M_get_Node_allocator(), (__node->_M_valptr()), std::forward< _Args> (__args)...); 
+# 629
+} 
+# 630
+catch (...) 
+# 631
+{ 
+# 632
+(__node->~_Rb_tree_node< _Val> ()); 
+# 633
+_M_put_node(__node); 
+# 634
+throw; 
+# 635
+}  
+# 636
+} 
+# 638
+template< class ..._Args> _Link_type 
+# 640
+_M_create_node(_Args &&...__args) 
+# 641
+{ 
+# 642
+_Link_type __tmp = _M_get_node(); 
+# 643
+_M_construct_node(__tmp, std::forward< _Args> (__args)...); 
+# 644
+return __tmp; 
+# 645
+} 
+# 648
+void _M_destroy_node(_Link_type __p) noexcept 
+# 649
+{ 
+# 650
+_Alloc_traits::destroy(_M_get_Node_allocator(), (__p->_M_valptr())); 
+# 651
+(__p->~_Rb_tree_node< _Val> ()); 
+# 652
+} 
+# 656
+void _M_drop_node(_Link_type __p) noexcept 
+# 657
+{ 
+# 658
+_M_destroy_node(__p); 
+# 659
+_M_put_node(__p); 
+# 660
+} 
+# 662
+template< class _NodeGen> _Link_type 
+# 664
+_M_clone_node(_Const_Link_type __x, _NodeGen &__node_gen) 
+# 665
+{ 
+# 666
+_Link_type __tmp = __node_gen(*(__x->_M_valptr())); 
+# 667
+(__tmp->_M_color) = (__x->_M_color); 
+# 668
+(__tmp->_M_left) = 0; 
+# 669
+(__tmp->_M_right) = 0; 
+# 670
+return __tmp; 
+# 671
+} 
+# 678
+template< class _Key_compare, bool 
+# 679
+ = __is_pod(_Key_compare)> 
+# 681
+struct _Rb_tree_impl : public _Node_allocator, public _Rb_tree_key_compare< _Key_compare> , public std::_Rb_tree_header { 
+# 686
+typedef std::_Rb_tree_key_compare< _Key_compare>  _Base_key_compare; 
+# 688
+_Rb_tree_impl() noexcept(is_nothrow_default_constructible< typename __gnu_cxx::__alloc_traits< _Alloc> ::template rebind< _Rb_tree_node< _Val> > ::other> ::value && is_nothrow_default_constructible< std::_Rb_tree_key_compare< _Key_compare> > ::value) : std::_Rb_tree< _Key, _Val, _KeyOfValue, _Compare, _Alloc> ::_Node_allocator() 
+# 693
+{ } 
+# 695
+_Rb_tree_impl(const _Rb_tree_impl &__x) : _Base_key_compare((__x._M_key_compare)), std::_Rb_tree< _Key, _Val, _KeyOfValue, _Compare, _Alloc> ::_Node_allocator(_Alloc_traits::_S_select_on_copy(__x)) 
+# 698
+{ } 
+# 705
+_Rb_tree_impl(_Rb_tree_impl &&) = default;
+# 707
+_Rb_tree_impl(const _Key_compare &__comp, typename std::_Rb_tree< _Key, _Val, _KeyOfValue, _Compare, _Alloc> ::_Node_allocator &&__a) : _Base_key_compare(__comp), std::_Rb_tree< _Key, _Val, _KeyOfValue, _Compare, _Alloc> ::_Node_allocator(std::move(__a)) 
+# 709
+{ } 
+# 711
+}; 
+# 713
+_Rb_tree_impl< _Compare>  _M_impl; 
+# 717
+_Base_ptr &_M_root() noexcept 
+# 718
+{ return ((this->_M_impl)._M_header)._M_parent; } 
+# 721
+_Const_Base_ptr _M_root() const noexcept 
+# 722
+{ return ((this->_M_impl)._M_header)._M_parent; } 
+# 725
+_Base_ptr &_M_leftmost() noexcept 
+# 726
+{ return ((this->_M_impl)._M_header)._M_left; } 
+# 729
+_Const_Base_ptr _M_leftmost() const noexcept 
+# 730
+{ return ((this->_M_impl)._M_header)._M_left; } 
+# 733
+_Base_ptr &_M_rightmost() noexcept 
+# 734
+{ return ((this->_M_impl)._M_header)._M_right; } 
+# 737
+_Const_Base_ptr _M_rightmost() const noexcept 
+# 738
+{ return ((this->_M_impl)._M_header)._M_right; } 
+# 741
+_Link_type _M_begin() noexcept 
+# 742
+{ return static_cast< _Link_type>(((this->_M_impl)._M_header)._M_parent); } 
+# 745
+_Const_Link_type _M_begin() const noexcept 
+# 746
+{ 
+# 747
+return static_cast< _Const_Link_type>(((this->_M_impl)._M_header)._M_parent); 
+# 749
+} 
+# 752
+_Base_ptr _M_end() noexcept 
+# 753
+{ return &((this->_M_impl)._M_header); } 
+# 756
+_Const_Base_ptr _M_end() const noexcept 
+# 757
+{ return &((this->_M_impl)._M_header); } 
+# 760
+static const_reference _S_value(_Const_Link_type __x) 
+# 761
+{ return *(__x->_M_valptr()); } 
+# 764
+static const _Key &_S_key(_Const_Link_type __x) 
+# 765
+{ 
+# 769
+static_assert((__is_invocable< _Compare &, const _Key &, const _Key &> {}), "comparison object must be invocable with two arguments of key type");
+# 782 "/usr/include/c++/8/bits/stl_tree.h" 3
+return _KeyOfValue()(*(__x->_M_valptr())); 
+# 783
+} 
+# 786
+static _Link_type _S_left(_Base_ptr __x) noexcept 
+# 787
+{ return static_cast< _Link_type>(__x->_M_left); } 
+# 790
+static _Const_Link_type _S_left(_Const_Base_ptr __x) noexcept 
+# 791
+{ return static_cast< _Const_Link_type>(__x->_M_left); } 
+# 794
+static _Link_type _S_right(_Base_ptr __x) noexcept 
+# 795
+{ return static_cast< _Link_type>(__x->_M_right); } 
+# 798
+static _Const_Link_type _S_right(_Const_Base_ptr __x) noexcept 
+# 799
+{ return static_cast< _Const_Link_type>(__x->_M_right); } 
+# 802
+static const_reference _S_value(_Const_Base_ptr __x) 
+# 803
+{ return *((static_cast< _Const_Link_type>(__x))->_M_valptr()); } 
+# 806
+static const _Key &_S_key(_Const_Base_ptr __x) 
+# 807
+{ return _S_key(static_cast< _Const_Link_type>(__x)); } 
+# 810
+static _Base_ptr _S_minimum(_Base_ptr __x) noexcept 
+# 811
+{ return _Rb_tree_node_base::_S_minimum(__x); } 
+# 814
+static _Const_Base_ptr _S_minimum(_Const_Base_ptr __x) noexcept 
+# 815
+{ return _Rb_tree_node_base::_S_minimum(__x); } 
+# 818
+static _Base_ptr _S_maximum(_Base_ptr __x) noexcept 
+# 819
+{ return _Rb_tree_node_base::_S_maximum(__x); } 
+# 822
+static _Const_Base_ptr _S_maximum(_Const_Base_ptr __x) noexcept 
+# 823
+{ return _Rb_tree_node_base::_S_maximum(__x); } 
+# 826
+public: typedef _Rb_tree_iterator< _Val>  iterator; 
+# 827
+typedef _Rb_tree_const_iterator< _Val>  const_iterator; 
+# 829
+typedef std::reverse_iterator< _Rb_tree_iterator< _Val> >  reverse_iterator; 
+# 830
+typedef std::reverse_iterator< _Rb_tree_const_iterator< _Val> >  const_reverse_iterator; 
+# 840 "/usr/include/c++/8/bits/stl_tree.h" 3
+pair< _Rb_tree_node_base *, _Rb_tree_node_base *>  _M_get_insert_unique_pos(const key_type & __k); 
+# 843
+pair< _Rb_tree_node_base *, _Rb_tree_node_base *>  _M_get_insert_equal_pos(const key_type & __k); 
+# 846
+pair< _Rb_tree_node_base *, _Rb_tree_node_base *>  _M_get_insert_hint_unique_pos(const_iterator __pos, const key_type & __k); 
+# 850
+pair< _Rb_tree_node_base *, _Rb_tree_node_base *>  _M_get_insert_hint_equal_pos(const_iterator __pos, const key_type & __k); 
+# 855
+private: template< class _Arg, class _NodeGen> iterator _M_insert_(_Base_ptr __x, _Base_ptr __y, _Arg && __v, _NodeGen &); 
+# 860
+iterator _M_insert_node(_Base_ptr __x, _Base_ptr __y, _Link_type __z); 
+# 862
+template< class _Arg> iterator _M_insert_lower(_Base_ptr __y, _Arg && __v); 
+# 866
+template< class _Arg> iterator _M_insert_equal_lower(_Arg && __x); 
+# 871
+iterator _M_insert_lower_node(_Base_ptr __p, _Link_type __z); 
+# 874
+iterator _M_insert_equal_lower_node(_Link_type __z); 
+# 890 "/usr/include/c++/8/bits/stl_tree.h" 3
+template< class _NodeGen> _Link_type _M_copy(_Const_Link_type __x, _Base_ptr __p, _NodeGen &); 
+# 894
+template< class _NodeGen> _Link_type 
+# 896
+_M_copy(const _Rb_tree &__x, _NodeGen &__gen) 
+# 897
+{ 
+# 898
+_Link_type __root = _M_copy(__x._M_begin(), _M_end(), __gen); 
+# 899
+_M_leftmost() = _S_minimum(__root); 
+# 900
+_M_rightmost() = _S_maximum(__root); 
+# 901
+((_M_impl)._M_node_count) = ((__x._M_impl)._M_node_count); 
+# 902
+return __root; 
+# 903
+} 
+# 906
+_Link_type _M_copy(const _Rb_tree &__x) 
+# 907
+{ 
+# 908
+_Alloc_node __an(*this); 
+# 909
+return _M_copy(__x, __an); 
+# 910
+} 
+# 913
+void _M_erase(_Link_type __x); 
+# 916
+iterator _M_lower_bound(_Link_type __x, _Base_ptr __y, const _Key & __k); 
+# 920
+const_iterator _M_lower_bound(_Const_Link_type __x, _Const_Base_ptr __y, const _Key & __k) const; 
+# 924
+iterator _M_upper_bound(_Link_type __x, _Base_ptr __y, const _Key & __k); 
+# 928
+const_iterator _M_upper_bound(_Const_Link_type __x, _Const_Base_ptr __y, const _Key & __k) const; 
+# 936
+public: _Rb_tree() = default;
+# 939
+_Rb_tree(const _Compare &__comp, const allocator_type &
+# 940
+__a = allocator_type()) : _M_impl(__comp, (_Node_allocator)__a) 
+# 941
+{ } 
+# 943
+_Rb_tree(const _Rb_tree &__x) : _M_impl(__x._M_impl) 
+# 945
+{ 
+# 946
+if (__x._M_root() != (0)) { 
+# 947
+_M_root() = _M_copy(__x); }  
+# 948
+} 
+# 951
+_Rb_tree(const allocator_type &__a) : _M_impl(_Compare(), (_Node_allocator)__a) 
+# 953
+{ } 
+# 955
+_Rb_tree(const _Rb_tree &__x, const allocator_type &__a) : _M_impl(((__x._M_impl)._M_key_compare), (_Node_allocator)__a) 
+# 957
+{ 
+# 958
+if (__x._M_root() != (nullptr)) { 
+# 959
+_M_root() = _M_copy(__x); }  
+# 960
+} 
+# 962
+_Rb_tree(_Rb_tree &&) = default;
+# 964
+_Rb_tree(_Rb_tree &&__x, const allocator_type &__a) : _Rb_tree(std::move(__x), (_Node_allocator)__a) 
+# 966
+{ } 
+# 968
+_Rb_tree(_Rb_tree && __x, _Node_allocator && __a); 
+# 971
+~_Rb_tree() noexcept 
+# 972
+{ _M_erase(_M_begin()); } 
+# 975
+_Rb_tree &operator=(const _Rb_tree & __x); 
+# 979
+_Compare key_comp() const 
+# 980
+{ return (_M_impl)._M_key_compare; } 
+# 983
+iterator begin() noexcept 
+# 984
+{ return ((_Rb_tree_iterator< _Val> )((((this->_M_impl)._M_header)._M_left))); } 
+# 987
+const_iterator begin() const noexcept 
+# 988
+{ return ((_Rb_tree_const_iterator< _Val> )((((this->_M_impl)._M_header)._M_left))); } 
+# 991
+iterator end() noexcept 
+# 992
+{ return ((_Rb_tree_iterator< _Val> )(&((this->_M_impl)._M_header))); } 
+# 995
+const_iterator end() const noexcept 
+# 996
+{ return ((_Rb_tree_const_iterator< _Val> )(&((this->_M_impl)._M_header))); } 
+# 999
+reverse_iterator rbegin() noexcept 
+# 1000
+{ return ((std::reverse_iterator< _Rb_tree_iterator< _Val> > )(end())); } 
+# 1003
+const_reverse_iterator rbegin() const noexcept 
+# 1004
+{ return ((std::reverse_iterator< _Rb_tree_const_iterator< _Val> > )(end())); } 
+# 1007
+reverse_iterator rend() noexcept 
+# 1008
+{ return ((std::reverse_iterator< _Rb_tree_iterator< _Val> > )(begin())); } 
+# 1011
+const_reverse_iterator rend() const noexcept 
+# 1012
+{ return ((std::reverse_iterator< _Rb_tree_const_iterator< _Val> > )(begin())); } 
+# 1015
+bool empty() const noexcept 
+# 1016
+{ return ((_M_impl)._M_node_count) == 0; } 
+# 1019
+size_type size() const noexcept 
+# 1020
+{ return (_M_impl)._M_node_count; } 
+# 1023
+size_type max_size() const noexcept 
+# 1024
+{ return _Alloc_traits::max_size(_M_get_Node_allocator()); } 
+# 1027
+void swap(_Rb_tree & __t) noexcept(__is_nothrow_swappable< _Compare> ::value); 
+# 1032
+template< class _Arg> pair< _Rb_tree_iterator< _Val> , bool>  _M_insert_unique(_Arg && __x); 
+# 1036
+template< class _Arg> iterator _M_insert_equal(_Arg && __x); 
+# 1040
+template< class _Arg, class _NodeGen> iterator _M_insert_unique_(const_iterator __pos, _Arg && __x, _NodeGen &); 
+# 1044
+template< class _Arg> iterator 
+# 1046
+_M_insert_unique_(const_iterator __pos, _Arg &&__x) 
+# 1047
+{ 
+# 1048
+_Alloc_node __an(*this); 
+# 1049
+return _M_insert_unique_(__pos, std::forward< _Arg> (__x), __an); 
+# 1050
+} 
+# 1052
+template< class _Arg, class _NodeGen> iterator _M_insert_equal_(const_iterator __pos, _Arg && __x, _NodeGen &); 
+# 1056
+template< class _Arg> iterator 
+# 1058
+_M_insert_equal_(const_iterator __pos, _Arg &&__x) 
+# 1059
+{ 
+# 1060
+_Alloc_node __an(*this); 
+# 1061
+return _M_insert_equal_(__pos, std::forward< _Arg> (__x), __an); 
+# 1062
+} 
+# 1064
+template< class ..._Args> pair< _Rb_tree_iterator< _Val> , bool>  _M_emplace_unique(_Args && ...__args); 
+# 1068
+template< class ..._Args> iterator _M_emplace_equal(_Args && ...__args); 
+# 1072
+template< class ..._Args> iterator _M_emplace_hint_unique(const_iterator __pos, _Args && ...__args); 
+# 1076
+template< class ..._Args> iterator _M_emplace_hint_equal(const_iterator __pos, _Args && ...__args); 
+# 1110 "/usr/include/c++/8/bits/stl_tree.h" 3
+template< class _InputIterator> void _M_insert_unique(_InputIterator __first, _InputIterator __last); 
+# 1114
+template< class _InputIterator> void _M_insert_equal(_InputIterator __first, _InputIterator __last); 
+# 1120
+private: void _M_erase_aux(const_iterator __position); 
+# 1123
+void _M_erase_aux(const_iterator __first, const_iterator __last); 
+# 1131
+public: 
+# 1129
+__attribute((__abi_tag__("cxx11"))) iterator 
+# 1131
+erase(const_iterator __position) 
+# 1132
+{ 
+# 1133
+; 
+# 1134
+const_iterator __result = __position; 
+# 1135
+++__result; 
+# 1136
+_M_erase_aux(__position); 
+# 1137
+return (__result._M_const_cast()); 
+# 1138
+} 
+# 1141
+__attribute((__abi_tag__("cxx11"))) iterator 
+# 1143
+erase(iterator __position) 
+# 1144
+{ 
+# 1145
+; 
+# 1146
+iterator __result = __position; 
+# 1147
+++__result; 
+# 1148
+_M_erase_aux(__position); 
+# 1149
+return __result; 
+# 1150
+} 
+# 1167 "/usr/include/c++/8/bits/stl_tree.h" 3
+size_type erase(const key_type & __x); 
+# 1172
+__attribute((__abi_tag__("cxx11"))) iterator 
+# 1174
+erase(const_iterator __first, const_iterator __last) 
+# 1175
+{ 
+# 1176
+_M_erase_aux(__first, __last); 
+# 1177
+return (__last._M_const_cast()); 
+# 1178
+} 
+# 1189 "/usr/include/c++/8/bits/stl_tree.h" 3
+void erase(const key_type * __first, const key_type * __last); 
+# 1192
+void clear() noexcept 
+# 1193
+{ 
+# 1194
+_M_erase(_M_begin()); 
+# 1195
+((_M_impl)._M_reset()); 
+# 1196
+} 
+# 1200
+iterator find(const key_type & __k); 
+# 1203
+const_iterator find(const key_type & __k) const; 
+# 1206
+size_type count(const key_type & __k) const; 
+# 1209
+iterator lower_bound(const key_type &__k) 
+# 1210
+{ return _M_lower_bound(_M_begin(), _M_end(), __k); } 
+# 1213
+const_iterator lower_bound(const key_type &__k) const 
+# 1214
+{ return _M_lower_bound(_M_begin(), _M_end(), __k); } 
+# 1217
+iterator upper_bound(const key_type &__k) 
+# 1218
+{ return _M_upper_bound(_M_begin(), _M_end(), __k); } 
+# 1221
+const_iterator upper_bound(const key_type &__k) const 
+# 1222
+{ return _M_upper_bound(_M_begin(), _M_end(), __k); } 
+# 1225
+pair< _Rb_tree_iterator< _Val> , _Rb_tree_iterator< _Val> >  equal_range(const key_type & __k); 
+# 1228
+pair< _Rb_tree_const_iterator< _Val> , _Rb_tree_const_iterator< _Val> >  equal_range(const key_type & __k) const; 
+# 1231
+template< class _Kt, class 
+# 1232
+_Req = typename __has_is_transparent< _Compare, _Kt> ::type> iterator 
+# 1235
+_M_find_tr(const _Kt &__k) 
+# 1236
+{ 
+# 1237
+const _Rb_tree *__const_this = this; 
+# 1238
+return ((__const_this->_M_find_tr(__k))._M_const_cast()); 
+# 1239
+} 
+# 1241
+template< class _Kt, class 
+# 1242
+_Req = typename __has_is_transparent< _Compare, _Kt> ::type> const_iterator 
+# 1245
+_M_find_tr(const _Kt &__k) const 
+# 1246
+{ 
+# 1247
+auto __j = _M_lower_bound_tr(__k); 
+# 1248
+if ((__j != end()) && ((_M_impl)._M_key_compare(__k, _S_key((__j._M_node))))) { 
+# 1249
+__j = end(); }  
+# 1250
+return __j; 
+# 1251
+} 
+# 1253
+template< class _Kt, class 
+# 1254
+_Req = typename __has_is_transparent< _Compare, _Kt> ::type> size_type 
+# 1257
+_M_count_tr(const _Kt &__k) const 
+# 1258
+{ 
+# 1259
+auto __p = _M_equal_range_tr(__k); 
+# 1260
+return std::distance((__p.first), (__p.second)); 
+# 1261
+} 
+# 1263
+template< class _Kt, class 
+# 1264
+_Req = typename __has_is_transparent< _Compare, _Kt> ::type> iterator 
+# 1267
+_M_lower_bound_tr(const _Kt &__k) 
+# 1268
+{ 
+# 1269
+const _Rb_tree *__const_this = this; 
+# 1270
+return ((__const_this->_M_lower_bound_tr(__k))._M_const_cast()); 
+# 1271
+} 
+# 1273
+template< class _Kt, class 
+# 1274
+_Req = typename __has_is_transparent< _Compare, _Kt> ::type> const_iterator 
+# 1277
+_M_lower_bound_tr(const _Kt &__k) const 
+# 1278
+{ 
+# 1279
+auto __x = _M_begin(); 
+# 1280
+auto __y = _M_end(); 
+# 1281
+while (__x != 0) { 
+# 1282
+if (!((_M_impl)._M_key_compare(_S_key(__x), __k))) 
+# 1283
+{ 
+# 1284
+__y = __x; 
+# 1285
+__x = _S_left(__x); 
+# 1286
+} else { 
+# 1288
+__x = _S_right(__x); }  }  
+# 1289
+return ((_Rb_tree_const_iterator< _Val> )(__y)); 
+# 1290
+} 
+# 1292
+template< class _Kt, class 
+# 1293
+_Req = typename __has_is_transparent< _Compare, _Kt> ::type> iterator 
+# 1296
+_M_upper_bound_tr(const _Kt &__k) 
+# 1297
+{ 
+# 1298
+const _Rb_tree *__const_this = this; 
+# 1299
+return ((__const_this->_M_upper_bound_tr(__k))._M_const_cast()); 
+# 1300
+} 
+# 1302
+template< class _Kt, class 
+# 1303
+_Req = typename __has_is_transparent< _Compare, _Kt> ::type> const_iterator 
+# 1306
+_M_upper_bound_tr(const _Kt &__k) const 
+# 1307
+{ 
+# 1308
+auto __x = _M_begin(); 
+# 1309
+auto __y = _M_end(); 
+# 1310
+while (__x != 0) { 
+# 1311
+if (((_M_impl)._M_key_compare(__k, _S_key(__x)))) 
+# 1312
+{ 
+# 1313
+__y = __x; 
+# 1314
+__x = _S_left(__x); 
+# 1315
+} else { 
+# 1317
+__x = _S_right(__x); }  }  
+# 1318
+return ((_Rb_tree_const_iterator< _Val> )(__y)); 
+# 1319
+} 
+# 1321
+template< class _Kt, class 
+# 1322
+_Req = typename __has_is_transparent< _Compare, _Kt> ::type> pair< _Rb_tree_iterator< _Val> , _Rb_tree_iterator< _Val> >  
+# 1325
+_M_equal_range_tr(const _Kt &__k) 
+# 1326
+{ 
+# 1327
+const _Rb_tree *__const_this = this; 
+# 1328
+auto __ret = (__const_this->_M_equal_range_tr(__k)); 
+# 1329
+return {((__ret.first)._M_const_cast()), ((__ret.second)._M_const_cast())}; 
+# 1330
+} 
+# 1332
+template< class _Kt, class 
+# 1333
+_Req = typename __has_is_transparent< _Compare, _Kt> ::type> pair< _Rb_tree_const_iterator< _Val> , _Rb_tree_const_iterator< _Val> >  
+# 1336
+_M_equal_range_tr(const _Kt &__k) const 
+# 1337
+{ 
+# 1338
+auto __low = _M_lower_bound_tr(__k); 
+# 1339
+auto __high = __low; 
+# 1340
+auto &__cmp = (((_M_impl)._M_key_compare)); 
+# 1341
+while ((__high != end()) && (!__cmp(__k, _S_key((__high._M_node))))) { 
+# 1342
+++__high; }  
+# 1343
+return {__low, __high}; 
+# 1344
+} 
+# 1349
+bool __rb_verify() const; 
+# 1353
+inline _Rb_tree &operator=(_Rb_tree &&) noexcept(_Alloc_traits::_S_nothrow_move() && is_nothrow_move_assignable< _Compare> ::value); 
+# 1357
+template< class _Iterator> void _M_assign_unique(_Iterator, _Iterator); 
+# 1361
+template< class _Iterator> void _M_assign_equal(_Iterator, _Iterator); 
+# 1368
+private: void _M_move_data(_Rb_tree &__x, true_type) 
+# 1369
+{ ((_M_impl)._M_move_data(__x._M_impl)); } 
+# 1374
+void _M_move_data(_Rb_tree &, false_type); 
+# 1378
+inline void _M_move_assign(_Rb_tree &, true_type); 
+# 1383
+void _M_move_assign(_Rb_tree &, false_type); 
+# 1551 "/usr/include/c++/8/bits/stl_tree.h" 3
+}; 
+# 1553
+template< class _Key, class _Val, class _KeyOfValue, class 
+# 1554
+_Compare, class _Alloc> inline bool 
+# 1556
+operator==(const _Rb_tree< _Key, _Val, _KeyOfValue, _Compare, _Alloc>  &__x, const _Rb_tree< _Key, _Val, _KeyOfValue, _Compare, _Alloc>  &
+# 1557
+__y) 
+# 1558
+{ 
+# 1559
+return ((__x.size()) == (__y.size())) && std::equal((__x.begin()), (__x.end()), (__y.begin())); 
+# 1561
+} 
+# 1563
+template< class _Key, class _Val, class _KeyOfValue, class 
+# 1564
+_Compare, class _Alloc> inline bool 
+# 1566
+operator<(const _Rb_tree< _Key, _Val, _KeyOfValue, _Compare, _Alloc>  &__x, const _Rb_tree< _Key, _Val, _KeyOfValue, _Compare, _Alloc>  &
+# 1567
+__y) 
+# 1568
+{ 
+# 1569
+return std::lexicographical_compare((__x.begin()), (__x.end()), (__y.begin()), (__y.end())); 
+# 1571
+} 
+# 1573
+template< class _Key, class _Val, class _KeyOfValue, class 
+# 1574
+_Compare, class _Alloc> inline bool 
+# 1576
+operator!=(const _Rb_tree< _Key, _Val, _KeyOfValue, _Compare, _Alloc>  &__x, const _Rb_tree< _Key, _Val, _KeyOfValue, _Compare, _Alloc>  &
+# 1577
+__y) 
+# 1578
+{ return !(__x == __y); } 
+# 1580
+template< class _Key, class _Val, class _KeyOfValue, class 
+# 1581
+_Compare, class _Alloc> inline bool 
+# 1583
+operator>(const _Rb_tree< _Key, _Val, _KeyOfValue, _Compare, _Alloc>  &__x, const _Rb_tree< _Key, _Val, _KeyOfValue, _Compare, _Alloc>  &
+# 1584
+__y) 
+# 1585
+{ return __y < __x; } 
+# 1587
+template< class _Key, class _Val, class _KeyOfValue, class 
+# 1588
+_Compare, class _Alloc> inline bool 
+# 1590
+operator<=(const _Rb_tree< _Key, _Val, _KeyOfValue, _Compare, _Alloc>  &__x, const _Rb_tree< _Key, _Val, _KeyOfValue, _Compare, _Alloc>  &
+# 1591
+__y) 
+# 1592
+{ return !(__y < __x); } 
+# 1594
+template< class _Key, class _Val, class _KeyOfValue, class 
+# 1595
+_Compare, class _Alloc> inline bool 
+# 1597
+operator>=(const _Rb_tree< _Key, _Val, _KeyOfValue, _Compare, _Alloc>  &__x, const _Rb_tree< _Key, _Val, _KeyOfValue, _Compare, _Alloc>  &
+# 1598
+__y) 
+# 1599
+{ return !(__x < __y); } 
+# 1601
+template< class _Key, class _Val, class _KeyOfValue, class 
+# 1602
+_Compare, class _Alloc> inline void 
+# 1604
+swap(_Rb_tree< _Key, _Val, _KeyOfValue, _Compare, _Alloc>  &__x, _Rb_tree< _Key, _Val, _KeyOfValue, _Compare, _Alloc>  &
+# 1605
+__y) 
+# 1606
+{ (__x.swap(__y)); } 
+# 1609
+template< class _Key, class _Val, class _KeyOfValue, class 
+# 1610
+_Compare, class _Alloc> 
+# 1612
+_Rb_tree< _Key, _Val, _KeyOfValue, _Compare, _Alloc> ::_Rb_tree(_Rb_tree &&__x, _Node_allocator &&__a) : _M_impl(((__x._M_impl)._M_key_compare), std::move(__a)) 
+# 1614
+{ 
+# 1615
+using __eq = typename __gnu_cxx::__alloc_traits< typename __gnu_cxx::__alloc_traits< _Alloc> ::template rebind< _Rb_tree_node< _Val> > ::other> ::is_always_equal; 
+# 1616
+if (__x._M_root() != (nullptr)) { 
+# 1617
+_M_move_data(__x, __eq()); }  
+# 1618
+} 
+# 1620
+template< class _Key, class _Val, class _KeyOfValue, class 
+# 1621
+_Compare, class _Alloc> void 
+# 1624
+_Rb_tree< _Key, _Val, _KeyOfValue, _Compare, _Alloc> ::_M_move_data(_Rb_tree &__x, false_type) 
+# 1625
+{ 
+# 1626
+if (_M_get_Node_allocator() == __x._M_get_Node_allocator()) { 
+# 1627
+_M_move_data(__x, true_type()); } else 
+# 1629
+{ 
+# 1630
+_Alloc_node __an(*this); 
+# 1631
+auto __lbd = [&__an](const value_type &
+# 1632
+__cval) 
+# 1633
+{ 
+# 1634
+auto &__val = const_cast< value_type &>(__cval); 
+# 1635
+return (__an)(std::move_if_noexcept(__val)); 
+# 1636
+} ; 
+# 1637
+_M_root() = _M_copy(__x, __lbd); 
+# 1638
+}  
+# 1639
+} 
+# 1641
+template< class _Key, class _Val, class _KeyOfValue, class 
+# 1642
+_Compare, class _Alloc> inline void 
+# 1645
+_Rb_tree< _Key, _Val, _KeyOfValue, _Compare, _Alloc> ::_M_move_assign(_Rb_tree &__x, true_type) 
+# 1646
+{ 
+# 1647
+clear(); 
+# 1648
+if (__x._M_root() != (nullptr)) { 
+# 1649
+_M_move_data(__x, true_type()); }  
+# 1650
+std::__alloc_on_move(_M_get_Node_allocator(), __x._M_get_Node_allocator()); 
+# 1652
+} 
+# 1654
+template< class _Key, class _Val, class _KeyOfValue, class 
+# 1655
+_Compare, class _Alloc> void 
+# 1658
+_Rb_tree< _Key, _Val, _KeyOfValue, _Compare, _Alloc> ::_M_move_assign(_Rb_tree &__x, false_type) 
+# 1659
+{ 
+# 1660
+if (_M_get_Node_allocator() == __x._M_get_Node_allocator()) { 
+# 1661
+return _M_move_assign(__x, true_type{}); }  
+# 1665
+_Reuse_or_alloc_node __roan(*this); 
+# 1666
+((_M_impl)._M_reset()); 
+# 1667
+if (__x._M_root() != (nullptr)) 
+# 1668
+{ 
+# 1669
+auto __lbd = [&__roan](const value_type &
+# 1670
+__cval) 
+# 1671
+{ 
+# 1672
+auto &__val = const_cast< value_type &>(__cval); 
+# 1673
+return (__roan)(std::move_if_noexcept(__val)); 
+# 1674
+} ; 
+# 1675
+_M_root() = _M_copy(__x, __lbd); 
+# 1676
+__x.clear(); 
+# 1677
+}  
+# 1678
+} 
+# 1680
+template< class _Key, class _Val, class _KeyOfValue, class 
+# 1681
+_Compare, class _Alloc> inline _Rb_tree< _Key, _Val, _KeyOfValue, _Compare, _Alloc>  &
+# 1684
+_Rb_tree< _Key, _Val, _KeyOfValue, _Compare, _Alloc> ::operator=(_Rb_tree &&__x) noexcept(_Alloc_traits::_S_nothrow_move() && is_nothrow_move_assignable< _Compare> ::value) 
+# 1687
+{ 
+# 1688
+((_M_impl)._M_key_compare) = std::move(((__x._M_impl)._M_key_compare)); 
+# 1689
+_M_move_assign(__x, __bool_constant< __gnu_cxx::__alloc_traits< typename __gnu_cxx::__alloc_traits< _Alloc> ::template rebind< _Rb_tree_node< _Val> > ::other> ::_S_nothrow_move()> ()); 
+# 1690
+return *this; 
+# 1691
+} 
+# 1693
+template< class _Key, class _Val, class _KeyOfValue, class 
+# 1694
+_Compare, class _Alloc> 
+# 1695
+template< class _Iterator> void 
+# 1698
+_Rb_tree< _Key, _Val, _KeyOfValue, _Compare, _Alloc> ::_M_assign_unique(_Iterator __first, _Iterator __last) 
+# 1699
+{ 
+# 1700
+_Reuse_or_alloc_node __roan(*this); 
+# 1701
+((_M_impl)._M_reset()); 
+# 1702
+for (; __first != __last; ++__first) { 
+# 1703
+_M_insert_unique_(end(), *__first, __roan); }  
+# 1704
+} 
+# 1706
+template< class _Key, class _Val, class _KeyOfValue, class 
+# 1707
+_Compare, class _Alloc> 
+# 1708
+template< class _Iterator> void 
+# 1711
+_Rb_tree< _Key, _Val, _KeyOfValue, _Compare, _Alloc> ::_M_assign_equal(_Iterator __first, _Iterator __last) 
+# 1712
+{ 
+# 1713
+_Reuse_or_alloc_node __roan(*this); 
+# 1714
+((_M_impl)._M_reset()); 
+# 1715
+for (; __first != __last; ++__first) { 
+# 1716
+_M_insert_equal_(end(), *__first, __roan); }  
+# 1717
+} 
+# 1720
+template< class _Key, class _Val, class _KeyOfValue, class 
+# 1721
+_Compare, class _Alloc> _Rb_tree< _Key, _Val, _KeyOfValue, _Compare, _Alloc>  &
+# 1724
+_Rb_tree< _Key, _Val, _KeyOfValue, _Compare, _Alloc> ::operator=(const _Rb_tree &__x) 
+# 1725
+{ 
+# 1726
+if (this != (&__x)) 
+# 1727
+{ 
+# 1730
+if (_Alloc_traits::_S_propagate_on_copy_assign()) 
+# 1731
+{ 
+# 1732
+auto &__this_alloc = _M_get_Node_allocator(); 
+# 1733
+auto &__that_alloc = __x._M_get_Node_allocator(); 
+# 1734
+if ((!_Alloc_traits::_S_always_equal()) && (__this_alloc != __that_alloc)) 
+# 1736
+{ 
+# 1739
+clear(); 
+# 1740
+std::__alloc_on_copy(__this_alloc, __that_alloc); 
+# 1741
+}  
+# 1742
+}  
+# 1745
+_Reuse_or_alloc_node __roan(*this); 
+# 1746
+((_M_impl)._M_reset()); 
+# 1747
+((_M_impl)._M_key_compare) = ((__x._M_impl)._M_key_compare); 
+# 1748
+if (__x._M_root() != (0)) { 
+# 1749
+_M_root() = _M_copy(__x, __roan); }  
+# 1750
+}  
+# 1752
+return *this; 
+# 1753
+} 
+# 1755
+template< class _Key, class _Val, class _KeyOfValue, class 
+# 1756
+_Compare, class _Alloc> 
+# 1758
+template< class _Arg, class _NodeGen> typename _Rb_tree< _Key, _Val, _KeyOfValue, _Compare, _Alloc> ::iterator 
+# 1764
+_Rb_tree< _Key, _Val, _KeyOfValue, _Compare, _Alloc> ::_M_insert_(_Base_ptr __x, _Base_ptr __p, _Arg &&
+# 1766
+__v, _NodeGen &
+# 1770
+__node_gen) 
+# 1771
+{ 
+# 1772
+bool __insert_left = ((__x != (0)) || (__p == _M_end())) || ((_M_impl)._M_key_compare(_KeyOfValue()(__v), _S_key(__p))); 
+# 1776
+_Link_type __z = __node_gen(std::forward< _Arg> (__v)); 
+# 1778
+_Rb_tree_insert_and_rebalance(__insert_left, __z, __p, ((this->_M_impl)._M_header)); 
+# 1780
+++((_M_impl)._M_node_count); 
+# 1781
+return ((_Rb_tree_iterator< _Val> )(__z)); 
+# 1782
+} 
+# 1784
+template< class _Key, class _Val, class _KeyOfValue, class 
+# 1785
+_Compare, class _Alloc> 
+# 1787
+template< class _Arg> typename _Rb_tree< _Key, _Val, _KeyOfValue, _Compare, _Alloc> ::iterator 
+# 1792
+_Rb_tree< _Key, _Val, _KeyOfValue, _Compare, _Alloc> ::_M_insert_lower(_Base_ptr __p, _Arg &&__v) 
+# 1796
+{ 
+# 1797
+bool __insert_left = (__p == _M_end()) || (!((_M_impl)._M_key_compare(_S_key(__p), _KeyOfValue()(__v)))); 
+# 1801
+_Link_type __z = _M_create_node(std::forward< _Arg> (__v)); 
+# 1803
+_Rb_tree_insert_and_rebalance(__insert_left, __z, __p, ((this->_M_impl)._M_header)); 
+# 1805
+++((_M_impl)._M_node_count); 
+# 1806
+return ((_Rb_tree_iterator< _Val> )(__z)); 
+# 1807
+} 
+# 1809
+template< class _Key, class _Val, class _KeyOfValue, class 
+# 1810
+_Compare, class _Alloc> 
+# 1812
+template< class _Arg> typename _Rb_tree< _Key, _Val, _KeyOfValue, _Compare, _Alloc> ::iterator 
+# 1817
+_Rb_tree< _Key, _Val, _KeyOfValue, _Compare, _Alloc> ::_M_insert_equal_lower(_Arg &&__v) 
+# 1821
+{ 
+# 1822
+_Link_type __x = _M_begin(); 
+# 1823
+_Base_ptr __y = _M_end(); 
+# 1824
+while (__x != 0) 
+# 1825
+{ 
+# 1826
+__y = __x; 
+# 1827
+__x = ((!((_M_impl)._M_key_compare(_S_key(__x), _KeyOfValue()(__v)))) ? _S_left(__x) : _S_right(__x)); 
+# 1829
+}  
+# 1830
+return _M_insert_lower(__y, std::forward< _Arg> (__v)); 
+# 1831
+} 
+# 1833
+template< class _Key, class _Val, class _KoV, class 
+# 1834
+_Compare, class _Alloc> 
+# 1835
+template< class _NodeGen> typename _Rb_tree< _Key, _Val, _KoV, _Compare, _Alloc> ::_Link_type 
+# 1838
+_Rb_tree< _Key, _Val, _KoV, _Compare, _Alloc> ::_M_copy(_Const_Link_type __x, _Base_ptr __p, _NodeGen &__node_gen) 
+# 1839
+{ 
+# 1841
+_Link_type __top = _M_clone_node(__x, __node_gen); 
+# 1842
+(__top->_M_parent) = __p; 
+# 1844
+try 
+# 1845
+{ 
+# 1846
+if (__x->_M_right) { 
+# 1847
+(__top->_M_right) = _M_copy(_S_right(__x), __top, __node_gen); }  
+# 1848
+__p = __top; 
+# 1849
+__x = _S_left(__x); 
+# 1851
+while (__x != 0) 
+# 1852
+{ 
+# 1853
+_Link_type __y = _M_clone_node(__x, __node_gen); 
+# 1854
+(__p->_M_left) = __y; 
+# 1855
+(__y->_M_parent) = __p; 
+# 1856
+if (__x->_M_right) { 
+# 1857
+(__y->_M_right) = _M_copy(_S_right(__x), __y, __node_gen); }  
+# 1858
+__p = __y; 
+# 1859
+__x = _S_left(__x); 
+# 1860
+}  
+# 1861
+} 
+# 1862
+catch (...) 
+# 1863
+{ 
+# 1864
+_M_erase(__top); 
+# 1865
+throw; 
+# 1866
+}  
+# 1867
+return __top; 
+# 1868
+} 
+# 1870
+template< class _Key, class _Val, class _KeyOfValue, class 
+# 1871
+_Compare, class _Alloc> void 
+# 1874
+_Rb_tree< _Key, _Val, _KeyOfValue, _Compare, _Alloc> ::_M_erase(_Link_type __x) 
+# 1875
+{ 
+# 1877
+while (__x != 0) 
+# 1878
+{ 
+# 1879
+_M_erase(_S_right(__x)); 
+# 1880
+_Link_type __y = _S_left(__x); 
+# 1881
+_M_drop_node(__x); 
+# 1882
+__x = __y; 
+# 1883
+}  
+# 1884
+} 
+# 1886
+template< class _Key, class _Val, class _KeyOfValue, class 
+# 1887
+_Compare, class _Alloc> typename _Rb_tree< _Key, _Val, _KeyOfValue, _Compare, _Alloc> ::iterator 
+# 1891
+_Rb_tree< _Key, _Val, _KeyOfValue, _Compare, _Alloc> ::_M_lower_bound(_Link_type __x, _Base_ptr __y, const _Key &
+# 1892
+__k) 
+# 1893
+{ 
+# 1894
+while (__x != 0) { 
+# 1895
+if (!((_M_impl)._M_key_compare(_S_key(__x), __k))) { 
+# 1896
+(__y = __x), (__x = _S_left(__x)); } else { 
+# 1898
+__x = _S_right(__x); }  }  
+# 1899
+return ((_Rb_tree_iterator< _Val> )(__y)); 
+# 1900
+} 
+# 1902
+template< class _Key, class _Val, class _KeyOfValue, class 
+# 1903
+_Compare, class _Alloc> typename _Rb_tree< _Key, _Val, _KeyOfValue, _Compare, _Alloc> ::const_iterator 
+# 1907
+_Rb_tree< _Key, _Val, _KeyOfValue, _Compare, _Alloc> ::_M_lower_bound(_Const_Link_type __x, _Const_Base_ptr __y, const _Key &
+# 1908
+__k) const 
+# 1909
+{ 
+# 1910
+while (__x != 0) { 
+# 1911
+if (!((_M_impl)._M_key_compare(_S_key(__x), __k))) { 
+# 1912
+(__y = __x), (__x = _S_left(__x)); } else { 
+# 1914
+__x = _S_right(__x); }  }  
+# 1915
+return ((_Rb_tree_const_iterator< _Val> )(__y)); 
+# 1916
+} 
+# 1918
+template< class _Key, class _Val, class _KeyOfValue, class 
+# 1919
+_Compare, class _Alloc> typename _Rb_tree< _Key, _Val, _KeyOfValue, _Compare, _Alloc> ::iterator 
+# 1923
+_Rb_tree< _Key, _Val, _KeyOfValue, _Compare, _Alloc> ::_M_upper_bound(_Link_type __x, _Base_ptr __y, const _Key &
+# 1924
+__k) 
+# 1925
+{ 
+# 1926
+while (__x != 0) { 
+# 1927
+if (((_M_impl)._M_key_compare(__k, _S_key(__x)))) { 
+# 1928
+(__y = __x), (__x = _S_left(__x)); } else { 
+# 1930
+__x = _S_right(__x); }  }  
+# 1931
+return ((_Rb_tree_iterator< _Val> )(__y)); 
+# 1932
+} 
+# 1934
+template< class _Key, class _Val, class _KeyOfValue, class 
+# 1935
+_Compare, class _Alloc> typename _Rb_tree< _Key, _Val, _KeyOfValue, _Compare, _Alloc> ::const_iterator 
+# 1939
+_Rb_tree< _Key, _Val, _KeyOfValue, _Compare, _Alloc> ::_M_upper_bound(_Const_Link_type __x, _Const_Base_ptr __y, const _Key &
+# 1940
+__k) const 
+# 1941
+{ 
+# 1942
+while (__x != 0) { 
+# 1943
+if (((_M_impl)._M_key_compare(__k, _S_key(__x)))) { 
+# 1944
+(__y = __x), (__x = _S_left(__x)); } else { 
+# 1946
+__x = _S_right(__x); }  }  
+# 1947
+return ((_Rb_tree_const_iterator< _Val> )(__y)); 
+# 1948
+} 
+# 1950
+template< class _Key, class _Val, class _KeyOfValue, class 
+# 1951
+_Compare, class _Alloc> pair< _Rb_tree_iterator< _Val> , _Rb_tree_iterator< _Val> >  
+# 1957
+_Rb_tree< _Key, _Val, _KeyOfValue, _Compare, _Alloc> ::equal_range(const _Key &__k) 
+# 1958
+{ 
+# 1959
+_Link_type __x = _M_begin(); 
+# 1960
+_Base_ptr __y = _M_end(); 
+# 1961
+while (__x != 0) 
+# 1962
+{ 
+# 1963
+if (((_M_impl)._M_key_compare(_S_key(__x), __k))) { 
+# 1964
+__x = _S_right(__x); } else { 
+# 1965
+if (((_M_impl)._M_key_compare(__k, _S_key(__x)))) { 
+# 1966
+(__y = __x), (__x = _S_left(__x)); } else 
+# 1968
+{ 
+# 1969
+_Link_type __xu(__x); 
+# 1970
+_Base_ptr __yu(__y); 
+# 1971
+(__y = __x), (__x = _S_left(__x)); 
+# 1972
+__xu = _S_right(__xu); 
+# 1973
+return pair< _Rb_tree_iterator< _Val> , _Rb_tree_iterator< _Val> > (_M_lower_bound(__x, __y, __k), _M_upper_bound(__xu, __yu, __k)); 
+# 1976
+}  }  
+# 1977
+}  
+# 1978
+return pair< _Rb_tree_iterator< _Val> , _Rb_tree_iterator< _Val> > (((_Rb_tree_iterator< _Val> )(__y)), ((_Rb_tree_iterator< _Val> )(__y))); 
+# 1980
+} 
+# 1982
+template< class _Key, class _Val, class _KeyOfValue, class 
+# 1983
+_Compare, class _Alloc> pair< _Rb_tree_const_iterator< _Val> , _Rb_tree_const_iterator< _Val> >  
+# 1989
+_Rb_tree< _Key, _Val, _KeyOfValue, _Compare, _Alloc> ::equal_range(const _Key &__k) const 
+# 1990
+{ 
+# 1991
+_Const_Link_type __x = _M_begin(); 
+# 1992
+_Const_Base_ptr __y = _M_end(); 
+# 1993
+while (__x != 0) 
+# 1994
+{ 
+# 1995
+if (((_M_impl)._M_key_compare(_S_key(__x), __k))) { 
+# 1996
+__x = _S_right(__x); } else { 
+# 1997
+if (((_M_impl)._M_key_compare(__k, _S_key(__x)))) { 
+# 1998
+(__y = __x), (__x = _S_left(__x)); } else 
+# 2000
+{ 
+# 2001
+_Const_Link_type __xu(__x); 
+# 2002
+_Const_Base_ptr __yu(__y); 
+# 2003
+(__y = __x), (__x = _S_left(__x)); 
+# 2004
+__xu = _S_right(__xu); 
+# 2005
+return pair< _Rb_tree_const_iterator< _Val> , _Rb_tree_const_iterator< _Val> > (_M_lower_bound(__x, __y, __k), _M_upper_bound(__xu, __yu, __k)); 
+# 2008
+}  }  
+# 2009
+}  
+# 2010
+return pair< _Rb_tree_const_iterator< _Val> , _Rb_tree_const_iterator< _Val> > (((_Rb_tree_const_iterator< _Val> )(__y)), ((_Rb_tree_const_iterator< _Val> )(__y))); 
+# 2012
+} 
+# 2014
+template< class _Key, class _Val, class _KeyOfValue, class 
+# 2015
+_Compare, class _Alloc> void 
+# 2018
+_Rb_tree< _Key, _Val, _KeyOfValue, _Compare, _Alloc> ::swap(_Rb_tree &__t) noexcept(__is_nothrow_swappable< _Compare> ::value) 
+# 2020
+{ 
+# 2021
+if (_M_root() == (0)) 
+# 2022
+{ 
+# 2023
+if (__t._M_root() != (0)) { 
+# 2024
+((_M_impl)._M_move_data(__t._M_impl)); }  
+# 2025
+} else { 
+# 2026
+if (__t._M_root() == (0)) { 
+# 2027
+((__t._M_impl)._M_move_data(_M_impl)); } else 
+# 2029
+{ 
+# 2030
+std::swap(_M_root(), __t._M_root()); 
+# 2031
+std::swap(_M_leftmost(), __t._M_leftmost()); 
+# 2032
+std::swap(_M_rightmost(), __t._M_rightmost()); 
+# 2034
+(_M_root()->_M_parent) = _M_end(); 
+# 2035
+(__t._M_root()->_M_parent) = __t._M_end(); 
+# 2036
+std::swap(((this->_M_impl)._M_node_count), ((__t._M_impl)._M_node_count)); 
+# 2037
+}  }  
+# 2039
+std::swap(((this->_M_impl)._M_key_compare), ((__t._M_impl)._M_key_compare)); 
+# 2041
+_Alloc_traits::_S_on_swap(_M_get_Node_allocator(), __t._M_get_Node_allocator()); 
+# 2043
+} 
+# 2045
+template< class _Key, class _Val, class _KeyOfValue, class 
+# 2046
+_Compare, class _Alloc> pair< _Rb_tree_node_base *, _Rb_tree_node_base *>  
+# 2052
+_Rb_tree< _Key, _Val, _KeyOfValue, _Compare, _Alloc> ::_M_get_insert_unique_pos(const key_type &__k) 
+# 2053
+{ 
+# 2054
+typedef pair< _Rb_tree_node_base *, _Rb_tree_node_base *>  _Res; 
+# 2055
+_Link_type __x = _M_begin(); 
+# 2056
+_Base_ptr __y = _M_end(); 
+# 2057
+bool __comp = true; 
+# 2058
+while (__x != 0) 
+# 2059
+{ 
+# 2060
+__y = __x; 
+# 2061
+__comp = ((_M_impl)._M_key_compare(__k, _S_key(__x))); 
+# 2062
+__x = (__comp ? _S_left(__x) : _S_right(__x)); 
+# 2063
+}  
+# 2064
+iterator __j = ((_Rb_tree_iterator< _Val> )(__y)); 
+# 2065
+if (__comp) 
+# 2066
+{ 
+# 2067
+if (__j == begin()) { 
+# 2068
+return _Res(__x, __y); } else { 
+# 2070
+--__j; }  
+# 2071
+}  
+# 2072
+if (((_M_impl)._M_key_compare(_S_key((__j._M_node)), __k))) { 
+# 2073
+return _Res(__x, __y); }  
+# 2074
+return _Res((__j._M_node), 0); 
+# 2075
+} 
+# 2077
+template< class _Key, class _Val, class _KeyOfValue, class 
+# 2078
+_Compare, class _Alloc> pair< _Rb_tree_node_base *, _Rb_tree_node_base *>  
+# 2084
+_Rb_tree< _Key, _Val, _KeyOfValue, _Compare, _Alloc> ::_M_get_insert_equal_pos(const key_type &__k) 
+# 2085
+{ 
+# 2086
+typedef pair< _Rb_tree_node_base *, _Rb_tree_node_base *>  _Res; 
+# 2087
+_Link_type __x = _M_begin(); 
+# 2088
+_Base_ptr __y = _M_end(); 
+# 2089
+while (__x != 0) 
+# 2090
+{ 
+# 2091
+__y = __x; 
+# 2092
+__x = ((((_M_impl)._M_key_compare(__k, _S_key(__x)))) ? _S_left(__x) : _S_right(__x)); 
+# 2094
+}  
+# 2095
+return _Res(__x, __y); 
+# 2096
+} 
+# 2098
+template< class _Key, class _Val, class _KeyOfValue, class 
+# 2099
+_Compare, class _Alloc> 
+# 2101
+template< class _Arg> pair< _Rb_tree_iterator< _Val> , bool>  
+# 2107
+_Rb_tree< _Key, _Val, _KeyOfValue, _Compare, _Alloc> ::_M_insert_unique(_Arg &&__v) 
+# 2111
+{ 
+# 2112
+typedef pair< _Rb_tree_iterator< _Val> , bool>  _Res; 
+# 2113
+pair< _Rb_tree_node_base *, _Rb_tree_node_base *>  __res = _M_get_insert_unique_pos(_KeyOfValue()(__v)); 
+# 2116
+if (__res.second) 
+# 2117
+{ 
+# 2118
+_Alloc_node __an(*this); 
+# 2119
+return _Res(_M_insert_(__res.first, __res.second, std::forward< _Arg> (__v), __an), true); 
+# 2122
+}  
+# 2124
+return _Res(((_Rb_tree_iterator< _Val> )(__res.first)), false); 
+# 2125
+} 
+# 2127
+template< class _Key, class _Val, class _KeyOfValue, class 
+# 2128
+_Compare, class _Alloc> 
+# 2130
+template< class _Arg> typename _Rb_tree< _Key, _Val, _KeyOfValue, _Compare, _Alloc> ::iterator 
+# 2135
+_Rb_tree< _Key, _Val, _KeyOfValue, _Compare, _Alloc> ::_M_insert_equal(_Arg &&__v) 
+# 2139
+{ 
+# 2140
+pair< _Rb_tree_node_base *, _Rb_tree_node_base *>  __res = _M_get_insert_equal_pos(_KeyOfValue()(__v)); 
+# 2142
+_Alloc_node __an(*this); 
+# 2143
+return _M_insert_(__res.first, __res.second, std::forward< _Arg> (__v), __an); 
+# 2145
+} 
+# 2147
+template< class _Key, class _Val, class _KeyOfValue, class 
+# 2148
+_Compare, class _Alloc> pair< _Rb_tree_node_base *, _Rb_tree_node_base *>  
+# 2154
+_Rb_tree< _Key, _Val, _KeyOfValue, _Compare, _Alloc> ::_M_get_insert_hint_unique_pos(const_iterator __position, const key_type &
+# 2155
+__k) 
+# 2156
+{ 
+# 2157
+iterator __pos = (__position._M_const_cast()); 
+# 2158
+typedef pair< _Rb_tree_node_base *, _Rb_tree_node_base *>  _Res; 
+# 2161
+if ((__pos._M_node) == _M_end()) 
+# 2162
+{ 
+# 2163
+if ((size() > 0) && ((_M_impl)._M_key_compare(_S_key(_M_rightmost()), __k))) { 
+# 2165
+return _Res(0, _M_rightmost()); } else { 
+# 2167
+return _M_get_insert_unique_pos(__k); }  
+# 2168
+} else { 
+# 2169
+if (((_M_impl)._M_key_compare(__k, _S_key((__pos._M_node))))) 
+# 2170
+{ 
+# 2172
+iterator __before = __pos; 
+# 2173
+if ((__pos._M_node) == _M_leftmost()) { 
+# 2174
+return _Res(_M_leftmost(), _M_leftmost()); } else { 
+# 2175
+if (((_M_impl)._M_key_compare(_S_key(((--__before)._M_node)), __k))) 
+# 2176
+{ 
+# 2177
+if (_S_right((__before._M_node)) == 0) { 
+# 2178
+return _Res(0, (__before._M_node)); } else { 
+# 2180
+return _Res((__pos._M_node), (__pos._M_node)); }  
+# 2181
+} else { 
+# 2183
+return _M_get_insert_unique_pos(__k); }  }  
+# 2184
+} else { 
+# 2185
+if (((_M_impl)._M_key_compare(_S_key((__pos._M_node)), __k))) 
+# 2186
+{ 
+# 2188
+iterator __after = __pos; 
+# 2189
+if ((__pos._M_node) == _M_rightmost()) { 
+# 2190
+return _Res(0, _M_rightmost()); } else { 
+# 2191
+if (((_M_impl)._M_key_compare(__k, _S_key(((++__after)._M_node))))) 
+# 2192
+{ 
+# 2193
+if (_S_right((__pos._M_node)) == 0) { 
+# 2194
+return _Res(0, (__pos._M_node)); } else { 
+# 2196
+return _Res((__after._M_node), (__after._M_node)); }  
+# 2197
+} else { 
+# 2199
+return _M_get_insert_unique_pos(__k); }  }  
+# 2200
+} else { 
+# 2203
+return _Res((__pos._M_node), 0); }  }  }  
+# 2204
+} 
+# 2206
+template< class _Key, class _Val, class _KeyOfValue, class 
+# 2207
+_Compare, class _Alloc> 
+# 2209
+template< class _Arg, class _NodeGen> typename _Rb_tree< _Key, _Val, _KeyOfValue, _Compare, _Alloc> ::iterator 
+# 2215
+_Rb_tree< _Key, _Val, _KeyOfValue, _Compare, _Alloc> ::_M_insert_unique_(const_iterator __position, _Arg &&
+# 2217
+__v, _NodeGen &
+# 2221
+__node_gen) 
+# 2222
+{ 
+# 2223
+pair< _Rb_tree_node_base *, _Rb_tree_node_base *>  __res = _M_get_insert_hint_unique_pos(__position, _KeyOfValue()(__v)); 
+# 2226
+if (__res.second) { 
+# 2227
+return _M_insert_(__res.first, __res.second, std::forward< _Arg> (__v), __node_gen); }  
+# 2230
+return ((_Rb_tree_iterator< _Val> )(__res.first)); 
+# 2231
+} 
+# 2233
+template< class _Key, class _Val, class _KeyOfValue, class 
+# 2234
+_Compare, class _Alloc> pair< _Rb_tree_node_base *, _Rb_tree_node_base *>  
+# 2240
+_Rb_tree< _Key, _Val, _KeyOfValue, _Compare, _Alloc> ::_M_get_insert_hint_equal_pos(const_iterator __position, const key_type &__k) 
+# 2241
+{ 
+# 2242
+iterator __pos = (__position._M_const_cast()); 
+# 2243
+typedef pair< _Rb_tree_node_base *, _Rb_tree_node_base *>  _Res; 
+# 2246
+if ((__pos._M_node) == _M_end()) 
+# 2247
+{ 
+# 2248
+if ((size() > 0) && (!((_M_impl)._M_key_compare(__k, _S_key(_M_rightmost()))))) { 
+# 2250
+return _Res(0, _M_rightmost()); } else { 
+# 2252
+return _M_get_insert_equal_pos(__k); }  
+# 2253
+} else { 
+# 2254
+if (!((_M_impl)._M_key_compare(_S_key((__pos._M_node)), __k))) 
+# 2255
+{ 
+# 2257
+iterator __before = __pos; 
+# 2258
+if ((__pos._M_node) == _M_leftmost()) { 
+# 2259
+return _Res(_M_leftmost(), _M_leftmost()); } else { 
+# 2260
+if (!((_M_impl)._M_key_compare(__k, _S_key(((--__before)._M_node))))) 
+# 2261
+{ 
+# 2262
+if (_S_right((__before._M_node)) == 0) { 
+# 2263
+return _Res(0, (__before._M_node)); } else { 
+# 2265
+return _Res((__pos._M_node), (__pos._M_node)); }  
+# 2266
+} else { 
+# 2268
+return _M_get_insert_equal_pos(__k); }  }  
+# 2269
+} else 
+# 2271
+{ 
+# 2273
+iterator __after = __pos; 
+# 2274
+if ((__pos._M_node) == _M_rightmost()) { 
+# 2275
+return _Res(0, _M_rightmost()); } else { 
+# 2276
+if (!((_M_impl)._M_key_compare(_S_key(((++__after)._M_node)), __k))) 
+# 2277
+{ 
+# 2278
+if (_S_right((__pos._M_node)) == 0) { 
+# 2279
+return _Res(0, (__pos._M_node)); } else { 
+# 2281
+return _Res((__after._M_node), (__after._M_node)); }  
+# 2282
+} else { 
+# 2284
+return _Res(0, 0); }  }  
+# 2285
+}  }  
+# 2286
+} 
+# 2288
+template< class _Key, class _Val, class _KeyOfValue, class 
+# 2289
+_Compare, class _Alloc> 
+# 2291
+template< class _Arg, class _NodeGen> typename _Rb_tree< _Key, _Val, _KeyOfValue, _Compare, _Alloc> ::iterator 
+# 2297
+_Rb_tree< _Key, _Val, _KeyOfValue, _Compare, _Alloc> ::_M_insert_equal_(const_iterator __position, _Arg &&
+# 2299
+__v, _NodeGen &
+# 2303
+__node_gen) 
+# 2304
+{ 
+# 2305
+pair< _Rb_tree_node_base *, _Rb_tree_node_base *>  __res = _M_get_insert_hint_equal_pos(__position, _KeyOfValue()(__v)); 
+# 2308
+if (__res.second) { 
+# 2309
+return _M_insert_(__res.first, __res.second, std::forward< _Arg> (__v), __node_gen); }  
+# 2313
+return _M_insert_equal_lower(std::forward< _Arg> (__v)); 
+# 2314
+} 
+# 2317
+template< class _Key, class _Val, class _KeyOfValue, class 
+# 2318
+_Compare, class _Alloc> typename _Rb_tree< _Key, _Val, _KeyOfValue, _Compare, _Alloc> ::iterator 
+# 2321
+_Rb_tree< _Key, _Val, _KeyOfValue, _Compare, _Alloc> ::_M_insert_node(_Base_ptr __x, _Base_ptr __p, _Link_type __z) 
+# 2322
+{ 
+# 2323
+bool __insert_left = ((__x != (0)) || (__p == _M_end())) || ((_M_impl)._M_key_compare(_S_key(__z), _S_key(__p))); 
+# 2327
+_Rb_tree_insert_and_rebalance(__insert_left, __z, __p, ((this->_M_impl)._M_header)); 
+# 2329
+++((_M_impl)._M_node_count); 
+# 2330
+return ((_Rb_tree_iterator< _Val> )(__z)); 
+# 2331
+} 
+# 2333
+template< class _Key, class _Val, class _KeyOfValue, class 
+# 2334
+_Compare, class _Alloc> typename _Rb_tree< _Key, _Val, _KeyOfValue, _Compare, _Alloc> ::iterator 
+# 2337
+_Rb_tree< _Key, _Val, _KeyOfValue, _Compare, _Alloc> ::_M_insert_lower_node(_Base_ptr __p, _Link_type __z) 
+# 2338
+{ 
+# 2339
+bool __insert_left = (__p == _M_end()) || (!((_M_impl)._M_key_compare(_S_key(__p), _S_key(__z)))); 
+# 2343
+_Rb_tree_insert_and_rebalance(__insert_left, __z, __p, ((this->_M_impl)._M_header)); 
+# 2345
+++((_M_impl)._M_node_count); 
+# 2346
+return ((_Rb_tree_iterator< _Val> )(__z)); 
+# 2347
+} 
+# 2349
+template< class _Key, class _Val, class _KeyOfValue, class 
+# 2350
+_Compare, class _Alloc> typename _Rb_tree< _Key, _Val, _KeyOfValue, _Compare, _Alloc> ::iterator 
+# 2353
+_Rb_tree< _Key, _Val, _KeyOfValue, _Compare, _Alloc> ::_M_insert_equal_lower_node(_Link_type __z) 
+# 2354
+{ 
+# 2355
+_Link_type __x = _M_begin(); 
+# 2356
+_Base_ptr __y = _M_end(); 
+# 2357
+while (__x != 0) 
+# 2358
+{ 
+# 2359
+__y = __x; 
+# 2360
+__x = ((!((_M_impl)._M_key_compare(_S_key(__x), _S_key(__z)))) ? _S_left(__x) : _S_right(__x)); 
+# 2362
+}  
+# 2363
+return _M_insert_lower_node(__y, __z); 
+# 2364
+} 
+# 2366
+template< class _Key, class _Val, class _KeyOfValue, class 
+# 2367
+_Compare, class _Alloc> 
+# 2368
+template< class ..._Args> pair< _Rb_tree_iterator< _Val> , bool>  
+# 2372
+_Rb_tree< _Key, _Val, _KeyOfValue, _Compare, _Alloc> ::_M_emplace_unique(_Args &&...__args) 
+# 2373
+{ 
+# 2374
+_Link_type __z = _M_create_node(std::forward< _Args> (__args)...); 
+# 2376
+try 
+# 2377
+{ 
+# 2378
+typedef pair< _Rb_tree_iterator< _Val> , bool>  _Res; 
+# 2379
+auto __res = _M_get_insert_unique_pos(_S_key(__z)); 
+# 2380
+if (__res.second) { 
+# 2381
+return _Res(_M_insert_node((__res.first), (__res.second), __z), true); }  
+# 2383
+_M_drop_node(__z); 
+# 2384
+return _Res((((_Rb_tree_iterator< _Val> )((__res.first)))), false); 
+# 2385
+} 
+# 2386
+catch (...) 
+# 2387
+{ 
+# 2388
+_M_drop_node(__z); 
+# 2389
+throw; 
+# 2390
+}  
+# 2391
+} 
+# 2393
+template< class _Key, class _Val, class _KeyOfValue, class 
+# 2394
+_Compare, class _Alloc> 
+# 2395
+template< class ..._Args> typename _Rb_tree< _Key, _Val, _KeyOfValue, _Compare, _Alloc> ::iterator 
+# 2398
+_Rb_tree< _Key, _Val, _KeyOfValue, _Compare, _Alloc> ::_M_emplace_equal(_Args &&...__args) 
+# 2399
+{ 
+# 2400
+_Link_type __z = _M_create_node(std::forward< _Args> (__args)...); 
+# 2402
+try 
+# 2403
+{ 
+# 2404
+auto __res = _M_get_insert_equal_pos(_S_key(__z)); 
+# 2405
+return _M_insert_node((__res.first), (__res.second), __z); 
+# 2406
+} 
+# 2407
+catch (...) 
+# 2408
+{ 
+# 2409
+_M_drop_node(__z); 
+# 2410
+throw; 
+# 2411
+}  
+# 2412
+} 
+# 2414
+template< class _Key, class _Val, class _KeyOfValue, class 
+# 2415
+_Compare, class _Alloc> 
+# 2416
+template< class ..._Args> typename _Rb_tree< _Key, _Val, _KeyOfValue, _Compare, _Alloc> ::iterator 
+# 2419
+_Rb_tree< _Key, _Val, _KeyOfValue, _Compare, _Alloc> ::_M_emplace_hint_unique(const_iterator __pos, _Args &&...__args) 
+# 2420
+{ 
+# 2421
+_Link_type __z = _M_create_node(std::forward< _Args> (__args)...); 
+# 2423
+try 
+# 2424
+{ 
+# 2425
+auto __res = _M_get_insert_hint_unique_pos(__pos, _S_key(__z)); 
+# 2427
+if (__res.second) { 
+# 2428
+return _M_insert_node((__res.first), (__res.second), __z); }  
+# 2430
+_M_drop_node(__z); 
+# 2431
+return ((_Rb_tree_iterator< _Val> )((__res.first))); 
+# 2432
+} 
+# 2433
+catch (...) 
+# 2434
+{ 
+# 2435
+_M_drop_node(__z); 
+# 2436
+throw; 
+# 2437
+}  
+# 2438
+} 
+# 2440
+template< class _Key, class _Val, class _KeyOfValue, class 
+# 2441
+_Compare, class _Alloc> 
+# 2442
+template< class ..._Args> typename _Rb_tree< _Key, _Val, _KeyOfValue, _Compare, _Alloc> ::iterator 
+# 2445
+_Rb_tree< _Key, _Val, _KeyOfValue, _Compare, _Alloc> ::_M_emplace_hint_equal(const_iterator __pos, _Args &&...__args) 
+# 2446
+{ 
+# 2447
+_Link_type __z = _M_create_node(std::forward< _Args> (__args)...); 
+# 2449
+try 
+# 2450
+{ 
+# 2451
+auto __res = _M_get_insert_hint_equal_pos(__pos, _S_key(__z)); 
+# 2453
+if (__res.second) { 
+# 2454
+return _M_insert_node((__res.first), (__res.second), __z); }  
+# 2456
+return _M_insert_equal_lower_node(__z); 
+# 2457
+} 
+# 2458
+catch (...) 
+# 2459
+{ 
+# 2460
+_M_drop_node(__z); 
+# 2461
+throw; 
+# 2462
+}  
+# 2463
+} 
+# 2466
+template< class _Key, class _Val, class _KoV, class 
+# 2467
+_Cmp, class _Alloc> 
+# 2468
+template< class _II> void 
+# 2471
+_Rb_tree< _Key, _Val, _KoV, _Cmp, _Alloc> ::_M_insert_unique(_II __first, _II __last) 
+# 2472
+{ 
+# 2473
+_Alloc_node __an(*this); 
+# 2474
+for (; __first != __last; ++__first) { 
+# 2475
+_M_insert_unique_(end(), *__first, __an); }  
+# 2476
+} 
+# 2478
+template< class _Key, class _Val, class _KoV, class 
+# 2479
+_Cmp, class _Alloc> 
+# 2480
+template< class _II> void 
+# 2483
+_Rb_tree< _Key, _Val, _KoV, _Cmp, _Alloc> ::_M_insert_equal(_II __first, _II __last) 
+# 2484
+{ 
+# 2485
+_Alloc_node __an(*this); 
+# 2486
+for (; __first != __last; ++__first) { 
+# 2487
+_M_insert_equal_(end(), *__first, __an); }  
+# 2488
+} 
+# 2490
+template< class _Key, class _Val, class _KeyOfValue, class 
+# 2491
+_Compare, class _Alloc> void 
+# 2494
+_Rb_tree< _Key, _Val, _KeyOfValue, _Compare, _Alloc> ::_M_erase_aux(const_iterator __position) 
+# 2495
+{ 
+# 2496
+_Link_type __y = static_cast< _Link_type>(_Rb_tree_rebalance_for_erase(const_cast< _Base_ptr>(__position._M_node), ((this->_M_impl)._M_header))); 
+# 2500
+_M_drop_node(__y); 
+# 2501
+--((_M_impl)._M_node_count); 
+# 2502
+} 
+# 2504
+template< class _Key, class _Val, class _KeyOfValue, class 
+# 2505
+_Compare, class _Alloc> void 
+# 2508
+_Rb_tree< _Key, _Val, _KeyOfValue, _Compare, _Alloc> ::_M_erase_aux(const_iterator __first, const_iterator __last) 
+# 2509
+{ 
+# 2510
+if ((__first == begin()) && (__last == end())) { 
+# 2511
+clear(); } else { 
+# 2513
+while (__first != __last) { 
+# 2514
+_M_erase_aux(__first++); }  }  
+# 2515
+} 
+# 2517
+template< class _Key, class _Val, class _KeyOfValue, class 
+# 2518
+_Compare, class _Alloc> typename _Rb_tree< _Key, _Val, _KeyOfValue, _Compare, _Alloc> ::size_type 
+# 2521
+_Rb_tree< _Key, _Val, _KeyOfValue, _Compare, _Alloc> ::erase(const _Key &__x) 
+# 2522
+{ 
+# 2523
+pair< _Rb_tree_iterator< _Val> , _Rb_tree_iterator< _Val> >  __p = equal_range(__x); 
+# 2524
+const size_type __old_size = size(); 
+# 2525
+_M_erase_aux((__p.first), (__p.second)); 
+# 2526
+return __old_size - size(); 
+# 2527
+} 
+# 2529
+template< class _Key, class _Val, class _KeyOfValue, class 
+# 2530
+_Compare, class _Alloc> void 
+# 2533
+_Rb_tree< _Key, _Val, _KeyOfValue, _Compare, _Alloc> ::erase(const _Key *__first, const _Key *__last) 
+# 2534
+{ 
+# 2535
+while (__first != __last) { 
+# 2536
+erase(*(__first++)); }  
+# 2537
+} 
+# 2539
+template< class _Key, class _Val, class _KeyOfValue, class 
+# 2540
+_Compare, class _Alloc> typename _Rb_tree< _Key, _Val, _KeyOfValue, _Compare, _Alloc> ::iterator 
+# 2544
+_Rb_tree< _Key, _Val, _KeyOfValue, _Compare, _Alloc> ::find(const _Key &__k) 
+# 2545
+{ 
+# 2546
+iterator __j = _M_lower_bound(_M_begin(), _M_end(), __k); 
+# 2547
+return ((__j == end()) || ((_M_impl)._M_key_compare(__k, _S_key((__j._M_node))))) ? end() : __j; 
+# 2550
+} 
+# 2552
+template< class _Key, class _Val, class _KeyOfValue, class 
+# 2553
+_Compare, class _Alloc> typename _Rb_tree< _Key, _Val, _KeyOfValue, _Compare, _Alloc> ::const_iterator 
+# 2557
+_Rb_tree< _Key, _Val, _KeyOfValue, _Compare, _Alloc> ::find(const _Key &__k) const 
+# 2558
+{ 
+# 2559
+const_iterator __j = _M_lower_bound(_M_begin(), _M_end(), __k); 
+# 2560
+return ((__j == end()) || ((_M_impl)._M_key_compare(__k, _S_key((__j._M_node))))) ? end() : __j; 
+# 2563
+} 
+# 2565
+template< class _Key, class _Val, class _KeyOfValue, class 
+# 2566
+_Compare, class _Alloc> typename _Rb_tree< _Key, _Val, _KeyOfValue, _Compare, _Alloc> ::size_type 
+# 2569
+_Rb_tree< _Key, _Val, _KeyOfValue, _Compare, _Alloc> ::count(const _Key &__k) const 
+# 2570
+{ 
+# 2571
+pair< _Rb_tree_const_iterator< _Val> , _Rb_tree_const_iterator< _Val> >  __p = equal_range(__k); 
+# 2572
+const size_type __n = std::distance((__p.first), (__p.second)); 
+# 2573
+return __n; 
+# 2574
+} 
+# 2576
+__attribute((__pure__)) unsigned 
+# 2577
+_Rb_tree_black_count(const _Rb_tree_node_base * __node, const _Rb_tree_node_base * __root) throw(); 
+# 2580
+template< class _Key, class _Val, class _KeyOfValue, class 
+# 2581
+_Compare, class _Alloc> bool 
+# 2583
+_Rb_tree< _Key, _Val, _KeyOfValue, _Compare, _Alloc> ::__rb_verify() const 
+# 2584
+{ 
+# 2585
+if ((((_M_impl)._M_node_count) == 0) || (begin() == end())) { 
+# 2586
+return (((_M_impl)._M_node_count) == 0) && (begin() == end()) && ((((this->_M_impl)._M_header)._M_left) == _M_end()) && ((((this->_M_impl)._M_header)._M_right) == _M_end()); }  
+# 2590
+unsigned __len = _Rb_tree_black_count(_M_leftmost(), _M_root()); 
+# 2591
+for (const_iterator __it = begin(); __it != end(); ++__it) 
+# 2592
+{ 
+# 2593
+_Const_Link_type __x = static_cast< _Const_Link_type>(__it._M_node); 
+# 2594
+_Const_Link_type __L = _S_left(__x); 
+# 2595
+_Const_Link_type __R = _S_right(__x); 
+# 2597
+if ((__x->_M_color) == _S_red) { 
+# 2598
+if ((__L && ((__L->_M_color) == _S_red)) || (__R && ((__R->_M_color) == _S_red))) { 
+# 2600
+return false; }  }  
+# 2602
+if (__L && ((_M_impl)._M_key_compare(_S_key(__x), _S_key(__L)))) { 
+# 2603
+return false; }  
+# 2604
+if (__R && ((_M_impl)._M_key_compare(_S_key(__R), _S_key(__x)))) { 
+# 2605
+return false; }  
+# 2607
+if ((!__L) && (!__R) && (_Rb_tree_black_count(__x, _M_root()) != __len)) { 
+# 2608
+return false; }  
+# 2609
+}  
+# 2611
+if (_M_leftmost() != _Rb_tree_node_base::_S_minimum(_M_root())) { 
+# 2612
+return false; }  
+# 2613
+if (_M_rightmost() != _Rb_tree_node_base::_S_maximum(_M_root())) { 
+# 2614
+return false; }  
+# 2615
+return true; 
+# 2616
+} 
+# 2635 "/usr/include/c++/8/bits/stl_tree.h" 3
+}
+# 67 "/usr/include/c++/8/bits/stl_relops.h" 3
+namespace std __attribute((__visibility__("default"))) { 
+# 71
+namespace rel_ops { 
+# 85 "/usr/include/c++/8/bits/stl_relops.h" 3
+template< class _Tp> inline bool 
+# 87
+operator!=(const _Tp &__x, const _Tp &__y) 
+# 88
+{ return !(__x == __y); } 
+# 98 "/usr/include/c++/8/bits/stl_relops.h" 3
+template< class _Tp> inline bool 
+# 100
+operator>(const _Tp &__x, const _Tp &__y) 
+# 101
+{ return __y < __x; } 
+# 111 "/usr/include/c++/8/bits/stl_relops.h" 3
+template< class _Tp> inline bool 
+# 113
+operator<=(const _Tp &__x, const _Tp &__y) 
+# 114
+{ return !(__y < __x); } 
+# 124 "/usr/include/c++/8/bits/stl_relops.h" 3
+template< class _Tp> inline bool 
+# 126
+operator>=(const _Tp &__x, const _Tp &__y) 
+# 127
+{ return !(__x < __y); } 
+# 128
+}
+# 131
+}
+# 78 "/usr/include/c++/8/utility" 3
+namespace std __attribute((__visibility__("default"))) { 
+# 83
+template< class _Tp> struct tuple_size; 
+# 90
+template< class _Tp, class 
+# 91
+_Up = typename remove_cv< _Tp> ::type, class 
+# 92
+ = typename enable_if< is_same< _Tp, _Up> ::value> ::type, size_t 
+# 93
+ = tuple_size< _Tp> ::value> using __enable_if_has_tuple_size = _Tp; 
+# 96
+template< class _Tp> 
+# 97
+struct tuple_size< const __enable_if_has_tuple_size< _Tp, typename remove_cv< _Tp> ::type, typename enable_if< is_same< _Tp, typename remove_cv< _Tp> ::type> ::value> ::type, tuple_size< _Tp> ::value> >  : public std::tuple_size< _Tp>  { 
+# 98
+}; 
+# 100
+template< class _Tp> 
+# 101
+struct tuple_size< volatile __enable_if_has_tuple_size< _Tp, typename remove_cv< _Tp> ::type, typename enable_if< is_same< _Tp, typename remove_cv< _Tp> ::type> ::value> ::type, tuple_size< _Tp> ::value> >  : public std::tuple_size< _Tp>  { 
+# 102
+}; 
+# 104
+template< class _Tp> 
+# 105
+struct tuple_size< const volatile __enable_if_has_tuple_size< _Tp, typename remove_cv< _Tp> ::type, typename enable_if< is_same< _Tp, typename remove_cv< _Tp> ::type> ::value> ::type, tuple_size< _Tp> ::value> >  : public std::tuple_size< _Tp>  { 
+# 106
+}; 
+# 109
+template< size_t __i, class _Tp> struct tuple_element; 
+# 113
+template< size_t __i, class _Tp> using __tuple_element_t = typename tuple_element< __i, _Tp> ::type; 
+# 116
+template< size_t __i, class _Tp> 
+# 117
+struct tuple_element< __i, const _Tp>  { 
+# 119
+typedef typename add_const< __tuple_element_t< __i, _Tp> > ::type type; 
+# 120
+}; 
+# 122
+template< size_t __i, class _Tp> 
+# 123
+struct tuple_element< __i, volatile _Tp>  { 
+# 125
+typedef typename add_volatile< __tuple_element_t< __i, _Tp> > ::type type; 
+# 126
+}; 
+# 128
+template< size_t __i, class _Tp> 
+# 129
+struct tuple_element< __i, const volatile _Tp>  { 
+# 131
+typedef typename add_cv< __tuple_element_t< __i, _Tp> > ::type type; 
+# 132
+}; 
+# 137
+template< size_t __i, class _Tp> using tuple_element_t = typename tuple_element< __i, _Tp> ::type; 
+# 144
+template< class _T1, class _T2> 
+# 145
+struct __is_tuple_like_impl< pair< _T1, _T2> >  : public true_type { 
+# 146
+}; 
+# 149
+template< class _Tp1, class _Tp2> 
+# 150
+struct tuple_size< pair< _Tp1, _Tp2> >  : public integral_constant< unsigned long, 2UL>  { 
+# 151
+}; 
+# 154
+template< class _Tp1, class _Tp2> 
+# 155
+struct tuple_element< 0, pair< _Tp1, _Tp2> >  { 
+# 156
+typedef _Tp1 type; }; 
+# 159
+template< class _Tp1, class _Tp2> 
+# 160
+struct tuple_element< 1, pair< _Tp1, _Tp2> >  { 
+# 161
+typedef _Tp2 type; }; 
+# 163
+template< size_t _Int> struct __pair_get; 
+# 167
+template<> struct __pair_get< 0UL>  { 
+# 169
+template< class _Tp1, class _Tp2> static constexpr _Tp1 &
+# 171
+__get(pair< _Tp1, _Tp2>  &__pair) noexcept 
+# 172
+{ return __pair.first; } 
+# 174
+template< class _Tp1, class _Tp2> static constexpr _Tp1 &&
+# 176
+__move_get(pair< _Tp1, _Tp2>  &&__pair) noexcept 
+# 177
+{ return std::forward< _Tp1> ((__pair.first)); } 
+# 179
+template< class _Tp1, class _Tp2> static constexpr const _Tp1 &
+# 181
+__const_get(const pair< _Tp1, _Tp2>  &__pair) noexcept 
+# 182
+{ return __pair.first; } 
+# 184
+template< class _Tp1, class _Tp2> static constexpr const _Tp1 &&
+# 186
+__const_move_get(const pair< _Tp1, _Tp2>  &&__pair) noexcept 
+# 187
+{ return std::forward< const _Tp1> ((__pair.first)); } 
+# 188
+}; 
+# 191
+template<> struct __pair_get< 1UL>  { 
+# 193
+template< class _Tp1, class _Tp2> static constexpr _Tp2 &
+# 195
+__get(pair< _Tp1, _Tp2>  &__pair) noexcept 
+# 196
+{ return __pair.second; } 
+# 198
+template< class _Tp1, class _Tp2> static constexpr _Tp2 &&
+# 200
+__move_get(pair< _Tp1, _Tp2>  &&__pair) noexcept 
+# 201
+{ return std::forward< _Tp2> ((__pair.second)); } 
+# 203
+template< class _Tp1, class _Tp2> static constexpr const _Tp2 &
+# 205
+__const_get(const pair< _Tp1, _Tp2>  &__pair) noexcept 
+# 206
+{ return __pair.second; } 
+# 208
+template< class _Tp1, class _Tp2> static constexpr const _Tp2 &&
+# 210
+__const_move_get(const pair< _Tp1, _Tp2>  &&__pair) noexcept 
+# 211
+{ return std::forward< const _Tp2> ((__pair.second)); } 
+# 212
+}; 
+# 214
+template< size_t _Int, class _Tp1, class _Tp2> constexpr typename tuple_element< _Int, pair< _Tp1, _Tp2> > ::type &
+# 216
+get(pair< _Tp1, _Tp2>  &__in) noexcept 
+# 217
+{ return __pair_get< _Int> ::__get(__in); } 
+# 219
+template< size_t _Int, class _Tp1, class _Tp2> constexpr typename tuple_element< _Int, pair< _Tp1, _Tp2> > ::type &&
+# 221
+get(pair< _Tp1, _Tp2>  &&__in) noexcept 
+# 222
+{ return __pair_get< _Int> ::__move_get(std::move(__in)); } 
+# 224
+template< size_t _Int, class _Tp1, class _Tp2> constexpr const typename tuple_element< _Int, pair< _Tp1, _Tp2> > ::type &
+# 226
+get(const pair< _Tp1, _Tp2>  &__in) noexcept 
+# 227
+{ return __pair_get< _Int> ::__const_get(__in); } 
+# 229
+template< size_t _Int, class _Tp1, class _Tp2> constexpr const typename tuple_element< _Int, pair< _Tp1, _Tp2> > ::type &&
+# 231
+get(const pair< _Tp1, _Tp2>  &&__in) noexcept 
+# 232
+{ return __pair_get< _Int> ::__const_move_get(std::move(__in)); } 
+# 238
+template< class _Tp, class _Up> constexpr _Tp &
+# 240
+get(pair< _Tp, _Up>  &__p) noexcept 
+# 241
+{ return __p.first; } 
+# 243
+template< class _Tp, class _Up> constexpr const _Tp &
+# 245
+get(const pair< _Tp, _Up>  &__p) noexcept 
+# 246
+{ return __p.first; } 
+# 248
+template< class _Tp, class _Up> constexpr _Tp &&
+# 250
+get(pair< _Tp, _Up>  &&__p) noexcept 
+# 251
+{ return std::move((__p.first)); } 
+# 253
+template< class _Tp, class _Up> constexpr const _Tp &&
+# 255
+get(const pair< _Tp, _Up>  &&__p) noexcept 
+# 256
+{ return std::move((__p.first)); } 
+# 258
+template< class _Tp, class _Up> constexpr _Tp &
+# 260
+get(pair< _Up, _Tp>  &__p) noexcept 
+# 261
+{ return __p.second; } 
+# 263
+template< class _Tp, class _Up> constexpr const _Tp &
+# 265
+get(const pair< _Up, _Tp>  &__p) noexcept 
+# 266
+{ return __p.second; } 
+# 268
+template< class _Tp, class _Up> constexpr _Tp &&
+# 270
+get(pair< _Up, _Tp>  &&__p) noexcept 
+# 271
+{ return std::move((__p.second)); } 
+# 273
+template< class _Tp, class _Up> constexpr const _Tp &&
+# 275
+get(const pair< _Up, _Tp>  &&__p) noexcept 
+# 276
+{ return std::move((__p.second)); } 
+# 281
+template< class _Tp, class _Up = _Tp> inline _Tp 
+# 283
+exchange(_Tp &__obj, _Up &&__new_val) 
+# 284
+{ return std::__exchange(__obj, std::forward< _Up> (__new_val)); } 
+# 289
+template< size_t ..._Indexes> struct _Index_tuple { }; 
+# 298 "/usr/include/c++/8/utility" 3
+template< size_t _Num> 
+# 299
+struct _Build_index_tuple { 
+# 307
+using __type = _Index_tuple< __integer_pack(_Num)...> ; 
+# 309
+}; 
+# 316
+template< class _Tp, _Tp ..._Idx> 
+# 317
+struct integer_sequence { 
+# 319
+typedef _Tp value_type; 
+# 320
+static constexpr size_t size() noexcept { return sizeof...(_Idx); } 
+# 321
+}; 
+# 324
+template< class _Tp, _Tp _Num> using make_integer_sequence = integer_sequence< _Tp, __integer_pack(_Num)...> ; 
+# 335
+template< size_t ..._Idx> using index_sequence = integer_sequence< unsigned long, _Idx...> ; 
+# 339
+template< size_t _Num> using make_index_sequence = make_integer_sequence< unsigned long, _Num> ; 
+# 343
+template< class ..._Types> using index_sequence_for = make_index_sequence< sizeof...(_Types)> ; 
+# 394 "/usr/include/c++/8/utility" 3
+}
+# 43 "/usr/include/c++/8/array" 3
+namespace std __attribute((__visibility__("default"))) { 
+# 47
+template< class _Tp, size_t _Nm> 
+# 48
+struct __array_traits { 
+# 50
+typedef _Tp _Type[_Nm]; 
+# 51
+typedef __is_swappable< _Tp>  _Is_swappable; 
+# 52
+typedef __is_nothrow_swappable< _Tp>  _Is_nothrow_swappable; 
+# 55
+static constexpr _Tp &_S_ref(const _Type &__t, size_t __n) noexcept 
+# 56
+{ return const_cast< _Tp &>(__t[__n]); } 
+# 59
+static constexpr _Tp *_S_ptr(const _Type &__t) noexcept 
+# 60
+{ return const_cast< _Tp *>(__t); } 
+# 61
+}; 
+# 63
+template< class _Tp> 
+# 64
+struct __array_traits< _Tp, 0>  { 
+# 66
+struct _Type { }; 
+# 67
+typedef true_type _Is_swappable; 
+# 68
+typedef true_type _Is_nothrow_swappable; 
+# 71
+static constexpr _Tp &_S_ref(const _Type &, size_t) noexcept 
+# 72
+{ return *(static_cast< _Tp *>(nullptr)); } 
+# 75
+static constexpr _Tp *_S_ptr(const _Type &) noexcept 
+# 76
+{ return nullptr; } 
+# 77
+}; 
+# 93 "/usr/include/c++/8/array" 3
+template< class _Tp, size_t _Nm> 
+# 94
+struct array { 
+# 96
+typedef _Tp value_type; 
+# 97
+typedef value_type *pointer; 
+# 98
+typedef const value_type *const_pointer; 
+# 99
+typedef value_type &reference; 
+# 100
+typedef const value_type &const_reference; 
+# 101
+typedef value_type *iterator; 
+# 102
+typedef const value_type *const_iterator; 
+# 103
+typedef size_t size_type; 
+# 104
+typedef ptrdiff_t difference_type; 
+# 105
+typedef std::reverse_iterator< _Tp *>  reverse_iterator; 
+# 106
+typedef std::reverse_iterator< const _Tp *>  const_reverse_iterator; 
+# 109
+typedef __array_traits< _Tp, _Nm>  _AT_Type; 
+# 110
+typename __array_traits< _Tp, _Nm> ::_Type _M_elems; 
+# 116
+void fill(const value_type &__u) 
+# 117
+{ std::fill_n(begin(), size(), __u); } 
+# 120
+void swap(array &__other) noexcept(_AT_Type::_Is_nothrow_swappable::value) 
+# 122
+{ std::swap_ranges(begin(), end(), __other.begin()); } 
+# 126
+iterator begin() noexcept 
+# 127
+{ return (iterator)data(); } 
+# 130
+const_iterator begin() const noexcept 
+# 131
+{ return (const_iterator)data(); } 
+# 134
+iterator end() noexcept 
+# 135
+{ return (iterator)(data() + _Nm); } 
+# 138
+const_iterator end() const noexcept 
+# 139
+{ return (const_iterator)(data() + _Nm); } 
+# 142
+reverse_iterator rbegin() noexcept 
+# 143
+{ return ((std::reverse_iterator< _Tp *> )(end())); } 
+# 146
+const_reverse_iterator rbegin() const noexcept 
+# 147
+{ return ((std::reverse_iterator< const _Tp *> )(end())); } 
+# 150
+reverse_iterator rend() noexcept 
+# 151
+{ return ((std::reverse_iterator< _Tp *> )(begin())); } 
+# 154
+const_reverse_iterator rend() const noexcept 
+# 155
+{ return ((std::reverse_iterator< const _Tp *> )(begin())); } 
+# 158
+const_iterator cbegin() const noexcept 
+# 159
+{ return (const_iterator)data(); } 
+# 162
+const_iterator cend() const noexcept 
+# 163
+{ return (const_iterator)(data() + _Nm); } 
+# 166
+const_reverse_iterator crbegin() const noexcept 
+# 167
+{ return ((std::reverse_iterator< const _Tp *> )(end())); } 
+# 170
+const_reverse_iterator crend() const noexcept 
+# 171
+{ return ((std::reverse_iterator< const _Tp *> )(begin())); } 
+# 175
+constexpr size_type size() const noexcept { return _Nm; } 
+# 178
+constexpr size_type max_size() const noexcept { return _Nm; } 
+# 181
+constexpr bool empty() const noexcept { return size() == 0; } 
+# 185
+reference operator[](size_type __n) noexcept 
+# 186
+{ return _AT_Type::_S_ref(_M_elems, __n); } 
+# 189
+constexpr const_reference operator[](size_type __n) const noexcept 
+# 190
+{ return _AT_Type::_S_ref(_M_elems, __n); } 
+# 193
+reference at(size_type __n) 
+# 194
+{ 
+# 195
+if (__n >= _Nm) { 
+# 196
+std::__throw_out_of_range_fmt("array::at: __n (which is %zu) >= _Nm (which is %zu)", __n, _Nm); }  
+# 199
+return _AT_Type::_S_ref(_M_elems, __n); 
+# 200
+} 
+# 203
+constexpr const_reference at(size_type __n) const 
+# 204
+{ 
+# 207
+return (__n < _Nm) ? _AT_Type::_S_ref(_M_elems, __n) : (std::__throw_out_of_range_fmt("array::at: __n (which is %zu) >= _Nm (which is %zu)", __n, _Nm), _AT_Type::_S_ref(_M_elems, 0)); 
+# 212
+} 
+# 215
+reference front() noexcept 
+# 216
+{ return *begin(); } 
+# 219
+constexpr const_reference front() const noexcept 
+# 220
+{ return _AT_Type::_S_ref(_M_elems, 0); } 
+# 223
+reference back() noexcept 
+# 224
+{ return (_Nm) ? *(end() - 1) : (*end()); } 
+# 227
+constexpr const_reference back() const noexcept 
+# 228
+{ 
+# 229
+return (_Nm) ? _AT_Type::_S_ref(_M_elems, _Nm - (1)) : _AT_Type::_S_ref(_M_elems, 0); 
+# 231
+} 
+# 234
+pointer data() noexcept 
+# 235
+{ return _AT_Type::_S_ptr(_M_elems); } 
+# 238
+const_pointer data() const noexcept 
+# 239
+{ return _AT_Type::_S_ptr(_M_elems); } 
+# 240
+}; 
+# 250 "/usr/include/c++/8/array" 3
+template< class _Tp, size_t _Nm> inline bool 
+# 252
+operator==(const array< _Tp, _Nm>  &__one, const array< _Tp, _Nm>  &__two) 
+# 253
+{ return std::equal((__one.begin()), (__one.end()), (__two.begin())); } 
+# 255
+template< class _Tp, size_t _Nm> inline bool 
+# 257
+operator!=(const array< _Tp, _Nm>  &__one, const array< _Tp, _Nm>  &__two) 
+# 258
+{ return !(__one == __two); } 
+# 260
+template< class _Tp, size_t _Nm> inline bool 
+# 262
+operator<(const array< _Tp, _Nm>  &__a, const array< _Tp, _Nm>  &__b) 
+# 263
+{ 
+# 264
+return std::lexicographical_compare((__a.begin()), (__a.end()), (__b.begin()), (__b.end())); 
+# 266
+} 
+# 268
+template< class _Tp, size_t _Nm> inline bool 
+# 270
+operator>(const array< _Tp, _Nm>  &__one, const array< _Tp, _Nm>  &__two) 
+# 271
+{ return __two < __one; } 
+# 273
+template< class _Tp, size_t _Nm> inline bool 
+# 275
+operator<=(const array< _Tp, _Nm>  &__one, const array< _Tp, _Nm>  &__two) 
+# 276
+{ return !(__one > __two); } 
+# 278
+template< class _Tp, size_t _Nm> inline bool 
+# 280
+operator>=(const array< _Tp, _Nm>  &__one, const array< _Tp, _Nm>  &__two) 
+# 281
+{ return !(__one < __two); } 
+# 284
+template< class _Tp, size_t _Nm> inline void 
+# 294
+swap(array< _Tp, _Nm>  &__one, array< _Tp, _Nm>  &__two) noexcept(noexcept((__one.swap(__two)))) 
+# 296
+{ (__one.swap(__two)); } 
+# 305 "/usr/include/c++/8/array" 3
+template< size_t _Int, class _Tp, size_t _Nm> constexpr _Tp &
+# 307
+get(array< _Tp, _Nm>  &__arr) noexcept 
+# 308
+{ 
+# 309
+static_assert((_Int < _Nm), "array index is within bounds");
+# 310
+return std::__array_traits< _Tp, _Nm> ::_S_ref((__arr._M_elems), _Int); 
+# 312
+} 
+# 314
+template< size_t _Int, class _Tp, size_t _Nm> constexpr _Tp &&
+# 316
+get(array< _Tp, _Nm>  &&__arr) noexcept 
+# 317
+{ 
+# 318
+static_assert((_Int < _Nm), "array index is within bounds");
+# 319
+return std::move(std::get< _Int> (__arr)); 
+# 320
+} 
+# 322
+template< size_t _Int, class _Tp, size_t _Nm> constexpr const _Tp &
+# 324
+get(const array< _Tp, _Nm>  &__arr) noexcept 
+# 325
+{ 
+# 326
+static_assert((_Int < _Nm), "array index is within bounds");
+# 327
+return std::__array_traits< _Tp, _Nm> ::_S_ref((__arr._M_elems), _Int); 
+# 329
+} 
+# 331
+template< size_t _Int, class _Tp, size_t _Nm> constexpr const _Tp &&
+# 333
+get(const array< _Tp, _Nm>  &&__arr) noexcept 
+# 334
+{ 
+# 335
+static_assert((_Int < _Nm), "array index is within bounds");
+# 336
+return std::move(std::get< _Int> (__arr)); 
+# 337
+} 
+# 340
+}
+# 342
+namespace std __attribute((__visibility__("default"))) { 
+# 349
+template< class _Tp> struct tuple_size; 
+# 353
+template< class _Tp, size_t _Nm> 
+# 354
+struct tuple_size< array< _Tp, _Nm> >  : public integral_constant< unsigned long, _Nm>  { 
+# 355
+}; 
+# 358
+template< size_t _Int, class _Tp> struct tuple_element; 
+# 362
+template< size_t _Int, class _Tp, size_t _Nm> 
+# 363
+struct tuple_element< _Int, array< _Tp, _Nm> >  { 
+# 365
+static_assert((_Int < _Nm), "index is out of bounds");
+# 366
+typedef _Tp type; 
+# 367
+}; 
+# 369
+template< class _Tp, size_t _Nm> 
+# 370
+struct __is_tuple_like_impl< array< _Tp, _Nm> >  : public true_type { 
+# 371
+}; 
+# 374
+}
+# 35 "/usr/include/c++/8/bits/uses_allocator.h" 3
+namespace std __attribute((__visibility__("default"))) { 
+# 39
+struct __erased_type { }; 
+# 41
+template< class _Alloc, class _Tp> using __is_erased_or_convertible = __or_< is_same< _Tp, __erased_type> , is_convertible< _Alloc, _Tp> > ; 
+# 46
+struct allocator_arg_t { explicit allocator_arg_t() = default;}; 
+# 48
+constexpr allocator_arg_t allocator_arg = allocator_arg_t{}; 
+# 51
+template< class _Tp, class _Alloc, class  = __void_t< > > 
+# 52
+struct __uses_allocator_helper : public false_type { 
+# 53
+}; 
+# 55
+template< class _Tp, class _Alloc> 
+# 56
+struct __uses_allocator_helper< _Tp, _Alloc, __void_t< typename _Tp::allocator_type> >  : public __or_< is_same< typename _Tp::allocator_type, __erased_type> , is_convertible< _Alloc, typename _Tp::allocator_type> > ::type { 
+# 59
+}; 
+# 62
+template< class _Tp, class _Alloc> 
+# 63
+struct uses_allocator : public __uses_allocator_helper< _Tp, _Alloc> ::type { 
+# 65
+}; 
+# 67
+struct __uses_alloc_base { }; 
+# 69
+struct __uses_alloc0 : public __uses_alloc_base { 
+# 71
+struct _Sink { void operator=(const void *) { } } _M_a; 
+# 72
+}; 
+# 74
+template< class _Alloc> 
+# 75
+struct __uses_alloc1 : public __uses_alloc_base { const _Alloc *_M_a; }; 
+# 77
+template< class _Alloc> 
+# 78
+struct __uses_alloc2 : public __uses_alloc_base { const _Alloc *_M_a; }; 
+# 80
+template< bool , class _Tp, class _Alloc, class ..._Args> struct __uses_alloc; 
+# 83
+template< class _Tp, class _Alloc, class ..._Args> 
+# 84
+struct __uses_alloc< true, _Tp, _Alloc, _Args...>  : public conditional< is_constructible< _Tp, allocator_arg_t, const _Alloc &, _Args...> ::value, __uses_alloc1< _Alloc> , __uses_alloc2< _Alloc> > ::type { 
+# 92
+static_assert((__or_< is_constructible< _Tp, std::allocator_arg_t, const _Alloc &, _Args...> , is_constructible< _Tp, _Args..., const _Alloc &> > ::value), "construction with an allocator must be possible if uses_allocator is true");
+# 97
+}; 
+# 99
+template< class _Tp, class _Alloc, class ..._Args> 
+# 100
+struct __uses_alloc< false, _Tp, _Alloc, _Args...>  : public __uses_alloc0 { 
+# 101
+}; 
+# 103
+template< class _Tp, class _Alloc, class ..._Args> using __uses_alloc_t = __uses_alloc< uses_allocator< _Tp, _Alloc> ::value, _Tp, _Alloc, _Args...> ; 
+# 107
+template< class _Tp, class _Alloc, class ..._Args> inline __uses_alloc_t< _Tp, _Alloc, _Args...>  
+# 109
+__use_alloc(const _Alloc &__a) 
+# 110
+{ 
+# 111
+__uses_alloc_t< _Tp, _Alloc, _Args...>  __ret; 
+# 112
+(__ret._M_a) = std::__addressof(__a); 
+# 113
+return __ret; 
+# 114
+} 
+# 116
+template < typename _Tp, typename _Alloc, typename ... _Args >
+    void
+    __use_alloc ( const _Alloc && ) = delete;
+# 126
+template< template< class ...>  class _Predicate, class 
+# 127
+_Tp, class _Alloc, class ..._Args> 
+# 128
+struct __is_uses_allocator_predicate : public conditional< uses_allocator< _Tp, _Alloc> ::value, __or_< _Predicate< _Tp, allocator_arg_t, _Alloc, _Args...> , _Predicate< _Tp, _Args..., _Alloc> > , _Predicate< _Tp, _Args...> > ::type { 
+# 132
+}; 
+# 134
+template< class _Tp, class _Alloc, class ..._Args> 
+# 135
+struct __is_uses_allocator_constructible : public __is_uses_allocator_predicate< is_constructible, _Tp, _Alloc, _Args...>  { 
+# 137
+}; 
+# 140
+template< class _Tp, class _Alloc, class ..._Args> constexpr bool 
+# 141
+__is_uses_allocator_constructible_v = (__is_uses_allocator_constructible< _Tp, _Alloc, _Args...> ::value); 
+# 145
+template< class _Tp, class _Alloc, class ..._Args> 
+# 146
+struct __is_nothrow_uses_allocator_constructible : public __is_uses_allocator_predicate< is_nothrow_constructible, _Tp, _Alloc, _Args...>  { 
+# 149
+}; 
+# 153
+template< class _Tp, class _Alloc, class ..._Args> constexpr bool 
+# 155
+__is_nothrow_uses_allocator_constructible_v = (__is_nothrow_uses_allocator_constructible< _Tp, _Alloc, _Args...> ::value); 
+# 159
+template< class _Tp, class ..._Args> void 
+# 160
+__uses_allocator_construct_impl(__uses_alloc0 __a, _Tp *__ptr, _Args &&...
+# 161
+__args) 
+# 162
+{ ::new ((void *)__ptr) (_Tp)(std::forward< _Args> (__args)...); } 
+# 164
+template< class _Tp, class _Alloc, class ..._Args> void 
+# 165
+__uses_allocator_construct_impl(__uses_alloc1< _Alloc>  __a, _Tp *__ptr, _Args &&...
+# 166
+__args) 
+# 167
+{ 
+# 168
+::new ((void *)__ptr) (_Tp)(allocator_arg, *(__a._M_a), std::forward< _Args> (__args)...); 
+# 170
+} 
+# 172
+template< class _Tp, class _Alloc, class ..._Args> void 
+# 173
+__uses_allocator_construct_impl(__uses_alloc2< _Alloc>  __a, _Tp *__ptr, _Args &&...
+# 174
+__args) 
+# 175
+{ ::new ((void *)__ptr) (_Tp)(std::forward< _Args> (__args)..., *(__a._M_a)); } 
+# 177
+template< class _Tp, class _Alloc, class ..._Args> void 
+# 178
+__uses_allocator_construct(const _Alloc &__a, _Tp *__ptr, _Args &&...
+# 179
+__args) 
+# 180
+{ 
+# 181
+__uses_allocator_construct_impl(__use_alloc< _Tp, _Alloc, _Args...> (__a), __ptr, std::forward< _Args> (__args)...); 
+# 183
+} 
+# 186
+}
+# 41 "/usr/include/c++/8/bits/invoke.h" 3
+namespace std __attribute((__visibility__("default"))) { 
+# 52 "/usr/include/c++/8/bits/invoke.h" 3
+template< class _Tp, class _Up = typename __inv_unwrap< _Tp> ::type> constexpr _Up &&
+# 54
+__invfwd(typename remove_reference< _Tp> ::type &__t) noexcept 
+# 55
+{ return static_cast< _Up &&>(__t); } 
+# 57
+template< class _Res, class _Fn, class ..._Args> constexpr _Res 
+# 59
+__invoke_impl(__invoke_other, _Fn &&__f, _Args &&...__args) 
+# 60
+{ return std::forward< _Fn> (__f)(std::forward< _Args> (__args)...); } 
+# 62
+template< class _Res, class _MemFun, class _Tp, class ..._Args> constexpr _Res 
+# 64
+__invoke_impl(__invoke_memfun_ref, _MemFun &&__f, _Tp &&__t, _Args &&...
+# 65
+__args) 
+# 66
+{ return (__invfwd< _Tp> (__t).*__f)(std::forward< _Args> (__args)...); } 
+# 68
+template< class _Res, class _MemFun, class _Tp, class ..._Args> constexpr _Res 
+# 70
+__invoke_impl(__invoke_memfun_deref, _MemFun &&__f, _Tp &&__t, _Args &&...
+# 71
+__args) 
+# 72
+{ 
+# 73
+return ((*std::forward< _Tp> (__t)).*__f)(std::forward< _Args> (__args)...); 
 # 74
 } 
-# 75
-T *arr() { 
 # 76
-return m_data; 
-# 77
-} 
+template< class _Res, class _MemPtr, class _Tp> constexpr _Res 
 # 78
-size_t get_size() { 
+__invoke_impl(__invoke_memobj_ref, _MemPtr &&__f, _Tp &&__t) 
 # 79
-return m_size; 
-# 80
-} 
+{ return __invfwd< _Tp> (__t).*__f; } 
 # 81
+template< class _Res, class _MemPtr, class _Tp> constexpr _Res 
+# 83
+__invoke_impl(__invoke_memobj_deref, _MemPtr &&__f, _Tp &&__t) 
+# 84
+{ return (*std::forward< _Tp> (__t)).*__f; } 
+# 87
+template< class _Callable, class ..._Args> constexpr typename __invoke_result< _Callable, _Args...> ::type 
+# 89
+__invoke(_Callable &&__fn, _Args &&...__args) noexcept(__is_nothrow_invocable< _Callable, _Args...> ::value) 
+# 91
+{ 
+# 92
+using __result = __invoke_result< _Callable, _Args...> ; 
+# 93
+using __type = typename __invoke_result< _Callable, _Args...> ::type; 
+# 94
+using __tag = typename __invoke_result< _Callable, _Args...> ::__invoke_type; 
+# 95
+return std::__invoke_impl< typename __invoke_result< _Callable, _Args...> ::type> (__tag{}, std::forward< _Callable> (__fn), std::forward< _Args> (__args)...); 
+# 97
+} 
+# 100
+}
+# 43 "/usr/include/c++/8/tuple" 3
+namespace std __attribute((__visibility__("default"))) { 
+# 52
+template< class ..._Elements> class tuple; 
+# 55
+template< class _Tp> 
+# 56
+struct __is_empty_non_tuple : public is_empty< _Tp>  { }; 
+# 59
+template< class _El0, class ..._El> 
+# 60
+struct __is_empty_non_tuple< tuple< _El0, _El...> >  : public false_type { }; 
+# 63
+template< class _Tp> using __empty_not_final = typename conditional< __is_final(_Tp), integral_constant< bool, false> , __is_empty_non_tuple< _Tp> > ::type; 
+# 68
+template< size_t _Idx, class _Head, bool 
+# 69
+ = __empty_not_final< _Head> ::value> struct _Head_base; 
+# 72
+template< size_t _Idx, class _Head> 
+# 73
+struct _Head_base< _Idx, _Head, true>  : public _Head { 
+# 76
+constexpr _Head_base() : _Head() 
+# 77
+{ } 
+# 79
+constexpr _Head_base(const _Head &__h) : _Head(__h) 
+# 80
+{ } 
+# 82
+constexpr _Head_base(const std::_Head_base< _Idx, _Head, true>  &) = default;
+# 83
+constexpr _Head_base(std::_Head_base< _Idx, _Head, true>  &&) = default;
+# 85
+template< class _UHead> constexpr 
+# 86
+_Head_base(_UHead &&__h) : _Head(std::forward< _UHead> (__h)) 
+# 87
+{ } 
+# 89
+_Head_base(std::allocator_arg_t, std::__uses_alloc0) : _Head() 
+# 90
+{ } 
+# 92
+template< class _Alloc> 
+# 93
+_Head_base(std::allocator_arg_t, __uses_alloc1< _Alloc>  __a) : _Head(allocator_arg, *(__a._M_a)) 
+# 94
+{ } 
+# 96
+template< class _Alloc> 
+# 97
+_Head_base(std::allocator_arg_t, __uses_alloc2< _Alloc>  __a) : _Head(*(__a._M_a)) 
+# 98
+{ } 
+# 100
+template< class _UHead> 
+# 101
+_Head_base(std::__uses_alloc0, _UHead &&__uhead) : _Head(std::forward< _UHead> (__uhead)) 
+# 102
+{ } 
+# 104
+template< class _Alloc, class _UHead> 
+# 105
+_Head_base(__uses_alloc1< _Alloc>  __a, _UHead &&__uhead) : _Head(allocator_arg, *(__a._M_a), std::forward< _UHead> (__uhead)) 
+# 106
+{ } 
+# 108
+template< class _Alloc, class _UHead> 
+# 109
+_Head_base(__uses_alloc2< _Alloc>  __a, _UHead &&__uhead) : _Head(std::forward< _UHead> (__uhead), *(__a._M_a)) 
+# 110
+{ } 
+# 113
+static constexpr _Head &_M_head(std::_Head_base< _Idx, _Head, true>  &__b) noexcept { return __b; } 
+# 116
+static constexpr const _Head &_M_head(const std::_Head_base< _Idx, _Head, true>  &__b) noexcept { return __b; } 
+# 117
 }; 
+# 119
+template< size_t _Idx, class _Head> 
+# 120
+struct _Head_base< _Idx, _Head, false>  { 
+# 122
+constexpr _Head_base() : _M_head_impl() 
+# 123
+{ } 
+# 125
+constexpr _Head_base(const _Head &__h) : _M_head_impl(__h) 
+# 126
+{ } 
+# 128
+constexpr _Head_base(const std::_Head_base< _Idx, _Head, false>  &) = default;
+# 129
+constexpr _Head_base(std::_Head_base< _Idx, _Head, false>  &&) = default;
+# 131
+template< class _UHead> constexpr 
+# 132
+_Head_base(_UHead &&__h) : _M_head_impl(std::forward< _UHead> (__h)) 
+# 133
+{ } 
+# 135
+_Head_base(allocator_arg_t, __uses_alloc0) : _M_head_impl() 
+# 136
+{ } 
+# 138
+template< class _Alloc> 
+# 139
+_Head_base(allocator_arg_t, __uses_alloc1< _Alloc>  __a) : _M_head_impl(allocator_arg, *(__a._M_a)) 
+# 140
+{ } 
+# 142
+template< class _Alloc> 
+# 143
+_Head_base(allocator_arg_t, __uses_alloc2< _Alloc>  __a) : _M_head_impl(*(__a._M_a)) 
+# 144
+{ } 
+# 146
+template< class _UHead> 
+# 147
+_Head_base(__uses_alloc0, _UHead &&__uhead) : _M_head_impl(std::forward< _UHead> (__uhead)) 
+# 148
+{ } 
+# 150
+template< class _Alloc, class _UHead> 
+# 151
+_Head_base(__uses_alloc1< _Alloc>  __a, _UHead &&__uhead) : _M_head_impl(allocator_arg, *(__a._M_a), std::forward< _UHead> (__uhead)) 
+# 153
+{ } 
+# 155
+template< class _Alloc, class _UHead> 
+# 156
+_Head_base(__uses_alloc2< _Alloc>  __a, _UHead &&__uhead) : _M_head_impl(std::forward< _UHead> (__uhead), *(__a._M_a)) 
+# 157
+{ } 
+# 160
+static constexpr _Head &_M_head(std::_Head_base< _Idx, _Head, false>  &__b) noexcept { return __b._M_head_impl; } 
+# 163
+static constexpr const _Head &_M_head(const std::_Head_base< _Idx, _Head, false>  &__b) noexcept { return __b._M_head_impl; } 
+# 165
+_Head _M_head_impl; 
+# 166
+}; 
+# 176 "/usr/include/c++/8/tuple" 3
+template< size_t _Idx, class ..._Elements> struct _Tuple_impl; 
+# 184
+template< size_t _Idx, class _Head, class ..._Tail> 
+# 185
+struct _Tuple_impl< _Idx, _Head, _Tail...>  : public std::_Tuple_impl< _Idx + (1), _Tail...> , private _Head_base< _Idx, _Head>  { 
+# 189
+template< std::size_t , class ...> friend struct _Tuple_impl; 
+# 191
+typedef std::_Tuple_impl< _Idx + (1), _Tail...>  _Inherited; 
+# 192
+typedef _Head_base< _Idx, _Head>  _Base; 
+# 195
+static constexpr _Head &_M_head(std::_Tuple_impl< _Idx, _Head, _Tail...>  &__t) noexcept { return _Base::_M_head(__t); } 
+# 198
+static constexpr const _Head &_M_head(const std::_Tuple_impl< _Idx, _Head, _Tail...>  &__t) noexcept { return _Base::_M_head(__t); } 
+# 201
+static constexpr _Inherited &_M_tail(std::_Tuple_impl< _Idx, _Head, _Tail...>  &__t) noexcept { return __t; } 
+# 204
+static constexpr const _Inherited &_M_tail(const std::_Tuple_impl< _Idx, _Head, _Tail...>  &__t) noexcept { return __t; } 
+# 206
+constexpr _Tuple_impl() : _Inherited(), _Base() 
+# 207
+{ } 
+# 210
+constexpr explicit _Tuple_impl(const _Head &__head, const _Tail &...__tail) : _Inherited(__tail...), _Base(__head) 
+# 211
+{ } 
+# 213
+template< class _UHead, class ..._UTail, class  = typename enable_if< sizeof...(_Tail) == sizeof...(_UTail)> ::type> constexpr explicit 
+# 216
+_Tuple_impl(_UHead &&__head, _UTail &&...__tail) : _Inherited(std::forward< _UTail> (__tail)...), _Base(std::forward< _UHead> (__head)) 
+# 218
+{ } 
+# 220
+constexpr _Tuple_impl(const std::_Tuple_impl< _Idx, _Head, _Tail...>  &) = default;
+# 223
+constexpr _Tuple_impl(std::_Tuple_impl< _Idx, _Head, _Tail...>  &&__in) noexcept(__and_< is_nothrow_move_constructible< _Head> , is_nothrow_move_constructible< std::_Tuple_impl< _Idx + (1), _Tail...> > > ::value) : _Inherited(std::move(_M_tail(__in))), _Base(std::forward< _Head> (_M_head(__in))) 
+# 227
+{ } 
+# 229
+template< class ..._UElements> constexpr 
+# 230
+_Tuple_impl(const std::_Tuple_impl< _Idx, _UElements...>  &__in) : _Inherited(_Tuple_impl< _Idx, _UElements...> ::_M_tail(__in)), _Base(_Tuple_impl< _Idx, _UElements...> ::_M_head(__in)) 
+# 232
+{ } 
+# 234
+template< class _UHead, class ..._UTails> constexpr 
+# 235
+_Tuple_impl(std::_Tuple_impl< _Idx, _UHead, _UTails...>  &&__in) : _Inherited(std::move(_Tuple_impl< _Idx, _UHead, _UTails...> ::_M_tail(__in))), _Base(std::forward< _UHead> (_Tuple_impl< _Idx, _UHead, _UTails...> ::_M_head(__in))) 
+# 239
+{ } 
+# 241
+template< class _Alloc> 
+# 242
+_Tuple_impl(std::allocator_arg_t __tag, const _Alloc &__a) : _Inherited(__tag, __a), _Base(__tag, __use_alloc< _Head> (__a)) 
+# 244
+{ } 
+# 246
+template< class _Alloc> 
+# 247
+_Tuple_impl(std::allocator_arg_t __tag, const _Alloc &__a, const _Head &
+# 248
+__head, const _Tail &...__tail) : _Inherited(__tag, __a, __tail...), _Base(__use_alloc< _Head, _Alloc, _Head> (__a), __head) 
+# 250
+{ } 
+# 252
+template< class _Alloc, class _UHead, class ..._UTail, class 
+# 253
+ = typename enable_if< sizeof...(_Tail) == sizeof...(_UTail)> ::type> 
+# 255
+_Tuple_impl(std::allocator_arg_t __tag, const _Alloc &__a, _UHead &&
+# 256
+__head, _UTail &&...__tail) : _Inherited(__tag, __a, std::forward< _UTail> (__tail)...), _Base(__use_alloc< _Head, _Alloc, _UHead> (__a), std::forward< _UHead> (__head)) 
+# 259
+{ } 
+# 261
+template< class _Alloc> 
+# 262
+_Tuple_impl(std::allocator_arg_t __tag, const _Alloc &__a, const std::_Tuple_impl< _Idx, _Head, _Tail...>  &
+# 263
+__in) : _Inherited(__tag, __a, _M_tail(__in)), _Base(__use_alloc< _Head, _Alloc, _Head> (__a), _M_head(__in)) 
+# 265
+{ } 
+# 267
+template< class _Alloc> 
+# 268
+_Tuple_impl(std::allocator_arg_t __tag, const _Alloc &__a, std::_Tuple_impl< _Idx, _Head, _Tail...>  &&
+# 269
+__in) : _Inherited(__tag, __a, std::move(_M_tail(__in))), _Base(__use_alloc< _Head, _Alloc, _Head> (__a), std::forward< _Head> (_M_head(__in))) 
+# 272
+{ } 
+# 274
+template< class _Alloc, class ..._UElements> 
+# 275
+_Tuple_impl(std::allocator_arg_t __tag, const _Alloc &__a, const std::_Tuple_impl< _Idx, _UElements...>  &
+# 276
+__in) : _Inherited(__tag, __a, _Tuple_impl< _Idx, _UElements...> ::_M_tail(__in)), _Base(__use_alloc< _Head, _Alloc, _Head> (__a), _Tuple_impl< _Idx, _UElements...> ::_M_head(__in)) 
+# 280
+{ } 
+# 282
+template< class _Alloc, class _UHead, class ..._UTails> 
+# 283
+_Tuple_impl(std::allocator_arg_t __tag, const _Alloc &__a, std::_Tuple_impl< _Idx, _UHead, _UTails...>  &&
+# 284
+__in) : _Inherited(__tag, __a, std::move(_Tuple_impl< _Idx, _UHead, _UTails...> ::_M_tail(__in))), _Base(__use_alloc< _Head, _Alloc, _UHead> (__a), std::forward< _UHead> (_Tuple_impl< _Idx, _UHead, _UTails...> ::_M_head(__in))) 
+# 289
+{ } 
+# 292
+std::_Tuple_impl< _Idx, _Head, _Tail...>  &operator=(const std::_Tuple_impl< _Idx, _Head, _Tail...>  &__in) 
+# 293
+{ 
+# 294
+_M_head(*this) = _M_head(__in); 
+# 295
+_M_tail(*this) = _M_tail(__in); 
+# 296
+return *this; 
+# 297
+} 
+# 300
+std::_Tuple_impl< _Idx, _Head, _Tail...>  &operator=(std::_Tuple_impl< _Idx, _Head, _Tail...>  &&__in) noexcept(__and_< is_nothrow_move_assignable< _Head> , is_nothrow_move_assignable< std::_Tuple_impl< _Idx + (1), _Tail...> > > ::value) 
+# 303
+{ 
+# 304
+_M_head(*this) = std::forward< _Head> (_M_head(__in)); 
+# 305
+_M_tail(*this) = std::move(_M_tail(__in)); 
+# 306
+return *this; 
+# 307
+} 
+# 309
+template< class ..._UElements> std::_Tuple_impl< _Idx, _Head, _Tail...>  &
+# 311
+operator=(const std::_Tuple_impl< _Idx, _UElements...>  &__in) 
+# 312
+{ 
+# 313
+_M_head(*this) = _Tuple_impl< _Idx, _UElements...> ::_M_head(__in); 
+# 314
+_M_tail(*this) = _Tuple_impl< _Idx, _UElements...> ::_M_tail(__in); 
+# 315
+return *this; 
+# 316
+} 
+# 318
+template< class _UHead, class ..._UTails> std::_Tuple_impl< _Idx, _Head, _Tail...>  &
+# 320
+operator=(std::_Tuple_impl< _Idx, _UHead, _UTails...>  &&__in) 
+# 321
+{ 
+# 322
+_M_head(*this) = std::forward< _UHead> (_Tuple_impl< _Idx, _UHead, _UTails...> ::_M_head(__in)); 
+# 324
+_M_tail(*this) = std::move(_Tuple_impl< _Idx, _UHead, _UTails...> ::_M_tail(__in)); 
+# 326
+return *this; 
+# 327
+} 
+# 331
+protected: void _M_swap(std::_Tuple_impl< _Idx, _Head, _Tail...>  &__in) noexcept(__is_nothrow_swappable< _Head> ::value && noexcept((_M_tail(__in)._M_swap(_M_tail(__in))))) 
+# 334
+{ 
+# 335
+using std::swap;
+# 336
+swap(_M_head(*this), _M_head(__in)); 
+# 337
+_Inherited::_M_swap(_M_tail(__in)); 
+# 338
+} 
+# 339
+}; 
+# 342
+template< size_t _Idx, class _Head> 
+# 343
+struct _Tuple_impl< _Idx, _Head>  : private _Head_base< _Idx, _Head>  { 
+# 346
+template< std::size_t , class ...> friend struct _Tuple_impl; 
+# 348
+typedef _Head_base< _Idx, _Head>  _Base; 
+# 351
+static constexpr _Head &_M_head(std::_Tuple_impl< _Idx, _Head>  &__t) noexcept { return _Base::_M_head(__t); } 
+# 354
+static constexpr const _Head &_M_head(const std::_Tuple_impl< _Idx, _Head>  &__t) noexcept { return _Base::_M_head(__t); } 
+# 356
+constexpr _Tuple_impl() : _Base() 
+# 357
+{ } 
+# 360
+constexpr explicit _Tuple_impl(const _Head &__head) : _Base(__head) 
+# 361
+{ } 
+# 363
+template< class _UHead> constexpr explicit 
+# 365
+_Tuple_impl(_UHead &&__head) : _Base(std::forward< _UHead> (__head)) 
+# 366
+{ } 
+# 368
+constexpr _Tuple_impl(const std::_Tuple_impl< _Idx, _Head>  &) = default;
+# 371
+constexpr _Tuple_impl(std::_Tuple_impl< _Idx, _Head>  &&__in) noexcept(is_nothrow_move_constructible< _Head> ::value) : _Base(std::forward< _Head> (_M_head(__in))) 
+# 373
+{ } 
+# 375
+template< class _UHead> constexpr 
+# 376
+_Tuple_impl(const std::_Tuple_impl< _Idx, _UHead>  &__in) : _Base(_Tuple_impl< _Idx, _UHead> ::_M_head(__in)) 
+# 377
+{ } 
+# 379
+template< class _UHead> constexpr 
+# 380
+_Tuple_impl(std::_Tuple_impl< _Idx, _UHead>  &&__in) : _Base(std::forward< _UHead> (_Tuple_impl< _Idx, _UHead> ::_M_head(__in))) 
+# 382
+{ } 
+# 384
+template< class _Alloc> 
+# 385
+_Tuple_impl(std::allocator_arg_t __tag, const _Alloc &__a) : _Base(__tag, __use_alloc< _Head> (__a)) 
+# 386
+{ } 
+# 388
+template< class _Alloc> 
+# 389
+_Tuple_impl(std::allocator_arg_t __tag, const _Alloc &__a, const _Head &
+# 390
+__head) : _Base(__use_alloc< _Head, _Alloc, _Head> (__a), __head) 
+# 391
+{ } 
+# 393
+template< class _Alloc, class _UHead> 
+# 394
+_Tuple_impl(std::allocator_arg_t __tag, const _Alloc &__a, _UHead &&
+# 395
+__head) : _Base(__use_alloc< _Head, _Alloc, _UHead> (__a), std::forward< _UHead> (__head)) 
+# 397
+{ } 
+# 399
+template< class _Alloc> 
+# 400
+_Tuple_impl(std::allocator_arg_t __tag, const _Alloc &__a, const std::_Tuple_impl< _Idx, _Head>  &
+# 401
+__in) : _Base(__use_alloc< _Head, _Alloc, _Head> (__a), _M_head(__in)) 
+# 402
+{ } 
+# 404
+template< class _Alloc> 
+# 405
+_Tuple_impl(std::allocator_arg_t __tag, const _Alloc &__a, std::_Tuple_impl< _Idx, _Head>  &&
+# 406
+__in) : _Base(__use_alloc< _Head, _Alloc, _Head> (__a), std::forward< _Head> (_M_head(__in))) 
+# 408
+{ } 
+# 410
+template< class _Alloc, class _UHead> 
+# 411
+_Tuple_impl(std::allocator_arg_t __tag, const _Alloc &__a, const std::_Tuple_impl< _Idx, _UHead>  &
+# 412
+__in) : _Base(__use_alloc< _Head, _Alloc, _Head> (__a), _Tuple_impl< _Idx, _UHead> ::_M_head(__in)) 
+# 414
+{ } 
+# 416
+template< class _Alloc, class _UHead> 
+# 417
+_Tuple_impl(std::allocator_arg_t __tag, const _Alloc &__a, std::_Tuple_impl< _Idx, _UHead>  &&
+# 418
+__in) : _Base(__use_alloc< _Head, _Alloc, _UHead> (__a), std::forward< _UHead> (_Tuple_impl< _Idx, _UHead> ::_M_head(__in))) 
+# 421
+{ } 
+# 424
+std::_Tuple_impl< _Idx, _Head>  &operator=(const std::_Tuple_impl< _Idx, _Head>  &__in) 
+# 425
+{ 
+# 426
+_M_head(*this) = _M_head(__in); 
+# 427
+return *this; 
+# 428
+} 
+# 431
+std::_Tuple_impl< _Idx, _Head>  &operator=(std::_Tuple_impl< _Idx, _Head>  &&__in) noexcept(is_nothrow_move_assignable< _Head> ::value) 
+# 433
+{ 
+# 434
+_M_head(*this) = std::forward< _Head> (_M_head(__in)); 
+# 435
+return *this; 
+# 436
+} 
+# 438
+template< class _UHead> std::_Tuple_impl< _Idx, _Head>  &
+# 440
+operator=(const std::_Tuple_impl< _Idx, _UHead>  &__in) 
+# 441
+{ 
+# 442
+_M_head(*this) = _Tuple_impl< _Idx, _UHead> ::_M_head(__in); 
+# 443
+return *this; 
+# 444
+} 
+# 446
+template< class _UHead> std::_Tuple_impl< _Idx, _Head>  &
+# 448
+operator=(std::_Tuple_impl< _Idx, _UHead>  &&__in) 
+# 449
+{ 
+# 450
+_M_head(*this) = std::forward< _UHead> (_Tuple_impl< _Idx, _UHead> ::_M_head(__in)); 
+# 452
+return *this; 
+# 453
+} 
+# 457
+protected: void _M_swap(std::_Tuple_impl< _Idx, _Head>  &__in) noexcept(__is_nothrow_swappable< _Head> ::value) 
+# 459
+{ 
+# 460
+using std::swap;
+# 461
+swap(_M_head(*this), _M_head(__in)); 
+# 462
+} 
+# 463
+}; 
+# 467
+template< bool , class ..._Elements> 
+# 468
+struct _TC { 
+# 470
+template< class ..._UElements> static constexpr bool 
+# 471
+_ConstructibleTuple() 
+# 472
+{ 
+# 473
+return __and_< is_constructible< _Elements, const _UElements &> ...> ::value; 
+# 474
+} 
+# 476
+template< class ..._UElements> static constexpr bool 
+# 477
+_ImplicitlyConvertibleTuple() 
+# 478
+{ 
+# 479
+return __and_< is_convertible< const _UElements &, _Elements> ...> ::value; 
+# 480
+} 
+# 482
+template< class ..._UElements> static constexpr bool 
+# 483
+_MoveConstructibleTuple() 
+# 484
+{ 
+# 485
+return __and_< is_constructible< _Elements, _UElements &&> ...> ::value; 
+# 486
+} 
+# 488
+template< class ..._UElements> static constexpr bool 
+# 489
+_ImplicitlyMoveConvertibleTuple() 
+# 490
+{ 
+# 491
+return __and_< is_convertible< _UElements &&, _Elements> ...> ::value; 
+# 492
+} 
+# 494
+template< class _SrcTuple> static constexpr bool 
+# 495
+_NonNestedTuple() 
+# 496
+{ 
+# 497
+return __and_< __not_< is_same< tuple< _Elements...> , typename remove_cv< typename remove_reference< _SrcTuple> ::type> ::type> > , __not_< is_convertible< _SrcTuple, _Elements...> > , __not_< is_constructible< _Elements..., _SrcTuple> > > ::value; 
+# 504
+} 
+# 505
+template< class ..._UElements> static constexpr bool 
+# 506
+_NotSameTuple() 
+# 507
+{ 
+# 508
+return __not_< is_same< tuple< _Elements...> , typename remove_const< typename remove_reference< _UElements...> ::type> ::type> > ::value; 
+# 512
+} 
+# 513
+}; 
+# 515
+template< class ..._Elements> 
+# 516
+struct _TC< false, _Elements...>  { 
+# 518
+template< class ..._UElements> static constexpr bool 
+# 519
+_ConstructibleTuple() 
+# 520
+{ 
+# 521
+return false; 
+# 522
+} 
+# 524
+template< class ..._UElements> static constexpr bool 
+# 525
+_ImplicitlyConvertibleTuple() 
+# 526
+{ 
+# 527
+return false; 
+# 528
+} 
+# 530
+template< class ..._UElements> static constexpr bool 
+# 531
+_MoveConstructibleTuple() 
+# 532
+{ 
+# 533
+return false; 
+# 534
+} 
+# 536
+template< class ..._UElements> static constexpr bool 
+# 537
+_ImplicitlyMoveConvertibleTuple() 
+# 538
+{ 
+# 539
+return false; 
+# 540
+} 
+# 542
+template< class ..._UElements> static constexpr bool 
+# 543
+_NonNestedTuple() 
+# 544
+{ 
+# 545
+return true; 
+# 546
+} 
+# 547
+template< class ..._UElements> static constexpr bool 
+# 548
+_NotSameTuple() 
+# 549
+{ 
+# 550
+return true; 
+# 551
+} 
+# 552
+}; 
+# 555
+template< class ..._Elements> 
+# 556
+class tuple : public _Tuple_impl< 0UL, _Elements...>  { 
+# 558
+typedef _Tuple_impl< 0UL, _Elements...>  _Inherited; 
+# 562
+template< class _Dummy> 
+# 563
+struct _TC2 { 
+# 565
+static constexpr bool _DefaultConstructibleTuple() 
+# 566
+{ 
+# 567
+return __and_< is_default_constructible< _Elements> ...> ::value; 
+# 568
+} 
+# 569
+static constexpr bool _ImplicitlyDefaultConstructibleTuple() 
+# 570
+{ 
+# 571
+return __and_< __is_implicitly_default_constructible< _Elements> ...> ::value; 
+# 573
+} 
+# 574
+}; 
+# 581
+public: 
+# 577
+template< class _Dummy = void, typename enable_if< _TC2< _Dummy> ::_ImplicitlyDefaultConstructibleTuple(), bool> ::type 
+# 580
+ = true> constexpr 
+# 581
+tuple() : _Inherited() 
+# 582
+{ } 
+# 584
+template< class _Dummy = void, typename enable_if< _TC2< _Dummy> ::_DefaultConstructibleTuple() && (!_TC2< _Dummy> ::_ImplicitlyDefaultConstructibleTuple()), bool> ::type 
+# 590
+ = false> constexpr explicit 
+# 591
+tuple() : _Inherited() 
+# 592
+{ } 
+# 596
+template< class _Dummy> using _TCC = _TC< is_same< _Dummy, void> ::value, _Elements...> ; 
+# 600
+template< class _Dummy = void, typename enable_if< _TC< is_same< _Dummy, void> ::value, _Elements...> ::template _ConstructibleTuple< _Elements...> () && _TC< is_same< _Dummy, void> ::value, _Elements...> ::template _ImplicitlyConvertibleTuple< _Elements...> () && (sizeof...(_Elements) >= (1)), bool> ::type 
+# 607
+ = true> constexpr 
+# 608
+tuple(const _Elements &...__elements) : _Inherited(__elements...) 
+# 609
+{ } 
+# 611
+template< class _Dummy = void, typename enable_if< _TC< is_same< _Dummy, void> ::value, _Elements...> ::template _ConstructibleTuple< _Elements...> () && (!_TC< is_same< _Dummy, void> ::value, _Elements...> ::template _ImplicitlyConvertibleTuple< _Elements...> ()) && (sizeof...(_Elements) >= (1)), bool> ::type 
+# 618
+ = false> constexpr explicit 
+# 619
+tuple(const _Elements &...__elements) : _Inherited(__elements...) 
+# 620
+{ } 
+# 624
+template< class ..._UElements> using _TMC = _TC< (sizeof...(_Elements) == sizeof...(_UElements)) && _TC< sizeof...(_UElements) == (1), _Elements...> ::template _NotSameTuple< _UElements...> (), _Elements...> ; 
+# 632
+template< class ..._UElements> using _TMCT = _TC< (sizeof...(_Elements) == sizeof...(_UElements)) && (!is_same< tuple, std::tuple< _UElements...> > ::value), _Elements...> ; 
+# 638
+template< class ..._UElements, typename enable_if< _TC< (sizeof...(_Elements) == sizeof...(_UElements)) && _TC< sizeof...(_UElements) == (1), _Elements...> ::template _NotSameTuple< _UElements...> (), _Elements...> ::template _MoveConstructibleTuple< _UElements...> () && _TC< (sizeof...(_Elements) == sizeof...(_UElements)) && _TC< sizeof...(_UElements) == (1), _Elements...> ::template _NotSameTuple< _UElements...> (), _Elements...> ::template _ImplicitlyMoveConvertibleTuple< _UElements...> () && (sizeof...(_Elements) >= (1)), bool> ::type 
+# 645
+ = true> constexpr 
+# 646
+tuple(_UElements &&...__elements) : _Inherited(std::forward< _UElements> (__elements)...) 
+# 647
+{ } 
+# 649
+template< class ..._UElements, typename enable_if< _TC< (sizeof...(_Elements) == sizeof...(_UElements)) && _TC< sizeof...(_UElements) == (1), _Elements...> ::template _NotSameTuple< _UElements...> (), _Elements...> ::template _MoveConstructibleTuple< _UElements...> () && (!_TC< (sizeof...(_Elements) == sizeof...(_UElements)) && _TC< sizeof...(_UElements) == (1), _Elements...> ::template _NotSameTuple< _UElements...> (), _Elements...> ::template _ImplicitlyMoveConvertibleTuple< _UElements...> ()) && (sizeof...(_Elements) >= (1)), bool> ::type 
+# 656
+ = false> constexpr explicit 
+# 657
+tuple(_UElements &&...__elements) : _Inherited(std::forward< _UElements> (__elements)...) 
+# 658
+{ } 
+# 660
+constexpr tuple(const tuple &) = default;
+# 662
+constexpr tuple(tuple &&) = default;
+# 666
+template< class _Dummy> using _TNTC = _TC< is_same< _Dummy, void> ::value && (sizeof...(_Elements) == (1)), _Elements...> ; 
+# 670
+template< class ..._UElements, class _Dummy = void, typename enable_if< _TC< (sizeof...(_Elements) == sizeof...(_UElements)) && (!is_same< std::tuple< _Elements...> , std::tuple< _UElements...> > ::value), _Elements...> ::template _ConstructibleTuple< _UElements...> () && _TC< (sizeof...(_Elements) == sizeof...(_UElements)) && (!is_same< std::tuple< _Elements...> , std::tuple< _UElements...> > ::value), _Elements...> ::template _ImplicitlyConvertibleTuple< _UElements...> () && _TC< is_same< _Dummy, void> ::value && (sizeof...(_Elements) == (1)), _Elements...> ::template _NonNestedTuple< const std::tuple< _UElements...>  &> (), bool> ::type 
+# 677
+ = true> constexpr 
+# 678
+tuple(const std::tuple< _UElements...>  &__in) : _Inherited(static_cast< const _Tuple_impl< 0UL, _UElements...>  &>(__in)) 
+# 680
+{ } 
+# 682
+template< class ..._UElements, class _Dummy = void, typename enable_if< _TC< (sizeof...(_Elements) == sizeof...(_UElements)) && (!is_same< std::tuple< _Elements...> , std::tuple< _UElements...> > ::value), _Elements...> ::template _ConstructibleTuple< _UElements...> () && (!_TC< (sizeof...(_Elements) == sizeof...(_UElements)) && (!is_same< std::tuple< _Elements...> , std::tuple< _UElements...> > ::value), _Elements...> ::template _ImplicitlyConvertibleTuple< _UElements...> ()) && _TC< is_same< _Dummy, void> ::value && (sizeof...(_Elements) == (1)), _Elements...> ::template _NonNestedTuple< const std::tuple< _UElements...>  &> (), bool> ::type 
+# 689
+ = false> constexpr explicit 
+# 690
+tuple(const std::tuple< _UElements...>  &__in) : _Inherited(static_cast< const _Tuple_impl< 0UL, _UElements...>  &>(__in)) 
+# 692
+{ } 
+# 694
+template< class ..._UElements, class _Dummy = void, typename enable_if< _TC< (sizeof...(_Elements) == sizeof...(_UElements)) && (!is_same< std::tuple< _Elements...> , std::tuple< _UElements...> > ::value), _Elements...> ::template _MoveConstructibleTuple< _UElements...> () && _TC< (sizeof...(_Elements) == sizeof...(_UElements)) && (!is_same< std::tuple< _Elements...> , std::tuple< _UElements...> > ::value), _Elements...> ::template _ImplicitlyMoveConvertibleTuple< _UElements...> () && _TC< is_same< _Dummy, void> ::value && (sizeof...(_Elements) == (1)), _Elements...> ::template _NonNestedTuple< std::tuple< _UElements...>  &&> (), bool> ::type 
+# 701
+ = true> constexpr 
+# 702
+tuple(std::tuple< _UElements...>  &&__in) : _Inherited(static_cast< _Tuple_impl< 0UL, _UElements...>  &&>(__in)) 
+# 703
+{ } 
+# 705
+template< class ..._UElements, class _Dummy = void, typename enable_if< _TC< (sizeof...(_Elements) == sizeof...(_UElements)) && (!is_same< std::tuple< _Elements...> , std::tuple< _UElements...> > ::value), _Elements...> ::template _MoveConstructibleTuple< _UElements...> () && (!_TC< (sizeof...(_Elements) == sizeof...(_UElements)) && (!is_same< std::tuple< _Elements...> , std::tuple< _UElements...> > ::value), _Elements...> ::template _ImplicitlyMoveConvertibleTuple< _UElements...> ()) && _TC< is_same< _Dummy, void> ::value && (sizeof...(_Elements) == (1)), _Elements...> ::template _NonNestedTuple< std::tuple< _UElements...>  &&> (), bool> ::type 
+# 712
+ = false> constexpr explicit 
+# 713
+tuple(std::tuple< _UElements...>  &&__in) : _Inherited(static_cast< _Tuple_impl< 0UL, _UElements...>  &&>(__in)) 
+# 714
+{ } 
+# 718
+template< class _Alloc> 
+# 719
+tuple(std::allocator_arg_t __tag, const _Alloc &__a) : _Inherited(__tag, __a) 
+# 720
+{ } 
+# 722
+template< class _Alloc, class _Dummy = void, typename enable_if< _TC< is_same< _Dummy, void> ::value, _Elements...> ::template _ConstructibleTuple< _Elements...> () && _TC< is_same< _Dummy, void> ::value, _Elements...> ::template _ImplicitlyConvertibleTuple< _Elements...> (), bool> ::type 
+# 728
+ = true> 
+# 729
+tuple(std::allocator_arg_t __tag, const _Alloc &__a, const _Elements &...
+# 730
+__elements) : _Inherited(__tag, __a, __elements...) 
+# 731
+{ } 
+# 733
+template< class _Alloc, class _Dummy = void, typename enable_if< _TC< is_same< _Dummy, void> ::value, _Elements...> ::template _ConstructibleTuple< _Elements...> () && (!_TC< is_same< _Dummy, void> ::value, _Elements...> ::template _ImplicitlyConvertibleTuple< _Elements...> ()), bool> ::type 
+# 739
+ = false> explicit 
+# 740
+tuple(std::allocator_arg_t __tag, const _Alloc &__a, const _Elements &...
+# 741
+__elements) : _Inherited(__tag, __a, __elements...) 
+# 742
+{ } 
+# 744
+template< class _Alloc, class ..._UElements, typename enable_if< _TC< (sizeof...(_Elements) == sizeof...(_UElements)) && _TC< sizeof...(_UElements) == (1), _Elements...> ::template _NotSameTuple< _UElements...> (), _Elements...> ::template _MoveConstructibleTuple< _UElements...> () && _TC< (sizeof...(_Elements) == sizeof...(_UElements)) && _TC< sizeof...(_UElements) == (1), _Elements...> ::template _NotSameTuple< _UElements...> (), _Elements...> ::template _ImplicitlyMoveConvertibleTuple< _UElements...> (), bool> ::type 
+# 749
+ = true> 
+# 750
+tuple(std::allocator_arg_t __tag, const _Alloc &__a, _UElements &&...
+# 751
+__elements) : _Inherited(__tag, __a, std::forward< _UElements> (__elements)...) 
+# 753
+{ } 
+# 755
+template< class _Alloc, class ..._UElements, typename enable_if< _TC< (sizeof...(_Elements) == sizeof...(_UElements)) && _TC< sizeof...(_UElements) == (1), _Elements...> ::template _NotSameTuple< _UElements...> (), _Elements...> ::template _MoveConstructibleTuple< _UElements...> () && (!_TC< (sizeof...(_Elements) == sizeof...(_UElements)) && _TC< sizeof...(_UElements) == (1), _Elements...> ::template _NotSameTuple< _UElements...> (), _Elements...> ::template _ImplicitlyMoveConvertibleTuple< _UElements...> ()), bool> ::type 
+# 760
+ = false> explicit 
+# 761
+tuple(std::allocator_arg_t __tag, const _Alloc &__a, _UElements &&...
+# 762
+__elements) : _Inherited(__tag, __a, std::forward< _UElements> (__elements)...) 
+# 764
+{ } 
+# 766
+template< class _Alloc> 
+# 767
+tuple(std::allocator_arg_t __tag, const _Alloc &__a, const tuple &__in) : _Inherited(__tag, __a, static_cast< const _Inherited &>(__in)) 
+# 768
+{ } 
+# 770
+template< class _Alloc> 
+# 771
+tuple(std::allocator_arg_t __tag, const _Alloc &__a, tuple &&__in) : _Inherited(__tag, __a, static_cast< _Inherited &&>(__in)) 
+# 772
+{ } 
+# 774
+template< class _Alloc, class _Dummy = void, class ...
+# 775
+_UElements, typename enable_if< _TC< (sizeof...(_Elements) == sizeof...(_UElements)) && (!is_same< std::tuple< _Elements...> , std::tuple< _UElements...> > ::value), _Elements...> ::template _ConstructibleTuple< _UElements...> () && _TC< (sizeof...(_Elements) == sizeof...(_UElements)) && (!is_same< std::tuple< _Elements...> , std::tuple< _UElements...> > ::value), _Elements...> ::template _ImplicitlyConvertibleTuple< _UElements...> () && _TC< is_same< _Dummy, void> ::value && (sizeof...(_Elements) == (1)), _Elements...> ::template _NonNestedTuple< std::tuple< _UElements...>  &&> (), bool> ::type 
+# 782
+ = true> 
+# 783
+tuple(std::allocator_arg_t __tag, const _Alloc &__a, const std::tuple< _UElements...>  &
+# 784
+__in) : _Inherited(__tag, __a, static_cast< const _Tuple_impl< 0UL, _UElements...>  &>(__in)) 
+# 787
+{ } 
+# 789
+template< class _Alloc, class _Dummy = void, class ...
+# 790
+_UElements, typename enable_if< _TC< (sizeof...(_Elements) == sizeof...(_UElements)) && (!is_same< std::tuple< _Elements...> , std::tuple< _UElements...> > ::value), _Elements...> ::template _ConstructibleTuple< _UElements...> () && (!_TC< (sizeof...(_Elements) == sizeof...(_UElements)) && (!is_same< std::tuple< _Elements...> , std::tuple< _UElements...> > ::value), _Elements...> ::template _ImplicitlyConvertibleTuple< _UElements...> ()) && _TC< is_same< _Dummy, void> ::value && (sizeof...(_Elements) == (1)), _Elements...> ::template _NonNestedTuple< std::tuple< _UElements...>  &&> (), bool> ::type 
+# 797
+ = false> explicit 
+# 798
+tuple(std::allocator_arg_t __tag, const _Alloc &__a, const std::tuple< _UElements...>  &
+# 799
+__in) : _Inherited(__tag, __a, static_cast< const _Tuple_impl< 0UL, _UElements...>  &>(__in)) 
+# 802
+{ } 
+# 804
+template< class _Alloc, class _Dummy = void, class ...
+# 805
+_UElements, typename enable_if< _TC< (sizeof...(_Elements) == sizeof...(_UElements)) && (!is_same< std::tuple< _Elements...> , std::tuple< _UElements...> > ::value), _Elements...> ::template _MoveConstructibleTuple< _UElements...> () && _TC< (sizeof...(_Elements) == sizeof...(_UElements)) && (!is_same< std::tuple< _Elements...> , std::tuple< _UElements...> > ::value), _Elements...> ::template _ImplicitlyMoveConvertibleTuple< _UElements...> () && _TC< is_same< _Dummy, void> ::value && (sizeof...(_Elements) == (1)), _Elements...> ::template _NonNestedTuple< std::tuple< _UElements...>  &&> (), bool> ::type 
+# 812
+ = true> 
+# 813
+tuple(std::allocator_arg_t __tag, const _Alloc &__a, std::tuple< _UElements...>  &&
+# 814
+__in) : _Inherited(__tag, __a, static_cast< _Tuple_impl< 0UL, _UElements...>  &&>(__in)) 
+# 817
+{ } 
+# 819
+template< class _Alloc, class _Dummy = void, class ...
+# 820
+_UElements, typename enable_if< _TC< (sizeof...(_Elements) == sizeof...(_UElements)) && (!is_same< std::tuple< _Elements...> , std::tuple< _UElements...> > ::value), _Elements...> ::template _MoveConstructibleTuple< _UElements...> () && (!_TC< (sizeof...(_Elements) == sizeof...(_UElements)) && (!is_same< std::tuple< _Elements...> , std::tuple< _UElements...> > ::value), _Elements...> ::template _ImplicitlyMoveConvertibleTuple< _UElements...> ()) && _TC< is_same< _Dummy, void> ::value && (sizeof...(_Elements) == (1)), _Elements...> ::template _NonNestedTuple< std::tuple< _UElements...>  &&> (), bool> ::type 
+# 827
+ = false> explicit 
+# 828
+tuple(std::allocator_arg_t __tag, const _Alloc &__a, std::tuple< _UElements...>  &&
+# 829
+__in) : _Inherited(__tag, __a, static_cast< _Tuple_impl< 0UL, _UElements...>  &&>(__in)) 
+# 832
+{ } 
+# 835
+tuple &operator=(const tuple &__in) 
+# 836
+{ 
+# 837
+(static_cast< _Inherited &>(*this)) = __in; 
+# 838
+return *this; 
+# 839
+} 
+# 842
+tuple &operator=(tuple &&__in) noexcept(is_nothrow_move_assignable< _Tuple_impl< 0UL, _Elements...> > ::value) 
+# 844
+{ 
+# 845
+(static_cast< _Inherited &>(*this)) = std::move(__in); 
+# 846
+return *this; 
+# 847
+} 
+# 849
+template< class ..._UElements> typename enable_if< sizeof...(_UElements) == sizeof...(_Elements), tuple &> ::type 
+# 853
+operator=(const std::tuple< _UElements...>  &__in) 
+# 854
+{ 
+# 855
+(static_cast< _Inherited &>(*this)) = __in; 
+# 856
+return *this; 
+# 857
+} 
+# 859
+template< class ..._UElements> typename enable_if< sizeof...(_UElements) == sizeof...(_Elements), tuple &> ::type 
+# 863
+operator=(std::tuple< _UElements...>  &&__in) 
+# 864
+{ 
+# 865
+(static_cast< _Inherited &>(*this)) = std::move(__in); 
+# 866
+return *this; 
+# 867
+} 
+# 870
+void swap(tuple &__in) noexcept(noexcept((__in._M_swap(__in)))) 
+# 872
+{ _Inherited::_M_swap(__in); } 
+# 873
+}; 
+# 890 "/usr/include/c++/8/tuple" 3
+template<> class tuple< >  { 
+# 893
+public: void swap(std::tuple< >  &) noexcept { } 
+# 896
+tuple() = default;
+# 898
+template< class _Alloc> 
+# 899
+tuple(allocator_arg_t, const _Alloc &) { } 
+# 900
+template< class _Alloc> 
+# 901
+tuple(allocator_arg_t, const _Alloc &, const std::tuple< >  &) { } 
+# 902
+}; 
+# 906
+template< class _T1, class _T2> 
+# 907
+class tuple< _T1, _T2>  : public _Tuple_impl< 0UL, _T1, _T2>  { 
+# 909
+typedef _Tuple_impl< 0UL, _T1, _T2>  _Inherited; 
+# 919
+public: 
+# 912
+template< class _U1 = _T1, class 
+# 913
+_U2 = _T2, typename enable_if< __and_< __is_implicitly_default_constructible< _U1> , __is_implicitly_default_constructible< _U2> > ::value, bool> ::type 
+# 917
+ = true> constexpr 
+# 919
+tuple() : _Inherited() 
+# 920
+{ } 
+# 922
+template< class _U1 = _T1, class 
+# 923
+_U2 = _T2, typename enable_if< __and_< is_default_constructible< _U1> , is_default_constructible< _U2> , __not_< __and_< __is_implicitly_default_constructible< _U1> , __is_implicitly_default_constructible< _U2> > > > ::value, bool> ::type 
+# 931
+ = false> constexpr explicit 
+# 933
+tuple() : _Inherited() 
+# 934
+{ } 
+# 938
+template< class _Dummy> using _TCC = _TC< is_same< _Dummy, void> ::value, _T1, _T2> ; 
+# 941
+template< class _Dummy = void, typename enable_if< _TC< is_same< _Dummy, void> ::value, _T1, _T2> ::template _ConstructibleTuple< _T1, _T2> () && _TC< is_same< _Dummy, void> ::value, _T1, _T2> ::template _ImplicitlyConvertibleTuple< _T1, _T2> (), bool> ::type 
+# 946
+ = true> constexpr 
+# 947
+tuple(const _T1 &__a1, const _T2 &__a2) : _Inherited(__a1, __a2) 
+# 948
+{ } 
+# 950
+template< class _Dummy = void, typename enable_if< _TC< is_same< _Dummy, void> ::value, _T1, _T2> ::template _ConstructibleTuple< _T1, _T2> () && (!_TC< is_same< _Dummy, void> ::value, _T1, _T2> ::template _ImplicitlyConvertibleTuple< _T1, _T2> ()), bool> ::type 
+# 955
+ = false> constexpr explicit 
+# 956
+tuple(const _T1 &__a1, const _T2 &__a2) : _Inherited(__a1, __a2) 
+# 957
+{ } 
+# 961
+using _TMC = _TC< true, _T1, _T2> ; 
+# 963
+template< class _U1, class _U2, typename enable_if< _TC< true, _T1, _T2> ::template _MoveConstructibleTuple< _U1, _U2> () && _TC< true, _T1, _T2> ::template _ImplicitlyMoveConvertibleTuple< _U1, _U2> () && (!is_same< typename decay< _U1> ::type, std::allocator_arg_t> ::value), bool> ::type 
+# 970
+ = true> constexpr 
+# 971
+tuple(_U1 &&__a1, _U2 &&__a2) : _Inherited(std::forward< _U1> (__a1), std::forward< _U2> (__a2)) 
+# 972
+{ } 
+# 974
+template< class _U1, class _U2, typename enable_if< _TC< true, _T1, _T2> ::template _MoveConstructibleTuple< _U1, _U2> () && (!_TC< true, _T1, _T2> ::template _ImplicitlyMoveConvertibleTuple< _U1, _U2> ()) && (!is_same< typename decay< _U1> ::type, std::allocator_arg_t> ::value), bool> ::type 
+# 981
+ = false> constexpr explicit 
+# 982
+tuple(_U1 &&__a1, _U2 &&__a2) : _Inherited(std::forward< _U1> (__a1), std::forward< _U2> (__a2)) 
+# 983
+{ } 
+# 985
+constexpr tuple(const std::tuple< _T1, _T2>  &) = default;
+# 987
+constexpr tuple(std::tuple< _T1, _T2>  &&) = default;
+# 989
+template< class _U1, class _U2, typename enable_if< _TC< true, _T1, _T2> ::template _ConstructibleTuple< _U1, _U2> () && _TC< true, _T1, _T2> ::template _ImplicitlyConvertibleTuple< _U1, _U2> (), bool> ::type 
+# 994
+ = true> constexpr 
+# 995
+tuple(const std::tuple< _U1, _U2>  &__in) : _Inherited(static_cast< const _Tuple_impl< 0UL, _U1, _U2>  &>(__in)) 
+# 996
+{ } 
+# 998
+template< class _U1, class _U2, typename enable_if< _TC< true, _T1, _T2> ::template _ConstructibleTuple< _U1, _U2> () && (!_TC< true, _T1, _T2> ::template _ImplicitlyConvertibleTuple< _U1, _U2> ()), bool> ::type 
+# 1003
+ = false> constexpr explicit 
+# 1004
+tuple(const std::tuple< _U1, _U2>  &__in) : _Inherited(static_cast< const _Tuple_impl< 0UL, _U1, _U2>  &>(__in)) 
+# 1005
+{ } 
+# 1007
+template< class _U1, class _U2, typename enable_if< _TC< true, _T1, _T2> ::template _MoveConstructibleTuple< _U1, _U2> () && _TC< true, _T1, _T2> ::template _ImplicitlyMoveConvertibleTuple< _U1, _U2> (), bool> ::type 
+# 1012
+ = true> constexpr 
+# 1013
+tuple(std::tuple< _U1, _U2>  &&__in) : _Inherited(static_cast< _Tuple_impl< 0UL, _U1, _U2>  &&>(__in)) 
+# 1014
+{ } 
+# 1016
+template< class _U1, class _U2, typename enable_if< _TC< true, _T1, _T2> ::template _MoveConstructibleTuple< _U1, _U2> () && (!_TC< true, _T1, _T2> ::template _ImplicitlyMoveConvertibleTuple< _U1, _U2> ()), bool> ::type 
+# 1021
+ = false> constexpr explicit 
+# 1022
+tuple(std::tuple< _U1, _U2>  &&__in) : _Inherited(static_cast< _Tuple_impl< 0UL, _U1, _U2>  &&>(__in)) 
+# 1023
+{ } 
+# 1025
+template< class _U1, class _U2, typename enable_if< _TC< true, _T1, _T2> ::template _ConstructibleTuple< _U1, _U2> () && _TC< true, _T1, _T2> ::template _ImplicitlyConvertibleTuple< _U1, _U2> (), bool> ::type 
+# 1030
+ = true> constexpr 
+# 1031
+tuple(const pair< _U1, _U2>  &__in) : _Inherited((__in.first), (__in.second)) 
+# 1032
+{ } 
+# 1034
+template< class _U1, class _U2, typename enable_if< _TC< true, _T1, _T2> ::template _ConstructibleTuple< _U1, _U2> () && (!_TC< true, _T1, _T2> ::template _ImplicitlyConvertibleTuple< _U1, _U2> ()), bool> ::type 
+# 1039
+ = false> constexpr explicit 
+# 1040
+tuple(const pair< _U1, _U2>  &__in) : _Inherited((__in.first), (__in.second)) 
+# 1041
+{ } 
+# 1043
+template< class _U1, class _U2, typename enable_if< _TC< true, _T1, _T2> ::template _MoveConstructibleTuple< _U1, _U2> () && _TC< true, _T1, _T2> ::template _ImplicitlyMoveConvertibleTuple< _U1, _U2> (), bool> ::type 
+# 1048
+ = true> constexpr 
+# 1049
+tuple(pair< _U1, _U2>  &&__in) : _Inherited(std::forward< _U1> ((__in.first)), std::forward< _U2> ((__in.second))) 
+# 1051
+{ } 
+# 1053
+template< class _U1, class _U2, typename enable_if< _TC< true, _T1, _T2> ::template _MoveConstructibleTuple< _U1, _U2> () && (!_TC< true, _T1, _T2> ::template _ImplicitlyMoveConvertibleTuple< _U1, _U2> ()), bool> ::type 
+# 1058
+ = false> constexpr explicit 
+# 1059
+tuple(pair< _U1, _U2>  &&__in) : _Inherited(std::forward< _U1> ((__in.first)), std::forward< _U2> ((__in.second))) 
+# 1061
+{ } 
+# 1065
+template< class _Alloc> 
+# 1066
+tuple(std::allocator_arg_t __tag, const _Alloc &__a) : _Inherited(__tag, __a) 
+# 1067
+{ } 
+# 1069
+template< class _Alloc, class _Dummy = void, typename enable_if< _TC< is_same< _Dummy, void> ::value, _T1, _T2> ::template _ConstructibleTuple< _T1, _T2> () && _TC< is_same< _Dummy, void> ::value, _T1, _T2> ::template _ImplicitlyConvertibleTuple< _T1, _T2> (), bool> ::type 
+# 1075
+ = true> 
+# 1077
+tuple(std::allocator_arg_t __tag, const _Alloc &__a, const _T1 &
+# 1078
+__a1, const _T2 &__a2) : _Inherited(__tag, __a, __a1, __a2) 
+# 1079
+{ } 
+# 1081
+template< class _Alloc, class _Dummy = void, typename enable_if< _TC< is_same< _Dummy, void> ::value, _T1, _T2> ::template _ConstructibleTuple< _T1, _T2> () && (!_TC< is_same< _Dummy, void> ::value, _T1, _T2> ::template _ImplicitlyConvertibleTuple< _T1, _T2> ()), bool> ::type 
+# 1087
+ = false> explicit 
+# 1089
+tuple(std::allocator_arg_t __tag, const _Alloc &__a, const _T1 &
+# 1090
+__a1, const _T2 &__a2) : _Inherited(__tag, __a, __a1, __a2) 
+# 1091
+{ } 
+# 1093
+template< class _Alloc, class _U1, class _U2, typename enable_if< _TC< true, _T1, _T2> ::template _MoveConstructibleTuple< _U1, _U2> () && _TC< true, _T1, _T2> ::template _ImplicitlyMoveConvertibleTuple< _U1, _U2> (), bool> ::type 
+# 1098
+ = true> 
+# 1099
+tuple(std::allocator_arg_t __tag, const _Alloc &__a, _U1 &&__a1, _U2 &&__a2) : _Inherited(__tag, __a, std::forward< _U1> (__a1), std::forward< _U2> (__a2)) 
+# 1101
+{ } 
+# 1103
+template< class _Alloc, class _U1, class _U2, typename enable_if< _TC< true, _T1, _T2> ::template _MoveConstructibleTuple< _U1, _U2> () && (!_TC< true, _T1, _T2> ::template _ImplicitlyMoveConvertibleTuple< _U1, _U2> ()), bool> ::type 
+# 1108
+ = false> explicit 
+# 1109
+tuple(std::allocator_arg_t __tag, const _Alloc &__a, _U1 &&
+# 1110
+__a1, _U2 &&__a2) : _Inherited(__tag, __a, std::forward< _U1> (__a1), std::forward< _U2> (__a2)) 
+# 1112
+{ } 
+# 1114
+template< class _Alloc> 
+# 1115
+tuple(std::allocator_arg_t __tag, const _Alloc &__a, const std::tuple< _T1, _T2>  &__in) : _Inherited(__tag, __a, static_cast< const _Inherited &>(__in)) 
+# 1116
+{ } 
+# 1118
+template< class _Alloc> 
+# 1119
+tuple(std::allocator_arg_t __tag, const _Alloc &__a, std::tuple< _T1, _T2>  &&__in) : _Inherited(__tag, __a, static_cast< _Inherited &&>(__in)) 
+# 1120
+{ } 
+# 1122
+template< class _Alloc, class _U1, class _U2, typename enable_if< _TC< true, _T1, _T2> ::template _ConstructibleTuple< _U1, _U2> () && _TC< true, _T1, _T2> ::template _ImplicitlyConvertibleTuple< _U1, _U2> (), bool> ::type 
+# 1127
+ = true> 
+# 1128
+tuple(std::allocator_arg_t __tag, const _Alloc &__a, const std::tuple< _U1, _U2>  &
+# 1129
+__in) : _Inherited(__tag, __a, static_cast< const _Tuple_impl< 0UL, _U1, _U2>  &>(__in)) 
+# 1132
+{ } 
+# 1134
+template< class _Alloc, class _U1, class _U2, typename enable_if< _TC< true, _T1, _T2> ::template _ConstructibleTuple< _U1, _U2> () && (!_TC< true, _T1, _T2> ::template _ImplicitlyConvertibleTuple< _U1, _U2> ()), bool> ::type 
+# 1139
+ = false> explicit 
+# 1140
+tuple(std::allocator_arg_t __tag, const _Alloc &__a, const std::tuple< _U1, _U2>  &
+# 1141
+__in) : _Inherited(__tag, __a, static_cast< const _Tuple_impl< 0UL, _U1, _U2>  &>(__in)) 
+# 1144
+{ } 
+# 1146
+template< class _Alloc, class _U1, class _U2, typename enable_if< _TC< true, _T1, _T2> ::template _MoveConstructibleTuple< _U1, _U2> () && _TC< true, _T1, _T2> ::template _ImplicitlyMoveConvertibleTuple< _U1, _U2> (), bool> ::type 
+# 1151
+ = true> 
+# 1152
+tuple(std::allocator_arg_t __tag, const _Alloc &__a, std::tuple< _U1, _U2>  &&__in) : _Inherited(__tag, __a, static_cast< _Tuple_impl< 0UL, _U1, _U2>  &&>(__in)) 
+# 1154
+{ } 
+# 1156
+template< class _Alloc, class _U1, class _U2, typename enable_if< _TC< true, _T1, _T2> ::template _MoveConstructibleTuple< _U1, _U2> () && (!_TC< true, _T1, _T2> ::template _ImplicitlyMoveConvertibleTuple< _U1, _U2> ()), bool> ::type 
+# 1161
+ = false> explicit 
+# 1162
+tuple(std::allocator_arg_t __tag, const _Alloc &__a, std::tuple< _U1, _U2>  &&
+# 1163
+__in) : _Inherited(__tag, __a, static_cast< _Tuple_impl< 0UL, _U1, _U2>  &&>(__in)) 
+# 1165
+{ } 
+# 1167
+template< class _Alloc, class _U1, class _U2, typename enable_if< _TC< true, _T1, _T2> ::template _ConstructibleTuple< _U1, _U2> () && _TC< true, _T1, _T2> ::template _ImplicitlyConvertibleTuple< _U1, _U2> (), bool> ::type 
+# 1172
+ = true> 
+# 1173
+tuple(std::allocator_arg_t __tag, const _Alloc &__a, const pair< _U1, _U2>  &
+# 1174
+__in) : _Inherited(__tag, __a, (__in.first), (__in.second)) 
+# 1175
+{ } 
+# 1177
+template< class _Alloc, class _U1, class _U2, typename enable_if< _TC< true, _T1, _T2> ::template _ConstructibleTuple< _U1, _U2> () && (!_TC< true, _T1, _T2> ::template _ImplicitlyConvertibleTuple< _U1, _U2> ()), bool> ::type 
+# 1182
+ = false> explicit 
+# 1183
+tuple(std::allocator_arg_t __tag, const _Alloc &__a, const pair< _U1, _U2>  &
+# 1184
+__in) : _Inherited(__tag, __a, (__in.first), (__in.second)) 
+# 1185
+{ } 
+# 1187
+template< class _Alloc, class _U1, class _U2, typename enable_if< _TC< true, _T1, _T2> ::template _MoveConstructibleTuple< _U1, _U2> () && _TC< true, _T1, _T2> ::template _ImplicitlyMoveConvertibleTuple< _U1, _U2> (), bool> ::type 
+# 1192
+ = true> 
+# 1193
+tuple(std::allocator_arg_t __tag, const _Alloc &__a, pair< _U1, _U2>  &&__in) : _Inherited(__tag, __a, std::forward< _U1> ((__in.first)), std::forward< _U2> ((__in.second))) 
+# 1195
+{ } 
+# 1197
+template< class _Alloc, class _U1, class _U2, typename enable_if< _TC< true, _T1, _T2> ::template _MoveConstructibleTuple< _U1, _U2> () && (!_TC< true, _T1, _T2> ::template _ImplicitlyMoveConvertibleTuple< _U1, _U2> ()), bool> ::type 
+# 1202
+ = false> explicit 
+# 1203
+tuple(std::allocator_arg_t __tag, const _Alloc &__a, pair< _U1, _U2>  &&
+# 1204
+__in) : _Inherited(__tag, __a, std::forward< _U1> ((__in.first)), std::forward< _U2> ((__in.second))) 
+# 1206
+{ } 
+# 1209
+std::tuple< _T1, _T2>  &operator=(const std::tuple< _T1, _T2>  &__in) 
+# 1210
+{ 
+# 1211
+(static_cast< _Inherited &>(*this)) = __in; 
+# 1212
+return *this; 
+# 1213
+} 
+# 1216
+std::tuple< _T1, _T2>  &operator=(std::tuple< _T1, _T2>  &&__in) noexcept(is_nothrow_move_assignable< _Tuple_impl< 0UL, _T1, _T2> > ::value) 
+# 1218
+{ 
+# 1219
+(static_cast< _Inherited &>(*this)) = std::move(__in); 
+# 1220
+return *this; 
+# 1221
+} 
+# 1223
+template< class _U1, class _U2> std::tuple< _T1, _T2>  &
+# 1225
+operator=(const std::tuple< _U1, _U2>  &__in) 
+# 1226
+{ 
+# 1227
+(static_cast< _Inherited &>(*this)) = __in; 
+# 1228
+return *this; 
+# 1229
+} 
+# 1231
+template< class _U1, class _U2> std::tuple< _T1, _T2>  &
+# 1233
+operator=(std::tuple< _U1, _U2>  &&__in) 
+# 1234
+{ 
+# 1235
+(static_cast< _Inherited &>(*this)) = std::move(__in); 
+# 1236
+return *this; 
+# 1237
+} 
+# 1239
+template< class _U1, class _U2> std::tuple< _T1, _T2>  &
+# 1241
+operator=(const pair< _U1, _U2>  &__in) 
+# 1242
+{ 
+# 1243
+(this->_M_head(*this)) = (__in.first); 
+# 1244
+((this->_M_tail(*this))._M_head(*this)) = (__in.second); 
+# 1245
+return *this; 
+# 1246
+} 
+# 1248
+template< class _U1, class _U2> std::tuple< _T1, _T2>  &
+# 1250
+operator=(pair< _U1, _U2>  &&__in) 
+# 1251
+{ 
+# 1252
+(this->_M_head(*this)) = std::forward< _U1> ((__in.first)); 
+# 1253
+((this->_M_tail(*this))._M_head(*this)) = std::forward< _U2> ((__in.second)); 
+# 1254
+return *this; 
+# 1255
+} 
+# 1258
+void swap(std::tuple< _T1, _T2>  &__in) noexcept(noexcept((__in._M_swap(__in)))) 
+# 1260
+{ _Inherited::_M_swap(__in); } 
+# 1261
+}; 
+# 1265
+template< class ..._Elements> 
+# 1266
+struct tuple_size< tuple< _Elements...> >  : public integral_constant< unsigned long, sizeof...(_Elements)>  { 
+# 1267
+}; 
+# 1278 "/usr/include/c++/8/tuple" 3
+template< size_t __i, class _Head, class ..._Tail> 
+# 1279
+struct tuple_element< __i, tuple< _Head, _Tail...> >  : public std::tuple_element< __i - (1), tuple< _Tail...> >  { 
+# 1280
+}; 
+# 1285
+template< class _Head, class ..._Tail> 
+# 1286
+struct tuple_element< 0, tuple< _Head, _Tail...> >  { 
+# 1288
+typedef _Head type; 
+# 1289
+}; 
+# 1294
+template< size_t __i> 
+# 1295
+struct tuple_element< __i, tuple< > >  { 
+# 1297
+static_assert((__i < integral_constant< unsigned long, 0UL> ::value), "tuple index is in range");
+# 1299
+}; 
+# 1301
+template< size_t __i, class _Head, class ..._Tail> constexpr _Head &
+# 1303
+__get_helper(_Tuple_impl< __i, _Head, _Tail...>  &__t) noexcept 
+# 1304
+{ return _Tuple_impl< __i, _Head, _Tail...> ::_M_head(__t); } 
+# 1306
+template< size_t __i, class _Head, class ..._Tail> constexpr const _Head &
+# 1308
+__get_helper(const _Tuple_impl< __i, _Head, _Tail...>  &__t) noexcept 
+# 1309
+{ return _Tuple_impl< __i, _Head, _Tail...> ::_M_head(__t); } 
+# 1312
+template< size_t __i, class ..._Elements> constexpr __tuple_element_t< __i, tuple< _Elements...> >  &
+# 1314
+get(tuple< _Elements...>  &__t) noexcept 
+# 1315
+{ return std::__get_helper< __i> (__t); } 
+# 1318
+template< size_t __i, class ..._Elements> constexpr const __tuple_element_t< __i, tuple< _Elements...> >  &
+# 1320
+get(const tuple< _Elements...>  &__t) noexcept 
+# 1321
+{ return std::__get_helper< __i> (__t); } 
+# 1324
+template< size_t __i, class ..._Elements> constexpr __tuple_element_t< __i, tuple< _Elements...> >  &&
+# 1326
+get(tuple< _Elements...>  &&__t) noexcept 
+# 1327
+{ 
+# 1328
+typedef __tuple_element_t< __i, tuple< _Elements...> >  __element_type; 
+# 1329
+return std::forward< __tuple_element_t< __i, tuple< _Elements...> >  &&> (std::get< __i> (__t)); 
+# 1330
+} 
+# 1333
+template< size_t __i, class ..._Elements> constexpr const __tuple_element_t< __i, tuple< _Elements...> >  &&
+# 1335
+get(const tuple< _Elements...>  &&__t) noexcept 
+# 1336
+{ 
+# 1337
+typedef __tuple_element_t< __i, tuple< _Elements...> >  __element_type; 
+# 1338
+return std::forward< const __tuple_element_t< __i, tuple< _Elements...> >  &&> (std::get< __i> (__t)); 
+# 1339
+} 
+# 1345
+template< class _Head, size_t __i, class ..._Tail> constexpr _Head &
+# 1347
+__get_helper2(_Tuple_impl< __i, _Head, _Tail...>  &__t) noexcept 
+# 1348
+{ return _Tuple_impl< __i, _Head, _Tail...> ::_M_head(__t); } 
+# 1350
+template< class _Head, size_t __i, class ..._Tail> constexpr const _Head &
+# 1352
+__get_helper2(const _Tuple_impl< __i, _Head, _Tail...>  &__t) noexcept 
+# 1353
+{ return _Tuple_impl< __i, _Head, _Tail...> ::_M_head(__t); } 
+# 1356
+template< class _Tp, class ..._Types> constexpr _Tp &
+# 1358
+get(tuple< _Types...>  &__t) noexcept 
+# 1359
+{ return std::__get_helper2< _Tp> (__t); } 
+# 1362
+template< class _Tp, class ..._Types> constexpr _Tp &&
+# 1364
+get(tuple< _Types...>  &&__t) noexcept 
+# 1365
+{ return std::forward< _Tp &&> (std::__get_helper2< _Tp> (__t)); } 
+# 1368
+template< class _Tp, class ..._Types> constexpr const _Tp &
+# 1370
+get(const tuple< _Types...>  &__t) noexcept 
+# 1371
+{ return std::__get_helper2< _Tp> (__t); } 
+# 1375
+template< class _Tp, class ..._Types> constexpr const _Tp &&
+# 1377
+get(const tuple< _Types...>  &&__t) noexcept 
+# 1378
+{ return std::forward< const _Tp &&> (std::__get_helper2< _Tp> (__t)); } 
+# 1382
+template< class _Tp, class _Up, size_t __i, size_t __size> 
+# 1383
+struct __tuple_compare { 
+# 1386
+static constexpr bool __eq(const _Tp &__t, const _Up &__u) 
+# 1387
+{ 
+# 1388
+return ((bool)(std::get< __i> (__t) == std::get< __i> (__u))) && __tuple_compare< _Tp, _Up, __i + (1), __size> ::__eq(__t, __u); 
+# 1390
+} 
+# 1393
+static constexpr bool __less(const _Tp &__t, const _Up &__u) 
+# 1394
+{ 
+# 1395
+return ((bool)(std::get< __i> (__t) < std::get< __i> (__u))) || ((!((bool)(std::get< __i> (__u) < std::get< __i> (__t)))) && __tuple_compare< _Tp, _Up, __i + (1), __size> ::__less(__t, __u)); 
+# 1398
+} 
+# 1399
+}; 
+# 1401
+template< class _Tp, class _Up, size_t __size> 
+# 1402
+struct __tuple_compare< _Tp, _Up, __size, __size>  { 
+# 1405
+static constexpr bool __eq(const _Tp &, const _Up &) { return true; } 
+# 1408
+static constexpr bool __less(const _Tp &, const _Up &) { return false; } 
+# 1409
+}; 
+# 1411
+template< class ..._TElements, class ..._UElements> constexpr bool 
+# 1413
+operator==(const tuple< _TElements...>  &__t, const tuple< _UElements...>  &
+# 1414
+__u) 
+# 1415
+{ 
+# 1416
+static_assert((sizeof...(_TElements) == sizeof...(_UElements)), "tuple objects can only be compared if they have equal sizes.");
+# 1418
+using __compare = __tuple_compare< tuple< _TElements...> , tuple< _UElements...> , 0UL, sizeof...(_TElements)> ; 
+# 1421
+return __compare::__eq(__t, __u); 
+# 1422
+} 
+# 1424
+template< class ..._TElements, class ..._UElements> constexpr bool 
+# 1426
+operator<(const tuple< _TElements...>  &__t, const tuple< _UElements...>  &
+# 1427
+__u) 
+# 1428
+{ 
+# 1429
+static_assert((sizeof...(_TElements) == sizeof...(_UElements)), "tuple objects can only be compared if they have equal sizes.");
+# 1431
+using __compare = __tuple_compare< tuple< _TElements...> , tuple< _UElements...> , 0UL, sizeof...(_TElements)> ; 
+# 1434
+return __compare::__less(__t, __u); 
+# 1435
+} 
+# 1437
+template< class ..._TElements, class ..._UElements> constexpr bool 
+# 1439
+operator!=(const tuple< _TElements...>  &__t, const tuple< _UElements...>  &
+# 1440
+__u) 
+# 1441
+{ return !(__t == __u); } 
+# 1443
+template< class ..._TElements, class ..._UElements> constexpr bool 
+# 1445
+operator>(const tuple< _TElements...>  &__t, const tuple< _UElements...>  &
+# 1446
+__u) 
+# 1447
+{ return __u < __t; } 
+# 1449
+template< class ..._TElements, class ..._UElements> constexpr bool 
+# 1451
+operator<=(const tuple< _TElements...>  &__t, const tuple< _UElements...>  &
+# 1452
+__u) 
+# 1453
+{ return !(__u < __t); } 
+# 1455
+template< class ..._TElements, class ..._UElements> constexpr bool 
+# 1457
+operator>=(const tuple< _TElements...>  &__t, const tuple< _UElements...>  &
+# 1458
+__u) 
+# 1459
+{ return !(__t < __u); } 
+# 1462
+template< class ..._Elements> constexpr tuple< typename __decay_and_strip< _Elements> ::__type...>  
+# 1464
+make_tuple(_Elements &&...__args) 
+# 1465
+{ 
+# 1467
+typedef tuple< typename __decay_and_strip< _Elements> ::__type...>  __result_type; 
+# 1468
+return __result_type(std::forward< _Elements> (__args)...); 
+# 1469
+} 
+# 1473
+template< class ..._Elements> constexpr tuple< _Elements &&...>  
+# 1475
+forward_as_tuple(_Elements &&...__args) noexcept 
+# 1476
+{ return tuple< _Elements &&...> (std::forward< _Elements> (__args)...); } 
+# 1478
+template< size_t , class , class , size_t > struct __make_tuple_impl; 
+# 1481
+template< size_t _Idx, class _Tuple, class ..._Tp, size_t _Nm> 
+# 1482
+struct __make_tuple_impl< _Idx, tuple< _Tp...> , _Tuple, _Nm>  : public std::__make_tuple_impl< _Idx + (1), tuple< _Tp..., __tuple_element_t< _Idx, _Tuple> > , _Tuple, _Nm>  { 
+# 1486
+}; 
+# 1488
+template< size_t _Nm, class _Tuple, class ..._Tp> 
+# 1489
+struct __make_tuple_impl< _Nm, tuple< _Tp...> , _Tuple, _Nm>  { 
+# 1491
+typedef tuple< _Tp...>  __type; 
+# 1492
+}; 
+# 1494
+template< class _Tuple> 
+# 1495
+struct __do_make_tuple : public __make_tuple_impl< 0UL, tuple< > , _Tuple, tuple_size< _Tuple> ::value>  { 
+# 1497
+}; 
+# 1500
+template< class _Tuple> 
+# 1501
+struct __make_tuple : public __do_make_tuple< typename remove_cv< typename remove_reference< _Tuple> ::type> ::type>  { 
+# 1504
+}; 
+# 1507
+template< class ...> struct __combine_tuples; 
+# 1511
+template<> struct __combine_tuples< >  { 
+# 1513
+typedef tuple< >  __type; 
+# 1514
+}; 
+# 1516
+template< class ..._Ts> 
+# 1517
+struct __combine_tuples< tuple< _Ts...> >  { 
+# 1519
+typedef tuple< _Ts...>  __type; 
+# 1520
+}; 
+# 1522
+template< class ..._T1s, class ..._T2s, class ..._Rem> 
+# 1523
+struct __combine_tuples< tuple< _T1s...> , tuple< _T2s...> , _Rem...>  { 
+# 1526
+typedef typename std::__combine_tuples< tuple< _T1s..., _T2s...> , _Rem...> ::__type __type; 
+# 1527
+}; 
+# 1530
+template< class ..._Tpls> 
+# 1531
+struct __tuple_cat_result { 
+# 1534
+typedef typename __combine_tuples< typename __make_tuple< _Tpls> ::__type...> ::__type __type; 
+# 1535
+}; 
+# 1539
+template< class ...> struct __make_1st_indices; 
+# 1543
+template<> struct __make_1st_indices< >  { 
+# 1545
+typedef _Index_tuple< >  __type; 
+# 1546
+}; 
+# 1548
+template< class _Tp, class ..._Tpls> 
+# 1549
+struct __make_1st_indices< _Tp, _Tpls...>  { 
+# 1552
+typedef typename _Build_index_tuple< tuple_size< typename remove_reference< _Tp> ::type> ::value> ::__type __type; 
+# 1553
+}; 
+# 1558
+template< class _Ret, class _Indices, class ..._Tpls> struct __tuple_concater; 
+# 1561
+template< class _Ret, size_t ..._Is, class _Tp, class ..._Tpls> 
+# 1562
+struct __tuple_concater< _Ret, _Index_tuple< _Is...> , _Tp, _Tpls...>  { 
+# 1564
+template< class ..._Us> static constexpr _Ret 
+# 1566
+_S_do(_Tp &&__tp, _Tpls &&...__tps, _Us &&...__us) 
+# 1567
+{ 
+# 1568
+typedef typename __make_1st_indices< _Tpls...> ::__type __idx; 
+# 1569
+typedef std::__tuple_concater< _Ret, typename __make_1st_indices< _Tpls...> ::__type, _Tpls...>  __next; 
+# 1570
+return __next::_S_do(std::forward< _Tpls> (__tps)..., std::forward< _Us> (__us)..., std::get< _Is> (std::forward< _Tp> (__tp))...); 
+# 1573
+} 
+# 1574
+}; 
+# 1576
+template< class _Ret> 
+# 1577
+struct __tuple_concater< _Ret, _Index_tuple< > >  { 
+# 1579
+template< class ..._Us> static constexpr _Ret 
+# 1581
+_S_do(_Us &&...__us) 
+# 1582
+{ 
+# 1583
+return _Ret(std::forward< _Us> (__us)...); 
+# 1584
+} 
+# 1585
+}; 
+# 1588
+template< class ..._Tpls, class  = typename enable_if< __and_< __is_tuple_like< _Tpls> ...> ::value> ::type> constexpr auto 
+# 1591
+tuple_cat(_Tpls &&...__tpls)->typename __tuple_cat_result< _Tpls...> ::__type 
+# 1593
+{ 
+# 1594
+typedef typename __tuple_cat_result< _Tpls...> ::__type __ret; 
+# 1595
+typedef typename __make_1st_indices< _Tpls...> ::__type __idx; 
+# 1596
+typedef __tuple_concater< typename __tuple_cat_result< _Tpls...> ::__type, typename __make_1st_indices< _Tpls...> ::__type, _Tpls...>  __concater; 
+# 1597
+return __concater::_S_do(std::forward< _Tpls> (__tpls)...); 
+# 1598
+} 
+# 1603
+template< class ..._Elements> constexpr tuple< _Elements &...>  
+# 1605
+tie(_Elements &...__args) noexcept 
+# 1606
+{ return tuple< _Elements &...> (__args...); } 
+# 1609
+template< class ..._Elements> inline void 
+# 1618
+swap(tuple< _Elements...>  &__x, tuple< _Elements...>  &__y) noexcept(noexcept((__x.swap(__y)))) 
+# 1620
+{ (__x.swap(__y)); } 
+# 1632 "/usr/include/c++/8/tuple" 3
+struct _Swallow_assign { 
+# 1634
+template< class _Tp> constexpr const _Swallow_assign &
+# 1636
+operator=(const _Tp &) const 
+# 1637
+{ return *this; } 
+# 1638
+}; 
+# 1642
+constexpr _Swallow_assign ignore{}; 
+# 1645
+template< class ..._Types, class _Alloc> 
+# 1646
+struct uses_allocator< tuple< _Types...> , _Alloc>  : public true_type { }; 
+# 1649
+template< class _T1, class _T2> 
+# 1650
+template< class ..._Args1, class ..._Args2> inline 
+# 1653
+pair< _T1, _T2> ::pair(std::piecewise_construct_t, tuple< _Args1...>  
+# 1654
+__first, tuple< _Args2...>  __second) : pair(__first, __second, typename _Build_index_tuple< sizeof...(_Args1)> ::__type(), typename _Build_index_tuple< sizeof...(_Args2)> ::__type()) 
+# 1658
+{ } 
+# 1660
+template< class _T1, class _T2> 
+# 1661
+template< class ..._Args1, size_t ..._Indexes1, class ...
+# 1662
+_Args2, size_t ..._Indexes2> inline 
+# 1665
+pair< _T1, _T2> ::pair(tuple< _Args1...>  &__tuple1, tuple< _Args2...>  &__tuple2, _Index_tuple< _Indexes1...> , _Index_tuple< _Indexes2...> ) : first(std::forward< _Args1> (std::get< _Indexes1> (__tuple1))...), second(std::forward< _Args2> (std::get< _Indexes2> (__tuple2))...) 
+# 1669
+{ } 
+# 1712 "/usr/include/c++/8/tuple" 3
+}
+# 66 "/usr/include/c++/8/bits/stl_map.h" 3
+namespace std __attribute((__visibility__("default"))) { 
+# 71
+template< class _Key, class _Tp, class _Compare, class _Alloc> class multimap; 
+# 98 "/usr/include/c++/8/bits/stl_map.h" 3
+template< class _Key, class _Tp, class _Compare = less< _Key> , class 
+# 99
+_Alloc = allocator< pair< const _Key, _Tp> > > 
+# 100
+class map { 
+# 103
+public: typedef _Key key_type; 
+# 104
+typedef _Tp mapped_type; 
+# 105
+typedef pair< const _Key, _Tp>  value_type; 
+# 106
+typedef _Compare key_compare; 
+# 107
+typedef _Alloc allocator_type; 
+# 122 "/usr/include/c++/8/bits/stl_map.h" 3
+static_assert((is_same< typename _Alloc::value_type, pair< const _Key, _Tp> > ::value), "std::map must have the same value_type as its allocator");
+# 127
+class value_compare : public binary_function< pair< const _Key, _Tp> , pair< const _Key, _Tp> , bool>  { 
+# 130
+friend class map; 
+# 132
+protected: _Compare comp; 
+# 134
+value_compare(_Compare __c) : comp(__c) 
+# 135
+{ } 
+# 138
+public: bool operator()(const typename std::map< _Key, _Tp, _Compare, _Alloc> ::value_type &__x, const typename std::map< _Key, _Tp, _Compare, _Alloc> ::value_type &__y) const 
+# 139
+{ return (comp)((__x.first), (__y.first)); } 
+# 140
+}; 
+# 145
+private: typedef typename __gnu_cxx::__alloc_traits< _Alloc> ::template rebind< pair< const _Key, _Tp> > ::other _Pair_alloc_type; 
+# 148
+typedef _Rb_tree< _Key, pair< const _Key, _Tp> , _Select1st< pair< const _Key, _Tp> > , _Compare, typename __gnu_cxx::__alloc_traits< _Alloc> ::template rebind< pair< const _Key, _Tp> > ::other>  _Rep_type; 
+# 151
+_Rep_type _M_t; 
+# 153
+typedef __gnu_cxx::__alloc_traits< typename __gnu_cxx::__alloc_traits< _Alloc> ::template rebind< pair< const _Key, _Tp> > ::other>  _Alloc_traits; 
+# 158
+public: typedef typename __gnu_cxx::__alloc_traits< typename __gnu_cxx::__alloc_traits< _Alloc> ::template rebind< pair< const _Key, _Tp> > ::other> ::pointer pointer; 
+# 159
+typedef typename __gnu_cxx::__alloc_traits< typename __gnu_cxx::__alloc_traits< _Alloc> ::template rebind< pair< const _Key, _Tp> > ::other> ::const_pointer const_pointer; 
+# 160
+typedef typename __gnu_cxx::__alloc_traits< typename __gnu_cxx::__alloc_traits< _Alloc> ::template rebind< pair< const _Key, _Tp> > ::other> ::reference reference; 
+# 161
+typedef typename __gnu_cxx::__alloc_traits< typename __gnu_cxx::__alloc_traits< _Alloc> ::template rebind< pair< const _Key, _Tp> > ::other> ::const_reference const_reference; 
+# 162
+typedef typename _Rb_tree< _Key, pair< const _Key, _Tp> , _Select1st< pair< const _Key, _Tp> > , _Compare, typename __gnu_cxx::__alloc_traits< _Alloc> ::template rebind< pair< const _Key, _Tp> > ::other> ::iterator iterator; 
+# 163
+typedef typename _Rb_tree< _Key, pair< const _Key, _Tp> , _Select1st< pair< const _Key, _Tp> > , _Compare, typename __gnu_cxx::__alloc_traits< _Alloc> ::template rebind< pair< const _Key, _Tp> > ::other> ::const_iterator const_iterator; 
+# 164
+typedef typename _Rb_tree< _Key, pair< const _Key, _Tp> , _Select1st< pair< const _Key, _Tp> > , _Compare, typename __gnu_cxx::__alloc_traits< _Alloc> ::template rebind< pair< const _Key, _Tp> > ::other> ::size_type size_type; 
+# 165
+typedef typename _Rb_tree< _Key, pair< const _Key, _Tp> , _Select1st< pair< const _Key, _Tp> > , _Compare, typename __gnu_cxx::__alloc_traits< _Alloc> ::template rebind< pair< const _Key, _Tp> > ::other> ::difference_type difference_type; 
+# 166
+typedef typename _Rb_tree< _Key, pair< const _Key, _Tp> , _Select1st< pair< const _Key, _Tp> > , _Compare, typename __gnu_cxx::__alloc_traits< _Alloc> ::template rebind< pair< const _Key, _Tp> > ::other> ::reverse_iterator reverse_iterator; 
+# 167
+typedef typename _Rb_tree< _Key, pair< const _Key, _Tp> , _Select1st< pair< const _Key, _Tp> > , _Compare, typename __gnu_cxx::__alloc_traits< _Alloc> ::template rebind< pair< const _Key, _Tp> > ::other> ::const_reverse_iterator const_reverse_iterator; 
+# 183 "/usr/include/c++/8/bits/stl_map.h" 3
+map() = default;
+# 192
+explicit map(const _Compare &__comp, const allocator_type &
+# 193
+__a = allocator_type()) : _M_t(__comp, (_Pair_alloc_type)__a) 
+# 194
+{ } 
+# 205 "/usr/include/c++/8/bits/stl_map.h" 3
+map(const map &) = default;
+# 213
+map(map &&) = default;
+# 226 "/usr/include/c++/8/bits/stl_map.h" 3
+map(initializer_list< pair< const _Key, _Tp> >  __l, const _Compare &
+# 227
+__comp = _Compare(), const allocator_type &
+# 228
+__a = allocator_type()) : _M_t(__comp, (_Pair_alloc_type)__a) 
+# 230
+{ ((_M_t)._M_insert_unique((__l.begin()), (__l.end()))); } 
+# 234
+explicit map(const allocator_type &__a) : _M_t(_Compare(), (_Pair_alloc_type)__a) 
+# 235
+{ } 
+# 238
+map(const map &__m, const allocator_type &__a) : _M_t(__m._M_t, (_Pair_alloc_type)__a) 
+# 239
+{ } 
+# 242
+map(map &&__m, const allocator_type &__a) noexcept(is_nothrow_copy_constructible< _Compare> ::value && _Alloc_traits::_S_always_equal()) : _M_t(std::move(__m._M_t), (_Pair_alloc_type)__a) 
+# 245
+{ } 
+# 248
+map(initializer_list< pair< const _Key, _Tp> >  __l, const allocator_type &__a) : _M_t(_Compare(), (_Pair_alloc_type)__a) 
+# 250
+{ ((_M_t)._M_insert_unique((__l.begin()), (__l.end()))); } 
+# 253
+template< class _InputIterator> 
+# 254
+map(_InputIterator __first, _InputIterator __last, const allocator_type &
+# 255
+__a) : _M_t(_Compare(), (_Pair_alloc_type)__a) 
+# 257
+{ ((_M_t)._M_insert_unique(__first, __last)); } 
+# 270 "/usr/include/c++/8/bits/stl_map.h" 3
+template< class _InputIterator> 
+# 271
+map(_InputIterator __first, _InputIterator __last) : _M_t() 
+# 273
+{ ((_M_t)._M_insert_unique(__first, __last)); } 
+# 287 "/usr/include/c++/8/bits/stl_map.h" 3
+template< class _InputIterator> 
+# 288
+map(_InputIterator __first, _InputIterator __last, const _Compare &
+# 289
+__comp, const allocator_type &
+# 290
+__a = allocator_type()) : _M_t(__comp, (_Pair_alloc_type)__a) 
+# 292
+{ ((_M_t)._M_insert_unique(__first, __last)); } 
+# 300
+~map() = default;
+# 317 "/usr/include/c++/8/bits/stl_map.h" 3
+map &operator=(const map &) = default;
+# 321
+map &operator=(map &&) = default;
+# 335 "/usr/include/c++/8/bits/stl_map.h" 3
+map &operator=(initializer_list< pair< const _Key, _Tp> >  __l) 
+# 336
+{ 
+# 337
+((_M_t)._M_assign_unique((__l.begin()), (__l.end()))); 
+# 338
+return *this; 
+# 339
+} 
+# 344
+allocator_type get_allocator() const noexcept 
+# 345
+{ return (allocator_type)((_M_t).get_allocator()); } 
+# 354
+iterator begin() noexcept 
+# 355
+{ return ((_M_t).begin()); } 
+# 363
+const_iterator begin() const noexcept 
+# 364
+{ return ((_M_t).begin()); } 
+# 372
+iterator end() noexcept 
+# 373
+{ return ((_M_t).end()); } 
+# 381
+const_iterator end() const noexcept 
+# 382
+{ return ((_M_t).end()); } 
+# 390
+reverse_iterator rbegin() noexcept 
+# 391
+{ return ((_M_t).rbegin()); } 
+# 399
+const_reverse_iterator rbegin() const noexcept 
+# 400
+{ return ((_M_t).rbegin()); } 
+# 408
+reverse_iterator rend() noexcept 
+# 409
+{ return ((_M_t).rend()); } 
+# 417
+const_reverse_iterator rend() const noexcept 
+# 418
+{ return ((_M_t).rend()); } 
+# 427
+const_iterator cbegin() const noexcept 
+# 428
+{ return ((_M_t).begin()); } 
+# 436
+const_iterator cend() const noexcept 
+# 437
+{ return ((_M_t).end()); } 
+# 445
+const_reverse_iterator crbegin() const noexcept 
+# 446
+{ return ((_M_t).rbegin()); } 
+# 454
+const_reverse_iterator crend() const noexcept 
+# 455
+{ return ((_M_t).rend()); } 
+# 463
+bool empty() const noexcept 
+# 464
+{ return ((_M_t).empty()); } 
+# 468
+size_type size() const noexcept 
+# 469
+{ return ((_M_t).size()); } 
+# 473
+size_type max_size() const noexcept 
+# 474
+{ return ((_M_t).max_size()); } 
+# 490 "/usr/include/c++/8/bits/stl_map.h" 3
+mapped_type &operator[](const key_type &__k) 
+# 491
+{ 
+# 495
+iterator __i = lower_bound(__k); 
+# 497
+if ((__i == end()) || key_comp()(__k, ((*__i).first))) { 
+# 499
+__i = ((_M_t)._M_emplace_hint_unique(__i, std::piecewise_construct, ((tuple< const _Key &> )(__k)), tuple< > ())); }  
+# 505
+return (*__i).second; 
+# 506
+} 
+# 510
+mapped_type &operator[](key_type &&__k) 
+# 511
+{ 
+# 515
+iterator __i = lower_bound(__k); 
+# 517
+if ((__i == end()) || key_comp()(__k, ((*__i).first))) { 
+# 518
+__i = ((_M_t)._M_emplace_hint_unique(__i, std::piecewise_construct, std::forward_as_tuple(std::move(__k)), tuple< > ())); }  
+# 521
+return (*__i).second; 
+# 522
+} 
+# 535 "/usr/include/c++/8/bits/stl_map.h" 3
+mapped_type &at(const key_type &__k) 
+# 536
+{ 
+# 537
+iterator __i = lower_bound(__k); 
+# 538
+if ((__i == end()) || key_comp()(__k, ((*__i).first))) { 
+# 539
+__throw_out_of_range("map::at"); }  
+# 540
+return (*__i).second; 
+# 541
+} 
+# 544
+const mapped_type &at(const key_type &__k) const 
+# 545
+{ 
+# 546
+const_iterator __i = lower_bound(__k); 
+# 547
+if ((__i == end()) || key_comp()(__k, ((*__i).first))) { 
+# 548
+__throw_out_of_range("map::at"); }  
+# 549
+return (*__i).second; 
+# 550
+} 
+# 572 "/usr/include/c++/8/bits/stl_map.h" 3
+template< class ..._Args> pair< typename _Rb_tree< _Key, pair< const _Key, _Tp> , _Select1st< pair< const _Key, _Tp> > , _Compare, typename __gnu_cxx::__alloc_traits< _Alloc> ::template rebind< pair< const _Key, _Tp> > ::other> ::iterator, bool>  
+# 574
+emplace(_Args &&...__args) 
+# 575
+{ return ((_M_t)._M_emplace_unique(std::forward< _Args> (__args)...)); } 
+# 602 "/usr/include/c++/8/bits/stl_map.h" 3
+template< class ..._Args> iterator 
+# 604
+emplace_hint(const_iterator __pos, _Args &&...__args) 
+# 605
+{ 
+# 606
+return ((_M_t)._M_emplace_hint_unique(__pos, std::forward< _Args> (__args)...)); 
+# 608
+} 
+# 801 "/usr/include/c++/8/bits/stl_map.h" 3
+pair< typename _Rb_tree< _Key, pair< const _Key, _Tp> , _Select1st< pair< const _Key, _Tp> > , _Compare, typename __gnu_cxx::__alloc_traits< _Alloc> ::template rebind< pair< const _Key, _Tp> > ::other> ::iterator, bool>  insert(const value_type &__x) 
+# 802
+{ return ((_M_t)._M_insert_unique(__x)); } 
+# 808
+pair< typename _Rb_tree< _Key, pair< const _Key, _Tp> , _Select1st< pair< const _Key, _Tp> > , _Compare, typename __gnu_cxx::__alloc_traits< _Alloc> ::template rebind< pair< const _Key, _Tp> > ::other> ::iterator, bool>  insert(value_type &&__x) 
+# 809
+{ return ((_M_t)._M_insert_unique(std::move(__x))); } 
+# 811
+template< class _Pair> __enable_if_t< is_constructible< pair< const _Key, _Tp> , _Pair> ::value, pair< typename _Rb_tree< _Key, pair< const _Key, _Tp> , _Select1st< pair< const _Key, _Tp> > , _Compare, typename __gnu_cxx::__alloc_traits< _Alloc> ::template rebind< pair< const _Key, _Tp> > ::other> ::iterator, bool> >  
+# 814
+insert(_Pair &&__x) 
+# 815
+{ return ((_M_t)._M_emplace_unique(std::forward< _Pair> (__x))); } 
+# 828 "/usr/include/c++/8/bits/stl_map.h" 3
+void insert(initializer_list< pair< const _Key, _Tp> >  __list) 
+# 829
+{ insert((__list.begin()), (__list.end())); } 
+# 858 "/usr/include/c++/8/bits/stl_map.h" 3
+iterator insert(const_iterator __position, const value_type &__x) 
+# 862
+{ return ((_M_t)._M_insert_unique_(__position, __x)); } 
+# 868
+iterator insert(const_iterator __position, value_type &&__x) 
+# 869
+{ return ((_M_t)._M_insert_unique_(__position, std::move(__x))); } 
+# 871
+template< class _Pair> __enable_if_t< is_constructible< pair< const _Key, _Tp> , _Pair> ::value, typename _Rb_tree< _Key, pair< const _Key, _Tp> , _Select1st< pair< const _Key, _Tp> > , _Compare, typename __gnu_cxx::__alloc_traits< _Alloc> ::template rebind< pair< const _Key, _Tp> > ::other> ::iterator>  
+# 873
+insert(const_iterator __position, _Pair &&__x) 
+# 874
+{ 
+# 875
+return ((_M_t)._M_emplace_hint_unique(__position, std::forward< _Pair> (__x))); 
+# 877
+} 
+# 889 "/usr/include/c++/8/bits/stl_map.h" 3
+template< class _InputIterator> void 
+# 891
+insert(_InputIterator __first, _InputIterator __last) 
+# 892
+{ ((_M_t)._M_insert_unique(__first, __last)); } 
+# 1030 "/usr/include/c++/8/bits/stl_map.h" 3
+iterator erase(const_iterator __position) 
+# 1031
+{ return ((_M_t).erase(__position)); } 
+# 1034
+__attribute((__abi_tag__("cxx11"))) iterator 
+# 1036
+erase(iterator __position) 
+# 1037
+{ return ((_M_t).erase(__position)); } 
+# 1067 "/usr/include/c++/8/bits/stl_map.h" 3
+size_type erase(const key_type &__x) 
+# 1068
+{ return ((_M_t).erase(__x)); } 
+# 1087 "/usr/include/c++/8/bits/stl_map.h" 3
+iterator erase(const_iterator __first, const_iterator __last) 
+# 1088
+{ return ((_M_t).erase(__first, __last)); } 
+# 1121 "/usr/include/c++/8/bits/stl_map.h" 3
+void swap(map &__x) noexcept(__is_nothrow_swappable< _Compare> ::value) 
+# 1123
+{ ((_M_t).swap(__x._M_t)); } 
+# 1132
+void clear() noexcept 
+# 1133
+{ ((_M_t).clear()); } 
+# 1141
+key_compare key_comp() const 
+# 1142
+{ return ((_M_t).key_comp()); } 
+# 1149
+value_compare value_comp() const 
+# 1150
+{ return (value_compare)((_M_t).key_comp()); } 
+# 1168 "/usr/include/c++/8/bits/stl_map.h" 3
+iterator find(const key_type &__x) 
+# 1169
+{ return ((_M_t).find(__x)); } 
+# 1172
+template< class _Kt> auto 
+# 1174
+find(const _Kt &__x)->__decltype((((_M_t)._M_find_tr(__x)))) 
+# 1175
+{ return ((_M_t)._M_find_tr(__x)); } 
+# 1193 "/usr/include/c++/8/bits/stl_map.h" 3
+const_iterator find(const key_type &__x) const 
+# 1194
+{ return ((_M_t).find(__x)); } 
+# 1197
+template< class _Kt> auto 
+# 1199
+find(const _Kt &__x) const->__decltype((((_M_t)._M_find_tr(__x)))) 
+# 1200
+{ return ((_M_t)._M_find_tr(__x)); } 
+# 1214 "/usr/include/c++/8/bits/stl_map.h" 3
+size_type count(const key_type &__x) const 
+# 1215
+{ return (((_M_t).find(__x)) == ((_M_t).end())) ? 0 : 1; } 
+# 1218
+template< class _Kt> auto 
+# 1220
+count(const _Kt &__x) const->__decltype((((_M_t)._M_count_tr(__x)))) 
+# 1221
+{ return ((_M_t)._M_count_tr(__x)); } 
+# 1238 "/usr/include/c++/8/bits/stl_map.h" 3
+iterator lower_bound(const key_type &__x) 
+# 1239
+{ return ((_M_t).lower_bound(__x)); } 
+# 1242
+template< class _Kt> auto 
+# 1244
+lower_bound(const _Kt &__x)->__decltype(((iterator)((_M_t)._M_lower_bound_tr(__x)))) 
+# 1246
+{ return (iterator)((_M_t)._M_lower_bound_tr(__x)); } 
+# 1263 "/usr/include/c++/8/bits/stl_map.h" 3
+const_iterator lower_bound(const key_type &__x) const 
+# 1264
+{ return ((_M_t).lower_bound(__x)); } 
+# 1267
+template< class _Kt> auto 
+# 1269
+lower_bound(const _Kt &__x) const->__decltype(((const_iterator)((_M_t)._M_lower_bound_tr(__x)))) 
+# 1271
+{ return (const_iterator)((_M_t)._M_lower_bound_tr(__x)); } 
+# 1283 "/usr/include/c++/8/bits/stl_map.h" 3
+iterator upper_bound(const key_type &__x) 
+# 1284
+{ return ((_M_t).upper_bound(__x)); } 
+# 1287
+template< class _Kt> auto 
+# 1289
+upper_bound(const _Kt &__x)->__decltype(((iterator)((_M_t)._M_upper_bound_tr(__x)))) 
+# 1291
+{ return (iterator)((_M_t)._M_upper_bound_tr(__x)); } 
+# 1303 "/usr/include/c++/8/bits/stl_map.h" 3
+const_iterator upper_bound(const key_type &__x) const 
+# 1304
+{ return ((_M_t).upper_bound(__x)); } 
+# 1307
+template< class _Kt> auto 
+# 1309
+upper_bound(const _Kt &__x) const->__decltype(((const_iterator)((_M_t)._M_upper_bound_tr(__x)))) 
+# 1311
+{ return (const_iterator)((_M_t)._M_upper_bound_tr(__x)); } 
+# 1332 "/usr/include/c++/8/bits/stl_map.h" 3
+pair< typename _Rb_tree< _Key, pair< const _Key, _Tp> , _Select1st< pair< const _Key, _Tp> > , _Compare, typename __gnu_cxx::__alloc_traits< _Alloc> ::template rebind< pair< const _Key, _Tp> > ::other> ::iterator, typename _Rb_tree< _Key, pair< const _Key, _Tp> , _Select1st< pair< const _Key, _Tp> > , _Compare, typename __gnu_cxx::__alloc_traits< _Alloc> ::template rebind< pair< const _Key, _Tp> > ::other> ::iterator>  equal_range(const key_type &__x) 
+# 1333
+{ return ((_M_t).equal_range(__x)); } 
+# 1336
+template< class _Kt> auto 
+# 1338
+equal_range(const _Kt &__x)->__decltype((((pair< typename _Rb_tree< _Key, pair< const _Key, _Tp> , _Select1st< pair< const _Key, _Tp> > , _Compare, typename __gnu_cxx::__alloc_traits< _Alloc> ::template rebind< pair< const _Key, _Tp> > ::other> ::iterator, typename _Rb_tree< _Key, pair< const _Key, _Tp> , _Select1st< pair< const _Key, _Tp> > , _Compare, typename __gnu_cxx::__alloc_traits< _Alloc> ::template rebind< pair< const _Key, _Tp> > ::other> ::iterator> )(((_M_t)._M_equal_range_tr(__x)))))) 
+# 1340
+{ return ((pair< typename _Rb_tree< _Key, pair< const _Key, _Tp> , _Select1st< pair< const _Key, _Tp> > , _Compare, typename __gnu_cxx::__alloc_traits< _Alloc> ::template rebind< pair< const _Key, _Tp> > ::other> ::iterator, typename _Rb_tree< _Key, pair< const _Key, _Tp> , _Select1st< pair< const _Key, _Tp> > , _Compare, typename __gnu_cxx::__alloc_traits< _Alloc> ::template rebind< pair< const _Key, _Tp> > ::other> ::iterator> )(((_M_t)._M_equal_range_tr(__x)))); } 
+# 1361 "/usr/include/c++/8/bits/stl_map.h" 3
+pair< typename _Rb_tree< _Key, pair< const _Key, _Tp> , _Select1st< pair< const _Key, _Tp> > , _Compare, typename __gnu_cxx::__alloc_traits< _Alloc> ::template rebind< pair< const _Key, _Tp> > ::other> ::const_iterator, typename _Rb_tree< _Key, pair< const _Key, _Tp> , _Select1st< pair< const _Key, _Tp> > , _Compare, typename __gnu_cxx::__alloc_traits< _Alloc> ::template rebind< pair< const _Key, _Tp> > ::other> ::const_iterator>  equal_range(const key_type &__x) const 
+# 1362
+{ return ((_M_t).equal_range(__x)); } 
+# 1365
+template< class _Kt> auto 
+# 1367
+equal_range(const _Kt &__x) const->__decltype((((pair< typename _Rb_tree< _Key, pair< const _Key, _Tp> , _Select1st< pair< const _Key, _Tp> > , _Compare, typename __gnu_cxx::__alloc_traits< _Alloc> ::template rebind< pair< const _Key, _Tp> > ::other> ::const_iterator, typename _Rb_tree< _Key, pair< const _Key, _Tp> , _Select1st< pair< const _Key, _Tp> > , _Compare, typename __gnu_cxx::__alloc_traits< _Alloc> ::template rebind< pair< const _Key, _Tp> > ::other> ::const_iterator> )(((_M_t)._M_equal_range_tr(__x)))))) 
+# 1370
+{ 
+# 1371
+return ((pair< typename _Rb_tree< _Key, pair< const _Key, _Tp> , _Select1st< pair< const _Key, _Tp> > , _Compare, typename __gnu_cxx::__alloc_traits< _Alloc> ::template rebind< pair< const _Key, _Tp> > ::other> ::const_iterator, typename _Rb_tree< _Key, pair< const _Key, _Tp> , _Select1st< pair< const _Key, _Tp> > , _Compare, typename __gnu_cxx::__alloc_traits< _Alloc> ::template rebind< pair< const _Key, _Tp> > ::other> ::const_iterator> )(((_M_t)._M_equal_range_tr(__x)))); 
+# 1373
+} 
+# 1377
+template< class _K1, class _T1, class _C1, class _A1> friend bool operator==(const std::map< _K1, _T1, _C1, _A1>  &, const std::map< _K1, _T1, _C1, _A1>  &); 
+# 1382
+template< class _K1, class _T1, class _C1, class _A1> friend bool operator<(const std::map< _K1, _T1, _C1, _A1>  &, const std::map< _K1, _T1, _C1, _A1>  &); 
+# 1386
+}; 
+# 1432 "/usr/include/c++/8/bits/stl_map.h" 3
+template< class _Key, class _Tp, class _Compare, class _Alloc> inline bool 
+# 1434
+operator==(const map< _Key, _Tp, _Compare, _Alloc>  &__x, const map< _Key, _Tp, _Compare, _Alloc>  &
+# 1435
+__y) 
+# 1436
+{ return (__x._M_t) == (__y._M_t); } 
+# 1449 "/usr/include/c++/8/bits/stl_map.h" 3
+template< class _Key, class _Tp, class _Compare, class _Alloc> inline bool 
+# 1451
+operator<(const map< _Key, _Tp, _Compare, _Alloc>  &__x, const map< _Key, _Tp, _Compare, _Alloc>  &
+# 1452
+__y) 
+# 1453
+{ return (__x._M_t) < (__y._M_t); } 
+# 1456
+template< class _Key, class _Tp, class _Compare, class _Alloc> inline bool 
+# 1458
+operator!=(const map< _Key, _Tp, _Compare, _Alloc>  &__x, const map< _Key, _Tp, _Compare, _Alloc>  &
+# 1459
+__y) 
+# 1460
+{ return !(__x == __y); } 
+# 1463
+template< class _Key, class _Tp, class _Compare, class _Alloc> inline bool 
+# 1465
+operator>(const map< _Key, _Tp, _Compare, _Alloc>  &__x, const map< _Key, _Tp, _Compare, _Alloc>  &
+# 1466
+__y) 
+# 1467
+{ return __y < __x; } 
+# 1470
+template< class _Key, class _Tp, class _Compare, class _Alloc> inline bool 
+# 1472
+operator<=(const map< _Key, _Tp, _Compare, _Alloc>  &__x, const map< _Key, _Tp, _Compare, _Alloc>  &
+# 1473
+__y) 
+# 1474
+{ return !(__y < __x); } 
+# 1477
+template< class _Key, class _Tp, class _Compare, class _Alloc> inline bool 
+# 1479
+operator>=(const map< _Key, _Tp, _Compare, _Alloc>  &__x, const map< _Key, _Tp, _Compare, _Alloc>  &
+# 1480
+__y) 
+# 1481
+{ return !(__x < __y); } 
+# 1484
+template< class _Key, class _Tp, class _Compare, class _Alloc> inline void 
+# 1486
+swap(map< _Key, _Tp, _Compare, _Alloc>  &__x, map< _Key, _Tp, _Compare, _Alloc>  &
+# 1487
+__y) noexcept(noexcept((__x.swap(__y)))) 
+# 1489
+{ (__x.swap(__y)); } 
+# 1515 "/usr/include/c++/8/bits/stl_map.h" 3
+}
+# 64 "/usr/include/c++/8/bits/stl_multimap.h" 3
+namespace std __attribute((__visibility__("default"))) { 
+# 69
+template< class _Key, class _Tp, class _Compare, class _Alloc> class map; 
+# 96 "/usr/include/c++/8/bits/stl_multimap.h" 3
+template< class _Key, class _Tp, class 
+# 97
+_Compare = less< _Key> , class 
+# 98
+_Alloc = allocator< pair< const _Key, _Tp> > > 
+# 99
+class multimap { 
+# 102
+public: typedef _Key key_type; 
+# 103
+typedef _Tp mapped_type; 
+# 104
+typedef pair< const _Key, _Tp>  value_type; 
+# 105
+typedef _Compare key_compare; 
+# 106
+typedef _Alloc allocator_type; 
+# 121 "/usr/include/c++/8/bits/stl_multimap.h" 3
+static_assert((is_same< typename _Alloc::value_type, pair< const _Key, _Tp> > ::value), "std::multimap must have the same value_type as its allocator");
+# 126
+class value_compare : public binary_function< pair< const _Key, _Tp> , pair< const _Key, _Tp> , bool>  { 
+# 129
+friend class multimap; 
+# 131
+protected: _Compare comp; 
+# 133
+value_compare(_Compare __c) : comp(__c) 
+# 134
+{ } 
+# 137
+public: bool operator()(const typename std::multimap< _Key, _Tp, _Compare, _Alloc> ::value_type &__x, const typename std::multimap< _Key, _Tp, _Compare, _Alloc> ::value_type &__y) const 
+# 138
+{ return (comp)((__x.first), (__y.first)); } 
+# 139
+}; 
+# 144
+private: typedef typename __gnu_cxx::__alloc_traits< _Alloc> ::template rebind< pair< const _Key, _Tp> > ::other _Pair_alloc_type; 
+# 147
+typedef _Rb_tree< _Key, pair< const _Key, _Tp> , _Select1st< pair< const _Key, _Tp> > , _Compare, typename __gnu_cxx::__alloc_traits< _Alloc> ::template rebind< pair< const _Key, _Tp> > ::other>  _Rep_type; 
+# 149
+_Rep_type _M_t; 
+# 151
+typedef __gnu_cxx::__alloc_traits< typename __gnu_cxx::__alloc_traits< _Alloc> ::template rebind< pair< const _Key, _Tp> > ::other>  _Alloc_traits; 
+# 156
+public: typedef typename __gnu_cxx::__alloc_traits< typename __gnu_cxx::__alloc_traits< _Alloc> ::template rebind< pair< const _Key, _Tp> > ::other> ::pointer pointer; 
+# 157
+typedef typename __gnu_cxx::__alloc_traits< typename __gnu_cxx::__alloc_traits< _Alloc> ::template rebind< pair< const _Key, _Tp> > ::other> ::const_pointer const_pointer; 
+# 158
+typedef typename __gnu_cxx::__alloc_traits< typename __gnu_cxx::__alloc_traits< _Alloc> ::template rebind< pair< const _Key, _Tp> > ::other> ::reference reference; 
+# 159
+typedef typename __gnu_cxx::__alloc_traits< typename __gnu_cxx::__alloc_traits< _Alloc> ::template rebind< pair< const _Key, _Tp> > ::other> ::const_reference const_reference; 
+# 160
+typedef typename _Rb_tree< _Key, pair< const _Key, _Tp> , _Select1st< pair< const _Key, _Tp> > , _Compare, typename __gnu_cxx::__alloc_traits< _Alloc> ::template rebind< pair< const _Key, _Tp> > ::other> ::iterator iterator; 
+# 161
+typedef typename _Rb_tree< _Key, pair< const _Key, _Tp> , _Select1st< pair< const _Key, _Tp> > , _Compare, typename __gnu_cxx::__alloc_traits< _Alloc> ::template rebind< pair< const _Key, _Tp> > ::other> ::const_iterator const_iterator; 
+# 162
+typedef typename _Rb_tree< _Key, pair< const _Key, _Tp> , _Select1st< pair< const _Key, _Tp> > , _Compare, typename __gnu_cxx::__alloc_traits< _Alloc> ::template rebind< pair< const _Key, _Tp> > ::other> ::size_type size_type; 
+# 163
+typedef typename _Rb_tree< _Key, pair< const _Key, _Tp> , _Select1st< pair< const _Key, _Tp> > , _Compare, typename __gnu_cxx::__alloc_traits< _Alloc> ::template rebind< pair< const _Key, _Tp> > ::other> ::difference_type difference_type; 
+# 164
+typedef typename _Rb_tree< _Key, pair< const _Key, _Tp> , _Select1st< pair< const _Key, _Tp> > , _Compare, typename __gnu_cxx::__alloc_traits< _Alloc> ::template rebind< pair< const _Key, _Tp> > ::other> ::reverse_iterator reverse_iterator; 
+# 165
+typedef typename _Rb_tree< _Key, pair< const _Key, _Tp> , _Select1st< pair< const _Key, _Tp> > , _Compare, typename __gnu_cxx::__alloc_traits< _Alloc> ::template rebind< pair< const _Key, _Tp> > ::other> ::const_reverse_iterator const_reverse_iterator; 
+# 180 "/usr/include/c++/8/bits/stl_multimap.h" 3
+multimap() = default;
+# 189
+explicit multimap(const _Compare &__comp, const allocator_type &
+# 190
+__a = allocator_type()) : _M_t(__comp, (_Pair_alloc_type)__a) 
+# 191
+{ } 
+# 202 "/usr/include/c++/8/bits/stl_multimap.h" 3
+multimap(const multimap &) = default;
+# 211 "/usr/include/c++/8/bits/stl_multimap.h" 3
+multimap(multimap &&) = default;
+# 223 "/usr/include/c++/8/bits/stl_multimap.h" 3
+multimap(initializer_list< pair< const _Key, _Tp> >  __l, const _Compare &
+# 224
+__comp = _Compare(), const allocator_type &
+# 225
+__a = allocator_type()) : _M_t(__comp, (_Pair_alloc_type)__a) 
+# 227
+{ ((_M_t)._M_insert_equal((__l.begin()), (__l.end()))); } 
+# 231
+explicit multimap(const allocator_type &__a) : _M_t(_Compare(), (_Pair_alloc_type)__a) 
+# 232
+{ } 
+# 235
+multimap(const multimap &__m, const allocator_type &__a) : _M_t(__m._M_t, (_Pair_alloc_type)__a) 
+# 236
+{ } 
+# 239
+multimap(multimap &&__m, const allocator_type &__a) noexcept(is_nothrow_copy_constructible< _Compare> ::value && _Alloc_traits::_S_always_equal()) : _M_t(std::move(__m._M_t), (_Pair_alloc_type)__a) 
+# 242
+{ } 
+# 245
+multimap(initializer_list< pair< const _Key, _Tp> >  __l, const allocator_type &__a) : _M_t(_Compare(), (_Pair_alloc_type)__a) 
+# 247
+{ ((_M_t)._M_insert_equal((__l.begin()), (__l.end()))); } 
+# 250
+template< class _InputIterator> 
+# 251
+multimap(_InputIterator __first, _InputIterator __last, const allocator_type &
+# 252
+__a) : _M_t(_Compare(), (_Pair_alloc_type)__a) 
+# 254
+{ ((_M_t)._M_insert_equal(__first, __last)); } 
+# 266 "/usr/include/c++/8/bits/stl_multimap.h" 3
+template< class _InputIterator> 
+# 267
+multimap(_InputIterator __first, _InputIterator __last) : _M_t() 
+# 269
+{ ((_M_t)._M_insert_equal(__first, __last)); } 
+# 282 "/usr/include/c++/8/bits/stl_multimap.h" 3
+template< class _InputIterator> 
+# 283
+multimap(_InputIterator __first, _InputIterator __last, const _Compare &
+# 284
+__comp, const allocator_type &
+# 285
+__a = allocator_type()) : _M_t(__comp, (_Pair_alloc_type)__a) 
+# 287
+{ ((_M_t)._M_insert_equal(__first, __last)); } 
+# 295
+~multimap() = default;
+# 312 "/usr/include/c++/8/bits/stl_multimap.h" 3
+multimap &operator=(const multimap &) = default;
+# 316
+multimap &operator=(multimap &&) = default;
+# 330 "/usr/include/c++/8/bits/stl_multimap.h" 3
+multimap &operator=(initializer_list< pair< const _Key, _Tp> >  __l) 
+# 331
+{ 
+# 332
+((_M_t)._M_assign_equal((__l.begin()), (__l.end()))); 
+# 333
+return *this; 
+# 334
+} 
+# 339
+allocator_type get_allocator() const noexcept 
+# 340
+{ return (allocator_type)((_M_t).get_allocator()); } 
+# 349
+iterator begin() noexcept 
+# 350
+{ return ((_M_t).begin()); } 
+# 358
+const_iterator begin() const noexcept 
+# 359
+{ return ((_M_t).begin()); } 
+# 367
+iterator end() noexcept 
+# 368
+{ return ((_M_t).end()); } 
+# 376
+const_iterator end() const noexcept 
+# 377
+{ return ((_M_t).end()); } 
+# 385
+reverse_iterator rbegin() noexcept 
+# 386
+{ return ((_M_t).rbegin()); } 
+# 394
+const_reverse_iterator rbegin() const noexcept 
+# 395
+{ return ((_M_t).rbegin()); } 
+# 403
+reverse_iterator rend() noexcept 
+# 404
+{ return ((_M_t).rend()); } 
+# 412
+const_reverse_iterator rend() const noexcept 
+# 413
+{ return ((_M_t).rend()); } 
+# 422
+const_iterator cbegin() const noexcept 
+# 423
+{ return ((_M_t).begin()); } 
+# 431
+const_iterator cend() const noexcept 
+# 432
+{ return ((_M_t).end()); } 
+# 440
+const_reverse_iterator crbegin() const noexcept 
+# 441
+{ return ((_M_t).rbegin()); } 
+# 449
+const_reverse_iterator crend() const noexcept 
+# 450
+{ return ((_M_t).rend()); } 
+# 456
+bool empty() const noexcept 
+# 457
+{ return ((_M_t).empty()); } 
+# 461
+size_type size() const noexcept 
+# 462
+{ return ((_M_t).size()); } 
+# 466
+size_type max_size() const noexcept 
+# 467
+{ return ((_M_t).max_size()); } 
+# 487 "/usr/include/c++/8/bits/stl_multimap.h" 3
+template< class ..._Args> iterator 
+# 489
+emplace(_Args &&...__args) 
+# 490
+{ return ((_M_t)._M_emplace_equal(std::forward< _Args> (__args)...)); } 
+# 514 "/usr/include/c++/8/bits/stl_multimap.h" 3
+template< class ..._Args> iterator 
+# 516
+emplace_hint(const_iterator __pos, _Args &&...__args) 
+# 517
+{ 
+# 518
+return ((_M_t)._M_emplace_hint_equal(__pos, std::forward< _Args> (__args)...)); 
+# 520
+} 
+# 537 "/usr/include/c++/8/bits/stl_multimap.h" 3
+iterator insert(const value_type &__x) 
+# 538
+{ return ((_M_t)._M_insert_equal(__x)); } 
+# 544
+iterator insert(value_type &&__x) 
+# 545
+{ return ((_M_t)._M_insert_equal(std::move(__x))); } 
+# 547
+template< class _Pair> __enable_if_t< is_constructible< pair< const _Key, _Tp> , _Pair> ::value, typename _Rb_tree< _Key, pair< const _Key, _Tp> , _Select1st< pair< const _Key, _Tp> > , _Compare, typename __gnu_cxx::__alloc_traits< _Alloc> ::template rebind< pair< const _Key, _Tp> > ::other> ::iterator>  
+# 549
+insert(_Pair &&__x) 
+# 550
+{ return ((_M_t)._M_emplace_equal(std::forward< _Pair> (__x))); } 
+# 577 "/usr/include/c++/8/bits/stl_multimap.h" 3
+iterator insert(const_iterator __position, const value_type &__x) 
+# 581
+{ return ((_M_t)._M_insert_equal_(__position, __x)); } 
+# 587
+iterator insert(const_iterator __position, value_type &&__x) 
+# 588
+{ return ((_M_t)._M_insert_equal_(__position, std::move(__x))); } 
+# 590
+template< class _Pair> __enable_if_t< is_constructible< pair< const _Key, _Tp> , _Pair &&> ::value, typename _Rb_tree< _Key, pair< const _Key, _Tp> , _Select1st< pair< const _Key, _Tp> > , _Compare, typename __gnu_cxx::__alloc_traits< _Alloc> ::template rebind< pair< const _Key, _Tp> > ::other> ::iterator>  
+# 592
+insert(const_iterator __position, _Pair &&__x) 
+# 593
+{ 
+# 594
+return ((_M_t)._M_emplace_hint_equal(__position, std::forward< _Pair> (__x))); 
+# 596
+} 
+# 609 "/usr/include/c++/8/bits/stl_multimap.h" 3
+template< class _InputIterator> void 
+# 611
+insert(_InputIterator __first, _InputIterator __last) 
+# 612
+{ ((_M_t)._M_insert_equal(__first, __last)); } 
+# 623 "/usr/include/c++/8/bits/stl_multimap.h" 3
+void insert(initializer_list< pair< const _Key, _Tp> >  __l) 
+# 624
+{ (this->insert((__l.begin()), (__l.end()))); } 
+# 700 "/usr/include/c++/8/bits/stl_multimap.h" 3
+iterator erase(const_iterator __position) 
+# 701
+{ return ((_M_t).erase(__position)); } 
+# 704
+__attribute((__abi_tag__("cxx11"))) iterator 
+# 706
+erase(iterator __position) 
+# 707
+{ return ((_M_t).erase(__position)); } 
+# 737 "/usr/include/c++/8/bits/stl_multimap.h" 3
+size_type erase(const key_type &__x) 
+# 738
+{ return ((_M_t).erase(__x)); } 
+# 758 "/usr/include/c++/8/bits/stl_multimap.h" 3
+iterator erase(const_iterator __first, const_iterator __last) 
+# 759
+{ return ((_M_t).erase(__first, __last)); } 
+# 795 "/usr/include/c++/8/bits/stl_multimap.h" 3
+void swap(multimap &__x) noexcept(__is_nothrow_swappable< _Compare> ::value) 
+# 797
+{ ((_M_t).swap(__x._M_t)); } 
+# 806
+void clear() noexcept 
+# 807
+{ ((_M_t).clear()); } 
+# 815
+key_compare key_comp() const 
+# 816
+{ return ((_M_t).key_comp()); } 
+# 823
+value_compare value_comp() const 
+# 824
+{ return (value_compare)((_M_t).key_comp()); } 
+# 841 "/usr/include/c++/8/bits/stl_multimap.h" 3
+iterator find(const key_type &__x) 
+# 842
+{ return ((_M_t).find(__x)); } 
+# 845
+template< class _Kt> auto 
+# 847
+find(const _Kt &__x)->__decltype((((_M_t)._M_find_tr(__x)))) 
+# 848
+{ return ((_M_t)._M_find_tr(__x)); } 
+# 865 "/usr/include/c++/8/bits/stl_multimap.h" 3
+const_iterator find(const key_type &__x) const 
+# 866
+{ return ((_M_t).find(__x)); } 
+# 869
+template< class _Kt> auto 
+# 871
+find(const _Kt &__x) const->__decltype((((_M_t)._M_find_tr(__x)))) 
+# 872
+{ return ((_M_t)._M_find_tr(__x)); } 
+# 883 "/usr/include/c++/8/bits/stl_multimap.h" 3
+size_type count(const key_type &__x) const 
+# 884
+{ return ((_M_t).count(__x)); } 
+# 887
+template< class _Kt> auto 
+# 889
+count(const _Kt &__x) const->__decltype((((_M_t)._M_count_tr(__x)))) 
+# 890
+{ return ((_M_t)._M_count_tr(__x)); } 
+# 907 "/usr/include/c++/8/bits/stl_multimap.h" 3
+iterator lower_bound(const key_type &__x) 
+# 908
+{ return ((_M_t).lower_bound(__x)); } 
+# 911
+template< class _Kt> auto 
+# 913
+lower_bound(const _Kt &__x)->__decltype(((iterator)((_M_t)._M_lower_bound_tr(__x)))) 
+# 915
+{ return (iterator)((_M_t)._M_lower_bound_tr(__x)); } 
+# 932 "/usr/include/c++/8/bits/stl_multimap.h" 3
+const_iterator lower_bound(const key_type &__x) const 
+# 933
+{ return ((_M_t).lower_bound(__x)); } 
+# 936
+template< class _Kt> auto 
+# 938
+lower_bound(const _Kt &__x) const->__decltype(((const_iterator)((_M_t)._M_lower_bound_tr(__x)))) 
+# 940
+{ return (const_iterator)((_M_t)._M_lower_bound_tr(__x)); } 
+# 952 "/usr/include/c++/8/bits/stl_multimap.h" 3
+iterator upper_bound(const key_type &__x) 
+# 953
+{ return ((_M_t).upper_bound(__x)); } 
+# 956
+template< class _Kt> auto 
+# 958
+upper_bound(const _Kt &__x)->__decltype(((iterator)((_M_t)._M_upper_bound_tr(__x)))) 
+# 960
+{ return (iterator)((_M_t)._M_upper_bound_tr(__x)); } 
+# 972 "/usr/include/c++/8/bits/stl_multimap.h" 3
+const_iterator upper_bound(const key_type &__x) const 
+# 973
+{ return ((_M_t).upper_bound(__x)); } 
+# 976
+template< class _Kt> auto 
+# 978
+upper_bound(const _Kt &__x) const->__decltype(((const_iterator)((_M_t)._M_upper_bound_tr(__x)))) 
+# 980
+{ return (const_iterator)((_M_t)._M_upper_bound_tr(__x)); } 
+# 999 "/usr/include/c++/8/bits/stl_multimap.h" 3
+pair< typename _Rb_tree< _Key, pair< const _Key, _Tp> , _Select1st< pair< const _Key, _Tp> > , _Compare, typename __gnu_cxx::__alloc_traits< _Alloc> ::template rebind< pair< const _Key, _Tp> > ::other> ::iterator, typename _Rb_tree< _Key, pair< const _Key, _Tp> , _Select1st< pair< const _Key, _Tp> > , _Compare, typename __gnu_cxx::__alloc_traits< _Alloc> ::template rebind< pair< const _Key, _Tp> > ::other> ::iterator>  equal_range(const key_type &__x) 
+# 1000
+{ return ((_M_t).equal_range(__x)); } 
+# 1003
+template< class _Kt> auto 
+# 1005
+equal_range(const _Kt &__x)->__decltype((((pair< typename _Rb_tree< _Key, pair< const _Key, _Tp> , _Select1st< pair< const _Key, _Tp> > , _Compare, typename __gnu_cxx::__alloc_traits< _Alloc> ::template rebind< pair< const _Key, _Tp> > ::other> ::iterator, typename _Rb_tree< _Key, pair< const _Key, _Tp> , _Select1st< pair< const _Key, _Tp> > , _Compare, typename __gnu_cxx::__alloc_traits< _Alloc> ::template rebind< pair< const _Key, _Tp> > ::other> ::iterator> )(((_M_t)._M_equal_range_tr(__x)))))) 
+# 1007
+{ return ((pair< typename _Rb_tree< _Key, pair< const _Key, _Tp> , _Select1st< pair< const _Key, _Tp> > , _Compare, typename __gnu_cxx::__alloc_traits< _Alloc> ::template rebind< pair< const _Key, _Tp> > ::other> ::iterator, typename _Rb_tree< _Key, pair< const _Key, _Tp> , _Select1st< pair< const _Key, _Tp> > , _Compare, typename __gnu_cxx::__alloc_traits< _Alloc> ::template rebind< pair< const _Key, _Tp> > ::other> ::iterator> )(((_M_t)._M_equal_range_tr(__x)))); } 
+# 1026 "/usr/include/c++/8/bits/stl_multimap.h" 3
+pair< typename _Rb_tree< _Key, pair< const _Key, _Tp> , _Select1st< pair< const _Key, _Tp> > , _Compare, typename __gnu_cxx::__alloc_traits< _Alloc> ::template rebind< pair< const _Key, _Tp> > ::other> ::const_iterator, typename _Rb_tree< _Key, pair< const _Key, _Tp> , _Select1st< pair< const _Key, _Tp> > , _Compare, typename __gnu_cxx::__alloc_traits< _Alloc> ::template rebind< pair< const _Key, _Tp> > ::other> ::const_iterator>  equal_range(const key_type &__x) const 
+# 1027
+{ return ((_M_t).equal_range(__x)); } 
+# 1030
+template< class _Kt> auto 
+# 1032
+equal_range(const _Kt &__x) const->__decltype((((pair< typename _Rb_tree< _Key, pair< const _Key, _Tp> , _Select1st< pair< const _Key, _Tp> > , _Compare, typename __gnu_cxx::__alloc_traits< _Alloc> ::template rebind< pair< const _Key, _Tp> > ::other> ::const_iterator, typename _Rb_tree< _Key, pair< const _Key, _Tp> , _Select1st< pair< const _Key, _Tp> > , _Compare, typename __gnu_cxx::__alloc_traits< _Alloc> ::template rebind< pair< const _Key, _Tp> > ::other> ::const_iterator> )(((_M_t)._M_equal_range_tr(__x)))))) 
+# 1035
+{ 
+# 1036
+return ((pair< typename _Rb_tree< _Key, pair< const _Key, _Tp> , _Select1st< pair< const _Key, _Tp> > , _Compare, typename __gnu_cxx::__alloc_traits< _Alloc> ::template rebind< pair< const _Key, _Tp> > ::other> ::const_iterator, typename _Rb_tree< _Key, pair< const _Key, _Tp> , _Select1st< pair< const _Key, _Tp> > , _Compare, typename __gnu_cxx::__alloc_traits< _Alloc> ::template rebind< pair< const _Key, _Tp> > ::other> ::const_iterator> )(((_M_t)._M_equal_range_tr(__x)))); 
+# 1038
+} 
+# 1042
+template< class _K1, class _T1, class _C1, class _A1> friend bool operator==(const std::multimap< _K1, _T1, _C1, _A1>  &, const std::multimap< _K1, _T1, _C1, _A1>  &); 
+# 1047
+template< class _K1, class _T1, class _C1, class _A1> friend bool operator<(const std::multimap< _K1, _T1, _C1, _A1>  &, const std::multimap< _K1, _T1, _C1, _A1>  &); 
+# 1051
+}; 
+# 1096 "/usr/include/c++/8/bits/stl_multimap.h" 3
+template< class _Key, class _Tp, class _Compare, class _Alloc> inline bool 
+# 1098
+operator==(const multimap< _Key, _Tp, _Compare, _Alloc>  &__x, const multimap< _Key, _Tp, _Compare, _Alloc>  &
+# 1099
+__y) 
+# 1100
+{ return (__x._M_t) == (__y._M_t); } 
+# 1113 "/usr/include/c++/8/bits/stl_multimap.h" 3
+template< class _Key, class _Tp, class _Compare, class _Alloc> inline bool 
+# 1115
+operator<(const multimap< _Key, _Tp, _Compare, _Alloc>  &__x, const multimap< _Key, _Tp, _Compare, _Alloc>  &
+# 1116
+__y) 
+# 1117
+{ return (__x._M_t) < (__y._M_t); } 
+# 1120
+template< class _Key, class _Tp, class _Compare, class _Alloc> inline bool 
+# 1122
+operator!=(const multimap< _Key, _Tp, _Compare, _Alloc>  &__x, const multimap< _Key, _Tp, _Compare, _Alloc>  &
+# 1123
+__y) 
+# 1124
+{ return !(__x == __y); } 
+# 1127
+template< class _Key, class _Tp, class _Compare, class _Alloc> inline bool 
+# 1129
+operator>(const multimap< _Key, _Tp, _Compare, _Alloc>  &__x, const multimap< _Key, _Tp, _Compare, _Alloc>  &
+# 1130
+__y) 
+# 1131
+{ return __y < __x; } 
+# 1134
+template< class _Key, class _Tp, class _Compare, class _Alloc> inline bool 
+# 1136
+operator<=(const multimap< _Key, _Tp, _Compare, _Alloc>  &__x, const multimap< _Key, _Tp, _Compare, _Alloc>  &
+# 1137
+__y) 
+# 1138
+{ return !(__y < __x); } 
+# 1141
+template< class _Key, class _Tp, class _Compare, class _Alloc> inline bool 
+# 1143
+operator>=(const multimap< _Key, _Tp, _Compare, _Alloc>  &__x, const multimap< _Key, _Tp, _Compare, _Alloc>  &
+# 1144
+__y) 
+# 1145
+{ return !(__x < __y); } 
+# 1148
+template< class _Key, class _Tp, class _Compare, class _Alloc> inline void 
+# 1150
+swap(multimap< _Key, _Tp, _Compare, _Alloc>  &__x, multimap< _Key, _Tp, _Compare, _Alloc>  &
+# 1151
+__y) noexcept(noexcept((__x.swap(__y)))) 
+# 1153
+{ (__x.swap(__y)); } 
+# 1179 "/usr/include/c++/8/bits/stl_multimap.h" 3
+}
 # 7 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
 static int width[1]; 
 # 8 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
@@ -42097,98 +48215,208 @@ static int ntiles_x[1];
 # 11 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
 static int ntiles_y[1]; 
 # 13 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
-void ahe_GPU(unsigned char *img_in, unsigned char *img_out) ;
+void ahe_GPU1(unsigned char *img_in, unsigned char *mappings) ;
 #if 0
 # 14
 { 
 # 15
-int x = ((__device_builtin_variable_blockDim.x) * (__device_builtin_variable_blockIdx.x)) + (__device_builtin_variable_threadIdx.x); 
+int x = (((__device_builtin_variable_blockDim.x) * (__device_builtin_variable_blockIdx.x)) + (__device_builtin_variable_threadIdx.x)) * (1024); 
 # 16
-int y = ((__device_builtin_variable_blockDim.y) * (__device_builtin_variable_blockIdx.y)) + (__device_builtin_variable_threadIdx.y); 
+int y = (((__device_builtin_variable_blockDim.y) * (__device_builtin_variable_blockIdx.y)) + (__device_builtin_variable_threadIdx.y)) * (1024); 
 # 17
 if ((x < (width[0])) && (y < (heigth[0]))) { 
-# 18
-int i = x + (y * (width[0])); 
 # 19
-(img_out[i]) = (img_in[i]); 
-# 20
-}  
+int pdf[256], cdf[256]; 
 # 21
-} 
-#endif
-# 23 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
-extern "C" void run_ahe_GPU(unsigned char *img_in, unsigned char *img_out, int width_, int height_) { 
+for (int i = 0; i < 256; i++) { 
+# 22
+(pdf[i]) = 0; 
+# 23
+}  
 # 25
-int ntiles_x_ = width_ / 1024; 
+for (int j = y; j < (y + 1024); j++) { 
 # 26
-int ntiles_y_ = height_ / 1024; 
+for (int i = x; i < (x + 1024); i++) { 
+# 27
+(pdf[img_in[i + (j * (width[0]))]])++; 
 # 28
-my_errno = cudaMemcpyToSymbol(width, &width_, sizeof width_); if (my_errno != (cudaSuccess)) { (((((std::cerr << ("File : "))) << ("/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"))) << ('\n')); (((((std::cerr << ("Function : "))) << __func__)) << ('\n')); (((((std::cerr << ("Line : "))) << (28))) << ('\n')); (((((std::cerr << ("Cuda error : "))) << (cudaGetErrorString(my_errno)))) << (" !\n\n")); exit(1); 
-# 28 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
 }  
 # 29
-my_errno = cudaMemcpyToSymbol(heigth, &height_, sizeof height_); if (my_errno != (cudaSuccess)) { (((((std::cerr << ("File : "))) << ("/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"))) << ('\n')); (((((std::cerr << ("Function : "))) << __func__)) << ('\n')); (((((std::cerr << ("Line : "))) << (29))) << ('\n')); (((((std::cerr << ("Cuda error : "))) << (cudaGetErrorString(my_errno)))) << (" !\n\n")); exit(1); 
-# 29 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
-}  
-# 30
-my_errno = cudaMemcpyToSymbol(ntiles_x, &ntiles_x_, sizeof ntiles_x_); if (my_errno != (cudaSuccess)) { (((((std::cerr << ("File : "))) << ("/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"))) << ('\n')); (((((std::cerr << ("Function : "))) << __func__)) << ('\n')); (((((std::cerr << ("Line : "))) << (30))) << ('\n')); (((((std::cerr << ("Cuda error : "))) << (cudaGetErrorString(my_errno)))) << (" !\n\n")); exit(1); 
-# 30 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
 }  
 # 31
-my_errno = cudaMemcpyToSymbol(ntiles_y, &ntiles_y_, sizeof ntiles_y_); if (my_errno != (cudaSuccess)) { (((((std::cerr << ("File : "))) << ("/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"))) << ('\n')); (((((std::cerr << ("Function : "))) << __func__)) << ('\n')); (((((std::cerr << ("Line : "))) << (31))) << ('\n')); (((((std::cerr << ("Cuda error : "))) << (cudaGetErrorString(my_errno)))) << (" !\n\n")); exit(1); 
-# 31 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
-}  
+(cdf[0]) = (pdf[0]); 
+# 32
+for (int i = 1; i < 256; i++) { 
 # 33
-auto img_size_bytes = (height_ * width_) * sizeof(unsigned char); 
-# 35
-unsigned char *d_img_in; 
+(cdf[i]) = ((cdf[i - 1]) + (pdf[i])); 
+# 34
+}  
 # 36
-my_errno = cudaMalloc((void **)(&d_img_in), img_size_bytes); if (my_errno != (cudaSuccess)) { (((((std::cerr << ("File : "))) << ("/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"))) << ('\n')); (((((std::cerr << ("Function : "))) << __func__)) << ('\n')); (((((std::cerr << ("Line : "))) << (36))) << ('\n')); (((((std::cerr << ("Cuda error : "))) << (cudaGetErrorString(my_errno)))) << (" !\n\n")); exit(1); 
-# 36 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
-}  
+int cdf_min = ((1024 * 1024) + 1); 
 # 37
-my_errno = cudaMemcpy((void *)d_img_in, (void *)img_in, img_size_bytes, cudaMemcpyHostToDevice); if (my_errno != (cudaSuccess)) { (((((std::cerr << ("File : "))) << ("/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"))) << ('\n')); (((((std::cerr << ("Function : "))) << __func__)) << ('\n')); (((((std::cerr << ("Line : "))) << (37))) << ('\n')); (((((std::cerr << ("Cuda error : "))) << (cudaGetErrorString(my_errno)))) << (" !\n\n")); exit(1); 
-# 37 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
-}  
+for (int i = 0; i < 256; i++) { 
+# 38
+if ((cdf[i]) != 0) { 
 # 39
-unsigned char *d_img_out; 
+cdf_min = (cdf[i]); 
 # 40
-my_errno = cudaMalloc((void **)(&d_img_out), img_size_bytes); if (my_errno != (cudaSuccess)) { (((((std::cerr << ("File : "))) << ("/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"))) << ('\n')); (((((std::cerr << ("Function : "))) << __func__)) << ('\n')); (((((std::cerr << ("Line : "))) << (40))) << ('\n')); (((((std::cerr << ("Cuda error : "))) << (cudaGetErrorString(my_errno)))) << (" !\n\n")); exit(1); 
-# 40 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
+break; 
+# 41
 }  
 # 42
-int num_threads_x = 16; 
-# 43
-int num_threads_y = 16; 
+}  
 # 44
-dim3 block_shape = dim3(num_threads_x, num_threads_y, 1); 
+int tile_i = x / 1024; 
+# 45
+int tile_j = y / 1024; 
 # 46
-int num_blocks_x = (width_ / num_threads_x) + 1; 
+int offset = 256 * (tile_i + (tile_j * (ntiles_x[0]))); 
 # 47
-int num_blocks_y = (height_ / num_threads_y) + 1; 
+for (int i = 0; i < 256; i++) { 
 # 48
-dim3 grid_shape = dim3(num_blocks_x, num_blocks_y, 1); 
-# 50
-(__cudaPushCallConfiguration(grid_shape, block_shape)) ? (void)0 : ahe_GPU(d_img_in, d_img_out); 
+(mappings[i + offset]) = ((unsigned char)round(((255.0) * ((float)((cdf[i]) - cdf_min))) / ((float)((1024 * 1024) - cdf_min)))); 
+# 49
+}  
 # 51
-cudaDeviceSynchronize(); 
-# 53
-my_errno = cudaMemcpy((void *)img_out, (void *)d_img_out, img_size_bytes, cudaMemcpyDeviceToHost); if (my_errno != (cudaSuccess)) { (((((std::cerr << ("File : "))) << ("/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"))) << ('\n')); (((((std::cerr << ("Function : "))) << __func__)) << ('\n')); (((((std::cerr << ("Line : "))) << (53))) << ('\n')); (((((std::cerr << ("Cuda error : "))) << (cudaGetErrorString(my_errno)))) << (" !\n\n")); exit(1); 
-# 53 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
 }  
-# 54
-my_errno = cudaFree(d_img_in); if (my_errno != (cudaSuccess)) { (((((std::cerr << ("File : "))) << ("/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"))) << ('\n')); (((((std::cerr << ("Function : "))) << __func__)) << ('\n')); (((((std::cerr << ("Line : "))) << (54))) << ('\n')); (((((std::cerr << ("Cuda error : "))) << (cudaGetErrorString(my_errno)))) << (" !\n\n")); exit(1); 
+# 52
+} 
+#endif
 # 54 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
-}  
+void get_mappings(unsigned char *d_img_in, unsigned char *d_mappings, int width_, int height_) { 
 # 55
-my_errno = cudaFree(d_img_out); if (my_errno != (cudaSuccess)) { (((((std::cerr << ("File : "))) << ("/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"))) << ('\n')); (((((std::cerr << ("Function : "))) << __func__)) << ('\n')); (((((std::cerr << ("Line : "))) << (55))) << ('\n')); (((((std::cerr << ("Cuda error : "))) << (cudaGetErrorString(my_errno)))) << (" !\n\n")); exit(1); 
-# 55 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
-}  
+int num_threads_x = 16; 
 # 56
+int num_threads_y = 16; 
+# 57
+dim3 block_shape = dim3(num_threads_x, num_threads_y, 1); 
+# 59
+int num_blocks_x = (width_ / 1024) + 1; 
+# 60
+int num_blocks_y = (height_ / 1024) + 1; 
+# 61
+dim3 grid_shape = dim3(num_blocks_x, num_blocks_y, 1); 
+# 63
+(__cudaPushCallConfiguration(grid_shape, block_shape)) ? (void)0 : ahe_GPU1(d_img_in, d_mappings); 
+# 64
+} 
+# 66
+void print_mappings(unsigned char *d_mappings, int mapping_size) { 
+# 67
+unsigned char *mappings = new unsigned char [mapping_size]; 
+# 68
+int mapping_size_bytes = mapping_size * sizeof(unsigned char); 
+# 69
+my_errno = cudaMemcpy((void *)mappings, (void *)d_mappings, mapping_size_bytes, cudaMemcpyDeviceToHost); if (my_errno != (cudaSuccess)) { (((((std::cerr << ("\nFile : "))) << ("/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"))) << ('\n')); (((((std::cerr << ("Function : "))) << __func__)) << ('\n')); (((((std::cerr << ("Line : "))) << (69))) << ('\n')); (((((std::cerr << ("Cuda error : "))) << (cudaGetErrorString(my_errno)))) << (" !\n\n")); exit(1); 
+# 69 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
+}  
+# 71
+std::map< int, int, std::less< int> , std::allocator< std::pair< const int, int> > >  counts; 
+# 72
+(std::cout << ("Printing mappings on GPU\n")); 
+# 73
+for (int i = 0; i < mapping_size; i++) { { 
+# 74
+int i__ = mappings[i]; 
+# 75
+if (((counts.find(i__)) == (counts.end()))) { 
+# 76
+counts[i__] = 1; 
+# 77
+continue; 
+# 78
+}  
+# 79
+counts[i__]++; 
+# 80
+} }  
+# 81
+for (auto &p : counts) { 
+# 82
+(((((((std::cout << (p.first))) << (':'))) << (p.second))) << ('\n')); 
+# 83
+}  
+# 84
+(std::cout << (std::endl)); 
+# 85
+delete [] mappings; 
+# 86
+} 
+# 87
+extern "C" void run_ahe_GPU(unsigned char *img_in, unsigned char *img_out, int width_, int height_) { 
+# 89
+int ntiles_x_ = width_ / 1024; 
+# 90
+int ntiles_y_ = height_ / 1024; 
+# 92
+my_errno = cudaMemcpyToSymbol(width, &width_, sizeof width_); if (my_errno != (cudaSuccess)) { (((((std::cerr << ("\nFile : "))) << ("/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"))) << ('\n')); (((((std::cerr << ("Function : "))) << __func__)) << ('\n')); (((((std::cerr << ("Line : "))) << (92))) << ('\n')); (((((std::cerr << ("Cuda error : "))) << (cudaGetErrorString(my_errno)))) << (" !\n\n")); exit(1); 
+# 92 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
+}  
+# 93
+my_errno = cudaMemcpyToSymbol(heigth, &height_, sizeof height_); if (my_errno != (cudaSuccess)) { (((((std::cerr << ("\nFile : "))) << ("/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"))) << ('\n')); (((((std::cerr << ("Function : "))) << __func__)) << ('\n')); (((((std::cerr << ("Line : "))) << (93))) << ('\n')); (((((std::cerr << ("Cuda error : "))) << (cudaGetErrorString(my_errno)))) << (" !\n\n")); exit(1); 
+# 93 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
+}  
+# 94
+my_errno = cudaMemcpyToSymbol(ntiles_x, &ntiles_x_, sizeof ntiles_x_); if (my_errno != (cudaSuccess)) { (((((std::cerr << ("\nFile : "))) << ("/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"))) << ('\n')); (((((std::cerr << ("Function : "))) << __func__)) << ('\n')); (((((std::cerr << ("Line : "))) << (94))) << ('\n')); (((((std::cerr << ("Cuda error : "))) << (cudaGetErrorString(my_errno)))) << (" !\n\n")); exit(1); 
+# 94 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
+}  
+# 95
+my_errno = cudaMemcpyToSymbol(ntiles_y, &ntiles_y_, sizeof ntiles_y_); if (my_errno != (cudaSuccess)) { (((((std::cerr << ("\nFile : "))) << ("/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"))) << ('\n')); (((((std::cerr << ("Function : "))) << __func__)) << ('\n')); (((((std::cerr << ("Line : "))) << (95))) << ('\n')); (((((std::cerr << ("Cuda error : "))) << (cudaGetErrorString(my_errno)))) << (" !\n\n")); exit(1); 
+# 95 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
+}  
+# 97
+auto img_size_bytes = (height_ * width_) * sizeof(unsigned char); 
+# 99
+unsigned char *d_img_in; 
+# 100
+my_errno = cudaMalloc((void **)(&d_img_in), img_size_bytes); if (my_errno != (cudaSuccess)) { (((((std::cerr << ("\nFile : "))) << ("/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"))) << ('\n')); (((((std::cerr << ("Function : "))) << __func__)) << ('\n')); (((((std::cerr << ("Line : "))) << (100))) << ('\n')); (((((std::cerr << ("Cuda error : "))) << (cudaGetErrorString(my_errno)))) << (" !\n\n")); exit(1); 
+# 100 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
+}  
+# 101
+my_errno = cudaMemcpy((void *)d_img_in, (void *)img_in, img_size_bytes, cudaMemcpyHostToDevice); if (my_errno != (cudaSuccess)) { (((((std::cerr << ("\nFile : "))) << ("/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"))) << ('\n')); (((((std::cerr << ("Function : "))) << __func__)) << ('\n')); (((((std::cerr << ("Line : "))) << (101))) << ('\n')); (((((std::cerr << ("Cuda error : "))) << (cudaGetErrorString(my_errno)))) << (" !\n\n")); exit(1); 
+# 101 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
+}  
+# 103
+unsigned char *d_img_out; 
+# 104
+my_errno = cudaMalloc((void **)(&d_img_out), img_size_bytes); if (my_errno != (cudaSuccess)) { (((((std::cerr << ("\nFile : "))) << ("/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"))) << ('\n')); (((((std::cerr << ("Function : "))) << __func__)) << ('\n')); (((((std::cerr << ("Line : "))) << (104))) << ('\n')); (((((std::cerr << ("Cuda error : "))) << (cudaGetErrorString(my_errno)))) << (" !\n\n")); exit(1); 
+# 104 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
+}  
+# 106
+unsigned char *d_mappings; 
+# 107
+auto mapping_size = (ntiles_x_ * ntiles_y_) * 256; 
+# 108
+auto mapping_size_bytes = mapping_size * sizeof(unsigned char); 
+# 109
+my_errno = cudaMalloc((void **)(&d_mappings), mapping_size_bytes); if (my_errno != (cudaSuccess)) { (((((std::cerr << ("\nFile : "))) << ("/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"))) << ('\n')); (((((std::cerr << ("Function : "))) << __func__)) << ('\n')); (((((std::cerr << ("Line : "))) << (109))) << ('\n')); (((((std::cerr << ("Cuda error : "))) << (cudaGetErrorString(my_errno)))) << (" !\n\n")); exit(1); 
+# 109 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
+}  
+# 111
+get_mappings(d_img_in, d_mappings, width_, height_); 
+# 112
+my_errno = cudaDeviceSynchronize(); if (my_errno != (cudaSuccess)) { (((((std::cerr << ("\nFile : "))) << ("/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"))) << ('\n')); (((((std::cerr << ("Function : "))) << __func__)) << ('\n')); (((((std::cerr << ("Line : "))) << (112))) << ('\n')); (((((std::cerr << ("Cuda error : "))) << (cudaGetErrorString(my_errno)))) << (" !\n\n")); exit(1); 
+# 112 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
+}  
+# 113
+print_mappings(d_mappings, mapping_size); 
+# 114
+my_errno = cudaFree(d_img_in); if (my_errno != (cudaSuccess)) { (((((std::cerr << ("\nFile : "))) << ("/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"))) << ('\n')); (((((std::cerr << ("Function : "))) << __func__)) << ('\n')); (((((std::cerr << ("Line : "))) << (114))) << ('\n')); (((((std::cerr << ("Cuda error : "))) << (cudaGetErrorString(my_errno)))) << (" !\n\n")); exit(1); 
+# 114 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
+}  
+# 115
+my_errno = cudaFree(d_mappings); if (my_errno != (cudaSuccess)) { (((((std::cerr << ("\nFile : "))) << ("/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"))) << ('\n')); (((((std::cerr << ("Function : "))) << __func__)) << ('\n')); (((((std::cerr << ("Line : "))) << (115))) << ('\n')); (((((std::cerr << ("Cuda error : "))) << (cudaGetErrorString(my_errno)))) << (" !\n\n")); exit(1); 
+# 115 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
+}  
+# 116
+my_errno = cudaFree(d_img_out); if (my_errno != (cudaSuccess)) { (((((std::cerr << ("\nFile : "))) << ("/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"))) << ('\n')); (((((std::cerr << ("Function : "))) << __func__)) << ('\n')); (((((std::cerr << ("Line : "))) << (116))) << ('\n')); (((((std::cerr << ("Cuda error : "))) << (cudaGetErrorString(my_errno)))) << (" !\n\n")); exit(1); 
+# 116 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
+}  
+# 118
 } 
 
 # 1 "ahe_gpu_kernels.cudafe1.stub.c"
-#define _NV_ANON_NAMESPACE _GLOBAL__N__23_ahe_gpu_kernels_cpp1_ii_a08274fe
+#define _NV_ANON_NAMESPACE _GLOBAL__N__23_ahe_gpu_kernels_cpp1_ii_4145e07c
 # 1 "ahe_gpu_kernels.cudafe1.stub.c"
 #include "ahe_gpu_kernels.cudafe1.stub.c"
 # 1 "ahe_gpu_kernels.cudafe1.stub.c"

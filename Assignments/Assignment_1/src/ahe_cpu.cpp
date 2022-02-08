@@ -1,7 +1,8 @@
 #include "ahe_cpu.h"
 #include <cstring>
 #include <cmath>
-
+#include<iostream>
+#include<map>
 // Histogram equalization: https://en.wikipedia.org/wiki/Histogram_equalization
 // Adaptive Histogram equalization: https://en.wikipedia.org/wiki/Adaptive_histogram_equalization
 
@@ -17,6 +18,22 @@ unsigned char interp2(unsigned char v00, unsigned char v01, unsigned char v10, u
 	return (unsigned char)(v);
 }
 
+void print_mapping(unsigned char* mappings, int mapping_size){
+	std::map<int, int> counts;
+	std::cout << "Printing mappings on CPU\n";
+    for(int i = 0; i < mapping_size; i++){
+        int i__ = mappings[i];
+        if(counts.find(i__) == counts.end()){
+			counts[i__] = 1;
+			continue;
+		}
+		counts[i__]++;
+    }
+	for(auto& p : counts){
+		std::cout << p.first << ':' << p.second << '\n';
+	}
+    std::cout << std::endl;
+}
 void adaptiveEqualizationCPU(unsigned char* img_in, unsigned char* img_out, int width, int height)
 {
   	int pdf[256], cdf[256];
@@ -25,7 +42,8 @@ void adaptiveEqualizationCPU(unsigned char* img_in, unsigned char* img_out, int 
 	int ntiles_y = height / TILE_SIZE_Y;
 
   // Step 1: Caculate equalization mapping for each tile
-	unsigned char *mappings = new unsigned char[ntiles_x*ntiles_y*256];
+	int mapping_size = ntiles_x*ntiles_y*256;
+	unsigned char *mappings = new unsigned char[mapping_size];
   	for(int y = 0; y < height; y+=TILE_SIZE_Y){
 		  for(int x = 0; x < width; x+=TILE_SIZE_X) {
 			// Compute PDF
@@ -63,8 +81,6 @@ void adaptiveEqualizationCPU(unsigned char* img_in, unsigned char* img_out, int 
 			}
 		}
 	}
-    	
-
   // Step 2: Perform adaptive equalization. For each pixel in a tile, interpolate results from neighbouring mappings
   	int tile_i0, tile_j0, tile_i1, tile_j1; // tile IDs
   	for(int y = 0; y < height; y++){
