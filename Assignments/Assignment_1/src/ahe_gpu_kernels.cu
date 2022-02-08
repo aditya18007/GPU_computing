@@ -31,11 +31,12 @@ __global__ void ahe_GPU1(unsigned char* img_in, unsigned char* mappings)
 		}
         
         cdf[0] = pdf[0];
-		for(int i=1; i< 256; i++){
+        for(int i=1; i< 256; i++){
 			cdf[i] = cdf[i-1] + pdf[i];
 		}
 
-        int cdf_min = PIXELS_PER_TILE+1; // minimum non-zero value of the CDF
+        int cdf_min = PIXELS_PER_TILE+1;
+        // minimum non-zero value of the CDF
 		for(int i=0; i<256; i++){
 			if(cdf[i] != 0) {
 				cdf_min = cdf[i]; 
@@ -47,8 +48,8 @@ __global__ void ahe_GPU1(unsigned char* img_in, unsigned char* mappings)
 		int tile_j = y / TILE_SIZE_Y;
 		int offset = 256*(tile_i + tile_j*Ntiles_x[0]);
         for(int i=0; i< 256; i++){
-			mappings[i+ offset] = (unsigned char)round(255.0 * float(cdf[i] - cdf_min)/float(PIXELS_PER_TILE - cdf_min));
-		}      
+			mappings[i+ offset] = (unsigned char)round(255.0 * (float(cdf[i] - cdf_min)/float(PIXELS_PER_TILE - cdf_min)));
+		}
     }
 }
 
@@ -56,15 +57,15 @@ void get_mappings( unsigned char* d_img_in, unsigned char* d_mappings, int width
     int max_x = (width_ / TILE_SIZE_X) + 1;
     int max_y = (height_ / TILE_SIZE_Y) + 1;
 
-    int num_threads_x = 16;
-    int num_threads_y = 16;
+    int num_threads_x = 32;
+    int num_threads_y = 32;
     dim3 block_shape = dim3( num_threads_x, num_threads_y ,1);  
 
     int num_blocks_x = (max_x/num_threads_x) + 1; 
     int num_blocks_y = (max_y/num_threads_y) + 1;
     dim3 grid_shape = dim3( num_blocks_x, num_blocks_y , 1); 
     
-    printf("Step 1 : Grid : {%d, %d, %d} blocks. Blocks : {%d, %d, %d} threads.\n",
+    printf("\nStep 1 : Grid : {%d, %d, %d} blocks. Blocks : {%d, %d, %d} threads.\n",
     grid_shape.x, grid_shape.y, grid_shape.z, block_shape.x, block_shape.y, block_shape.z);
 
     ahe_GPU1<<< grid_shape, block_shape>>>(d_img_in, d_mappings);
@@ -130,10 +131,11 @@ __global__ void ahe_GPU2(unsigned char* img_in, unsigned char* img_out, unsigned
 
 			// Compute 4 values and perform bilinear interpolation
       		unsigned char v00, v01, v10, v11;
-			v00 = mappings[img_in[x+y*width] + offset00];
-			v01 = mappings[img_in[x+y*width] + offset01];
-			v10 = mappings[img_in[x+y*width] + offset10];
-			v11 = mappings[img_in[x+y*width] + offset11];
+            unsigned char img_in_val = img_in[x+y*width];
+			v00 = mappings[ img_in_val + offset00];
+			v01 = mappings[ img_in_val + offset01];
+			v10 = mappings[ img_in_val + offset10];
+			v11 = mappings[ img_in_val + offset11];
 			float x_frac = float(x - tile_i0*TILE_SIZE_X - TILE_SIZE_X/2)/float(TILE_SIZE_X);
 			float y_frac = float(y - tile_j0*TILE_SIZE_Y - TILE_SIZE_Y/2)/float(TILE_SIZE_Y);
             float v0 = v00*(1 - x_frac) + v10*x_frac;
@@ -153,8 +155,8 @@ __global__ void ahe_GPU2(unsigned char* img_in, unsigned char* img_out, unsigned
 
 void adaptive_equalization( unsigned char* d_img_in, unsigned char* d_img_out, unsigned char* d_mappings, int width_, int height_ ){
     
-    int num_threads_x = 16;
-    int num_threads_y = 16;
+    int num_threads_x = 32;
+    int num_threads_y = 32;
     dim3 block_shape = dim3( num_threads_x, num_threads_y ,1);  
 
     int num_blocks_x = (width_ / num_threads_x) + 1; 
@@ -193,7 +195,6 @@ extern "C" void run_ahe_GPU(unsigned char* img_in, unsigned char* img_out, int w
     SAFE_CALL( cudaMalloc, (void**)&d_mappings, mapping_size_bytes)
     get_mappings(d_img_in, d_mappings, width_, height_);
     SAFE_CALL(cudaDeviceSynchronize)
-    
     unsigned char *d_img_out;
     SAFE_CALL( cudaMalloc, (void**)&d_img_out, img_size_bytes)
     adaptive_equalization(d_img_in, d_img_out, d_mappings, width_, height_);
