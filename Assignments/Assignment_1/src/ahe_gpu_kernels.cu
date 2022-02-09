@@ -88,7 +88,7 @@ __global__ void ahe_get_mappings(int*pdf_global, unsigned char* mappings){
 			}
 		}
         float val = (255.0 * float(cdf_i - cdf_min)/float(PIXELS_PER_TILE - cdf_min));
-		mappings[global_i] = (unsigned char)val;
+		mappings[global_i] = (unsigned char)round(val);
     }
 }
 

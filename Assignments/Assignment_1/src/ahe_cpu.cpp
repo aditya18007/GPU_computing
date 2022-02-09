@@ -88,7 +88,7 @@ void adaptiveEqualizationCPU(unsigned char* img_in, unsigned char* img_out, int 
 			int offset = 256*(tile_i + tile_j*ntiles_x);
 			for(int i=0; i< 256; i++){
 				auto val = (255.0 * float(cdf[i] - cdf_min)/float(pixels_per_tile - cdf_min));
-				mappings[i+ offset] = (unsigned char)val;
+				mappings[i+ offset] = (unsigned char)round(val);
 				// mappings[i+ offset] = (unsigned char)cdf[i];
 			}
 		}
