@@ -68,7 +68,6 @@ void get_pdf( unsigned char* d_img_in, int* d_pdf, int width, int height){
 }
 
 __global__ void ahe_get_mappings(int*pdf_global, unsigned char* mappings){
-    __shared__ int cdf[256];
     __shared__ int pdf[256];
 
     int i = threadIdx.x ;
@@ -81,16 +80,14 @@ __global__ void ahe_get_mappings(int*pdf_global, unsigned char* mappings){
         for(int j = 0; j < i; j++){
             cdf_i += pdf[j];
         }
-        cdf[i] = cdf_i;
-        __syncthreads();
         int cdf_min = PIXELS_PER_TILE+1; // minimum non-zero value of the CDF
 		for(int j=0; j<256; j++){
-		    if(cdf[j] != 0) {
-				cdf_min = cdf[j]; 
+		    if(pdf[j] != 0) { //First non zero value will be same as pdf
+				cdf_min = pdf[j]; 
 				break;
 			}
 		}
-        float val = (255.0 * float(cdf[i] - cdf_min)/float(PIXELS_PER_TILE - cdf_min));
+        float val = (255.0 * float(cdf_i - cdf_min)/float(PIXELS_PER_TILE - cdf_min));
 		mappings[global_i] = (unsigned char)val;
     }
 }
