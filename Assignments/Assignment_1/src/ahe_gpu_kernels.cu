@@ -38,6 +38,8 @@ __constant__ int Ntiles_x[1];
 __constant__ int Ntiles_y[1];
 __constant__ int Numtiles[1];
 
+__constant__ unsigned char Mappings[32*32*256];
+
 __global__ void ahe_get_PDF(unsigned char* img_in, int* pdf){
     int x = blockDim.x*blockIdx.x + threadIdx.x;
     int y = blockDim.y*blockIdx.y + threadIdx.y;
@@ -163,6 +165,66 @@ __global__ void ahe_equalize(unsigned char* img_in, unsigned char* img_out, unsi
     }
 }
 
+__global__ void ahe_equalize_const_map(unsigned char* img_in, unsigned char* img_out){
+    int x = blockDim.x*blockIdx.x + threadIdx.x;
+    int y = blockDim.y*blockIdx.y + threadIdx.y;
+    int width = Width[0];
+    if ( x < width && y < Heigth[0]){
+            
+            int ntiles_x = Ntiles_x[0];
+            int ntiles_y = Ntiles_y[0];
+
+            int tile_i0, tile_j0, tile_i1, tile_j1;
+            tile_i0 = (x - TILE_SIZE_X/2) / TILE_SIZE_X;
+			if(tile_i0 < 0) {
+				tile_i0 = 0;
+			}
+			
+			tile_j0 = (y - TILE_SIZE_Y/2) / TILE_SIZE_Y;
+			if(tile_j0 < 0) {
+				tile_j0 = 0;
+			}
+
+			tile_i1 = (x + TILE_SIZE_X/2) / TILE_SIZE_X;
+			if(tile_i1 >= ntiles_x){
+				tile_i1 = ntiles_x - 1;
+			} 
+			
+			tile_j1 = (y + TILE_SIZE_Y/2) / TILE_SIZE_Y;
+			if(tile_j1 >= ntiles_y) {
+				tile_j1 = ntiles_y - 1;
+			}
+
+			// Find offsets to neighboring mappings. For no neighbors, set the nearest neighbor.
+			int offset00 = 256*(tile_i0 + tile_j0*ntiles_x);
+			int offset01 = 256*(tile_i0 + tile_j1*ntiles_x);
+			int offset10 = 256*(tile_i1 + tile_j0*ntiles_x);
+			int offset11 = 256*(tile_i1 + tile_j1*ntiles_x);
+
+			// Compute 4 values and perform bilinear interpolation
+      		unsigned char v00, v01, v10, v11;
+            unsigned char img_in_val = img_in[x+y*width];
+			v00 = Mappings[ img_in_val + offset00];
+			v01 = Mappings[ img_in_val + offset01];
+			v10 = Mappings[ img_in_val + offset10];
+			v11 = Mappings[ img_in_val + offset11];
+			float x_frac = float(x - tile_i0*TILE_SIZE_X - TILE_SIZE_X/2)/float(TILE_SIZE_X);
+			float y_frac = float(y - tile_j0*TILE_SIZE_Y - TILE_SIZE_Y/2)/float(TILE_SIZE_Y);
+            float v0 = v00*(1 - x_frac) + v10*x_frac;
+            float v1 = v01*(1 - x_frac) + v11*x_frac;
+            float v = v0*(1 - y_frac) + v1*y_frac;
+
+            if (v < 0){
+                v = 0;
+            }
+                
+            if (v > 255){
+                v = 255;
+            } 
+      		img_out[x+y*width] = v;
+    }
+}
+
 void adaptive_equalization( unsigned char* d_img_in, unsigned char* d_img_out, unsigned char* d_mappings, int width_, int height_ ){
     
     int num_threads_x = 32;
@@ -178,6 +240,24 @@ void adaptive_equalization( unsigned char* d_img_in, unsigned char* d_img_out, u
     grid_shape.x, grid_shape.y, grid_shape.z, block_shape.x, block_shape.y, block_shape.z);
     
     ahe_equalize<<< grid_shape, block_shape>>>(d_img_in, d_img_out, d_mappings);
+}
+
+void adaptive_equalization_const_mapping( unsigned char* d_img_in, unsigned char* d_img_out, unsigned char* d_mappings, int width_, int height_ , int mapping_size_bytes ){
+    
+    int num_threads_x = 32;
+    int num_threads_y = 32;
+    dim3 block_shape = dim3( num_threads_x, num_threads_y ,1);  
+
+    int num_blocks_x = (width_ / num_threads_x) + 1; 
+    int num_blocks_y = (height_ / num_threads_y) + 1;
+
+    dim3 grid_shape = dim3( num_blocks_x, num_blocks_y , 1); 
+
+    printf("Step 3 : Grid : {%d, %d, %d} blocks. Blocks : {%d, %d, %d} threads.\n",
+    grid_shape.x, grid_shape.y, grid_shape.z, block_shape.x, block_shape.y, block_shape.z);
+
+    SAFE_CALL (cudaMemcpyToSymbol, Mappings, d_mappings, mapping_size_bytes, 0, cudaMemcpyDeviceToDevice)
+    ahe_equalize_const_map<<< grid_shape, block_shape>>>(d_img_in, d_img_out);
 }
 
 
@@ -220,7 +300,8 @@ extern "C" void run_ahe_GPU(unsigned char* img_in, unsigned char* img_out, int w
     
     unsigned char *d_img_out;
     SAFE_CALL( cudaMalloc, (void**)&d_img_out, img_size_bytes)
-    adaptive_equalization(d_img_in, d_img_out, d_mappings, width, height);
+    // adaptive_equalization(d_img_in, d_img_out, d_mappings, width, height);
+    adaptive_equalization_const_mapping(d_img_in, d_img_out, d_mappings, width, height, mappings_size_bytes);
     SAFE_CALL(cudaDeviceSynchronize)
 
     SAFE_CALL(cudaMemcpy, (void*)img_out, (void*)d_img_out,img_size_bytes, cudaMemcpyDeviceToHost)
