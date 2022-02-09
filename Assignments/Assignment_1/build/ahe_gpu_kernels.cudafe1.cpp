@@ -41982,6 +41982,2450 @@ extern wostream wclog;
 static ios_base::Init __ioinit; 
 # 77
 }
+# 41 "/usr/include/c++/8/bits/codecvt.h" 3
+namespace std __attribute((__visibility__("default"))) { 
+# 46
+class codecvt_base { 
+# 49
+public: enum result { 
+# 51
+ok, 
+# 52
+partial, 
+# 53
+error, 
+# 54
+noconv
+# 55
+}; 
+# 56
+}; 
+# 67 "/usr/include/c++/8/bits/codecvt.h" 3
+template< class _InternT, class _ExternT, class _StateT> 
+# 68
+class __codecvt_abstract_base : public locale::facet, public codecvt_base { 
+# 73
+public: typedef codecvt_base::result result; 
+# 74
+typedef _InternT intern_type; 
+# 75
+typedef _ExternT extern_type; 
+# 76
+typedef _StateT state_type; 
+# 116 "/usr/include/c++/8/bits/codecvt.h" 3
+result out(state_type &__state, const intern_type *__from, const intern_type *
+# 117
+__from_end, const intern_type *&__from_next, extern_type *
+# 118
+__to, extern_type *__to_end, extern_type *&
+# 119
+__to_next) const 
+# 120
+{ 
+# 121
+return do_out(__state, __from, __from_end, __from_next, __to, __to_end, __to_next); 
+# 123
+} 
+# 155 "/usr/include/c++/8/bits/codecvt.h" 3
+result unshift(state_type &__state, extern_type *__to, extern_type *__to_end, extern_type *&
+# 156
+__to_next) const 
+# 157
+{ return do_unshift(__state, __to, __to_end, __to_next); } 
+# 196 "/usr/include/c++/8/bits/codecvt.h" 3
+result in(state_type &__state, const extern_type *__from, const extern_type *
+# 197
+__from_end, const extern_type *&__from_next, intern_type *
+# 198
+__to, intern_type *__to_end, intern_type *&
+# 199
+__to_next) const 
+# 200
+{ 
+# 201
+return do_in(__state, __from, __from_end, __from_next, __to, __to_end, __to_next); 
+# 203
+} 
+# 206
+int encoding() const throw() 
+# 207
+{ return do_encoding(); } 
+# 210
+bool always_noconv() const throw() 
+# 211
+{ return do_always_noconv(); } 
+# 214
+int length(state_type &__state, const extern_type *__from, const extern_type *
+# 215
+__end, size_t __max) const 
+# 216
+{ return do_length(__state, __from, __end, __max); } 
+# 219
+int max_length() const throw() 
+# 220
+{ return do_max_length(); } 
+# 224
+protected: explicit __codecvt_abstract_base(size_t __refs = 0) : locale::facet(__refs) { } 
+# 227
+virtual ~__codecvt_abstract_base() { } 
+# 237 "/usr/include/c++/8/bits/codecvt.h" 3
+virtual result do_out(state_type & __state, const intern_type * __from, const intern_type * __from_end, const intern_type *& __from_next, extern_type * __to, extern_type * __to_end, extern_type *& __to_next) const = 0; 
+# 243
+virtual result do_unshift(state_type & __state, extern_type * __to, extern_type * __to_end, extern_type *& __to_next) const = 0; 
+# 247
+virtual result do_in(state_type & __state, const extern_type * __from, const extern_type * __from_end, const extern_type *& __from_next, intern_type * __to, intern_type * __to_end, intern_type *& __to_next) const = 0; 
+# 253
+virtual int do_encoding() const throw() = 0; 
+# 256
+virtual bool do_always_noconv() const throw() = 0; 
+# 259
+virtual int do_length(state_type &, const extern_type * __from, const extern_type * __end, size_t __max) const = 0; 
+# 263
+virtual int do_max_length() const throw() = 0; 
+# 264
+}; 
+# 273 "/usr/include/c++/8/bits/codecvt.h" 3
+template< class _InternT, class _ExternT, class _StateT> 
+# 274
+class codecvt : public __codecvt_abstract_base< _InternT, _ExternT, _StateT>  { 
+# 279
+public: typedef std::codecvt_base::result result; 
+# 280
+typedef _InternT intern_type; 
+# 281
+typedef _ExternT extern_type; 
+# 282
+typedef _StateT state_type; 
+# 285
+protected: std::__c_locale _M_c_locale_codecvt; 
+# 288
+public: static std::locale::id id; 
+# 291
+explicit codecvt(std::size_t __refs = 0) : std::__codecvt_abstract_base< _InternT, _ExternT, _StateT> (__refs), _M_c_locale_codecvt((0)) 
+# 294
+{ } 
+# 297
+explicit codecvt(std::__c_locale __cloc, std::size_t __refs = 0); 
+# 301
+protected: virtual ~codecvt() { } 
+# 304
+virtual result do_out(state_type & __state, const intern_type * __from, const intern_type * __from_end, const intern_type *& __from_next, extern_type * __to, extern_type * __to_end, extern_type *& __to_next) const; 
+# 310
+virtual result do_unshift(state_type & __state, extern_type * __to, extern_type * __to_end, extern_type *& __to_next) const; 
+# 314
+virtual result do_in(state_type & __state, const extern_type * __from, const extern_type * __from_end, const extern_type *& __from_next, intern_type * __to, intern_type * __to_end, intern_type *& __to_next) const; 
+# 320
+virtual int do_encoding() const throw(); 
+# 323
+virtual bool do_always_noconv() const throw(); 
+# 326
+virtual int do_length(state_type &, const extern_type * __from, const extern_type * __end, std::size_t __max) const; 
+# 330
+virtual int do_max_length() const throw(); 
+# 331
+}; 
+# 333
+template< class _InternT, class _ExternT, class _StateT> locale::id 
+# 334
+codecvt< _InternT, _ExternT, _StateT> ::id; 
+# 338
+template<> class codecvt< char, char, __mbstate_t>  : public __codecvt_abstract_base< char, char, __mbstate_t>  { 
+# 341
+friend class __cxx11::messages< char> ; 
+# 345
+public: typedef char intern_type; 
+# 346
+typedef char extern_type; 
+# 347
+typedef mbstate_t state_type; 
+# 350
+protected: __c_locale _M_c_locale_codecvt; 
+# 353
+public: static locale::id id; 
+# 356
+explicit codecvt(size_t __refs = 0); 
+# 359
+explicit codecvt(__c_locale __cloc, size_t __refs = 0); 
+# 363
+protected: virtual ~codecvt(); 
+# 366
+virtual result do_out(state_type & __state, const intern_type * __from, const intern_type * __from_end, const intern_type *& __from_next, extern_type * __to, extern_type * __to_end, extern_type *& __to_next) const; 
+# 372
+virtual result do_unshift(state_type & __state, extern_type * __to, extern_type * __to_end, extern_type *& __to_next) const; 
+# 376
+virtual result do_in(state_type & __state, const extern_type * __from, const extern_type * __from_end, const extern_type *& __from_next, intern_type * __to, intern_type * __to_end, intern_type *& __to_next) const; 
+# 382
+virtual int do_encoding() const throw(); 
+# 385
+virtual bool do_always_noconv() const throw(); 
+# 388
+virtual int do_length(state_type &, const extern_type * __from, const extern_type * __end, size_t __max) const; 
+# 392
+virtual int do_max_length() const throw(); 
+# 393
+}; 
+# 401
+template<> class codecvt< wchar_t, char, __mbstate_t>  : public __codecvt_abstract_base< wchar_t, char, __mbstate_t>  { 
+# 404
+friend class __cxx11::messages< wchar_t> ; 
+# 408
+public: typedef wchar_t intern_type; 
+# 409
+typedef char extern_type; 
+# 410
+typedef mbstate_t state_type; 
+# 413
+protected: __c_locale _M_c_locale_codecvt; 
+# 416
+public: static locale::id id; 
+# 419
+explicit codecvt(size_t __refs = 0); 
+# 422
+explicit codecvt(__c_locale __cloc, size_t __refs = 0); 
+# 426
+protected: virtual ~codecvt(); 
+# 429
+virtual result do_out(state_type & __state, const intern_type * __from, const intern_type * __from_end, const intern_type *& __from_next, extern_type * __to, extern_type * __to_end, extern_type *& __to_next) const; 
+# 435
+virtual result do_unshift(state_type & __state, extern_type * __to, extern_type * __to_end, extern_type *& __to_next) const; 
+# 440
+virtual result do_in(state_type & __state, const extern_type * __from, const extern_type * __from_end, const extern_type *& __from_next, intern_type * __to, intern_type * __to_end, intern_type *& __to_next) const; 
+# 447
+virtual int do_encoding() const throw(); 
+# 450
+virtual bool do_always_noconv() const throw(); 
+# 453
+virtual int do_length(state_type &, const extern_type * __from, const extern_type * __end, size_t __max) const; 
+# 457
+virtual int do_max_length() const throw(); 
+# 458
+}; 
+# 468 "/usr/include/c++/8/bits/codecvt.h" 3
+template<> class codecvt< char16_t, char, __mbstate_t>  : public __codecvt_abstract_base< char16_t, char, __mbstate_t>  { 
+# 473
+public: typedef char16_t intern_type; 
+# 474
+typedef char extern_type; 
+# 475
+typedef mbstate_t state_type; 
+# 478
+static locale::id id; 
+# 481
+explicit codecvt(size_t __refs = 0) : std::__codecvt_abstract_base< char16_t, char, __mbstate_t> (__refs) 
+# 482
+{ } 
+# 486
+protected: virtual ~codecvt(); 
+# 489
+virtual result do_out(state_type & __state, const intern_type * __from, const intern_type * __from_end, const intern_type *& __from_next, extern_type * __to, extern_type * __to_end, extern_type *& __to_next) const; 
+# 495
+virtual result do_unshift(state_type & __state, extern_type * __to, extern_type * __to_end, extern_type *& __to_next) const; 
+# 500
+virtual result do_in(state_type & __state, const extern_type * __from, const extern_type * __from_end, const extern_type *& __from_next, intern_type * __to, intern_type * __to_end, intern_type *& __to_next) const; 
+# 507
+virtual int do_encoding() const throw(); 
+# 510
+virtual bool do_always_noconv() const throw(); 
+# 513
+virtual int do_length(state_type &, const extern_type * __from, const extern_type * __end, size_t __max) const; 
+# 517
+virtual int do_max_length() const throw(); 
+# 518
+}; 
+# 525
+template<> class codecvt< char32_t, char, __mbstate_t>  : public __codecvt_abstract_base< char32_t, char, __mbstate_t>  { 
+# 530
+public: typedef char32_t intern_type; 
+# 531
+typedef char extern_type; 
+# 532
+typedef mbstate_t state_type; 
+# 535
+static locale::id id; 
+# 538
+explicit codecvt(size_t __refs = 0) : std::__codecvt_abstract_base< char32_t, char, __mbstate_t> (__refs) 
+# 539
+{ } 
+# 543
+protected: virtual ~codecvt(); 
+# 546
+virtual result do_out(state_type & __state, const intern_type * __from, const intern_type * __from_end, const intern_type *& __from_next, extern_type * __to, extern_type * __to_end, extern_type *& __to_next) const; 
+# 552
+virtual result do_unshift(state_type & __state, extern_type * __to, extern_type * __to_end, extern_type *& __to_next) const; 
+# 557
+virtual result do_in(state_type & __state, const extern_type * __from, const extern_type * __from_end, const extern_type *& __from_next, intern_type * __to, intern_type * __to_end, intern_type *& __to_next) const; 
+# 564
+virtual int do_encoding() const throw(); 
+# 567
+virtual bool do_always_noconv() const throw(); 
+# 570
+virtual int do_length(state_type &, const extern_type * __from, const extern_type * __end, size_t __max) const; 
+# 574
+virtual int do_max_length() const throw(); 
+# 575
+}; 
+# 581
+template< class _InternT, class _ExternT, class _StateT> 
+# 582
+class codecvt_byname : public codecvt< _InternT, _ExternT, _StateT>  { 
+# 586
+public: explicit codecvt_byname(const char *__s, std::size_t __refs = 0) : std::codecvt< _InternT, _ExternT, _StateT> (__refs) 
+# 588
+{ 
+# 589
+if ((__builtin_strcmp(__s, "C") != 0) && (__builtin_strcmp(__s, "POSIX") != 0)) 
+# 591
+{ 
+# 592
+(this->_S_destroy_c_locale((this->_M_c_locale_codecvt))); 
+# 593
+(this->_S_create_c_locale((this->_M_c_locale_codecvt), __s)); 
+# 594
+}  
+# 595
+} 
+# 599
+explicit codecvt_byname(const __cxx11::string &__s, std::size_t __refs = 0) : codecvt_byname(__s.c_str(), __refs) 
+# 600
+{ } 
+# 605
+protected: virtual ~codecvt_byname() { } 
+# 606
+}; 
+# 610
+template<> class codecvt_byname< char16_t, char, __mbstate_t>  : public codecvt< char16_t, char, __mbstate_t>  { 
+# 615
+public: explicit codecvt_byname(const char *, size_t __refs = 0) : std::codecvt< char16_t, char, __mbstate_t> (__refs) 
+# 616
+{ } 
+# 619
+explicit codecvt_byname(const __cxx11::string &__s, size_t __refs = 0) : codecvt_byname(__s.c_str(), __refs) 
+# 620
+{ } 
+# 624
+protected: virtual ~codecvt_byname() { } 
+# 625
+}; 
+# 628
+template<> class codecvt_byname< char32_t, char, __mbstate_t>  : public codecvt< char32_t, char, __mbstate_t>  { 
+# 633
+public: explicit codecvt_byname(const char *, size_t __refs = 0) : std::codecvt< char32_t, char, __mbstate_t> (__refs) 
+# 634
+{ } 
+# 637
+explicit codecvt_byname(const __cxx11::string &__s, size_t __refs = 0) : codecvt_byname(__s.c_str(), __refs) 
+# 638
+{ } 
+# 642
+protected: virtual ~codecvt_byname() { } 
+# 643
+}; 
+# 649
+extern template class codecvt_byname< char, char, __mbstate_t> ;
+# 651
+extern template const codecvt< char, char, __mbstate_t>  &use_facet< codecvt< char, char, __mbstate_t> > (const locale &);
+# 655
+extern template bool has_facet< codecvt< char, char, __mbstate_t> > (const locale &) throw();
+# 660
+extern template class codecvt_byname< wchar_t, char, __mbstate_t> ;
+# 662
+extern template const codecvt< wchar_t, char, __mbstate_t>  &use_facet< codecvt< wchar_t, char, __mbstate_t> > (const locale &);
+# 666
+extern template bool has_facet< codecvt< wchar_t, char, __mbstate_t> > (const locale &) throw();
+# 679
+}
+# 38 "/usr/include/x86_64-linux-gnu/c++/8/bits/c++io.h" 3
+namespace std __attribute((__visibility__("default"))) { 
+# 42
+typedef __gthread_mutex_t __c_lock; 
+# 45
+typedef FILE __c_file; 
+# 48
+}
+# 44 "/usr/include/x86_64-linux-gnu/c++/8/bits/basic_file.h" 3
+namespace std __attribute((__visibility__("default"))) { 
+# 49
+template< class _CharT> class __basic_file; 
+# 54
+template<> class __basic_file< char>  { 
+# 57
+__c_file *_M_cfile; 
+# 60
+bool _M_cfile_created; 
+# 63
+public: __basic_file(__c_lock * __lock = 0) throw(); 
+# 66
+__basic_file(std::__basic_file< char>  &&__rv, __c_lock * = 0) noexcept : _M_cfile(__rv._M_cfile), _M_cfile_created(__rv._M_cfile_created) 
+# 68
+{ 
+# 69
+(__rv._M_cfile) = (nullptr); 
+# 70
+(__rv._M_cfile_created) = false; 
+# 71
+} 
+# 73
+std::__basic_file< char>  &operator=(const std::__basic_file< char>  &) = delete;
+# 74
+std::__basic_file< char>  &operator=(std::__basic_file< char>  &&) = delete;
+# 77
+void swap(std::__basic_file< char>  &__f) noexcept 
+# 78
+{ 
+# 79
+std::swap(_M_cfile, __f._M_cfile); 
+# 80
+std::swap(_M_cfile_created, __f._M_cfile_created); 
+# 81
+} 
+# 85
+std::__basic_file< char>  *open(const char * __name, ios_base::openmode __mode, int __prot = 436); 
+# 88
+std::__basic_file< char>  *sys_open(__c_file * __file, ios_base::openmode); 
+# 91
+std::__basic_file< char>  *sys_open(int __fd, ios_base::openmode __mode) throw(); 
+# 94
+std::__basic_file< char>  *close(); 
+# 96
+__attribute((__pure__)) bool 
+# 97
+is_open() const throw(); 
+# 99
+__attribute((__pure__)) int 
+# 100
+fd() throw(); 
+# 102
+__attribute((__pure__)) __c_file *
+# 103
+file() throw(); 
+# 105
+~__basic_file(); 
+# 108
+streamsize xsputn(const char * __s, streamsize __n); 
+# 111
+streamsize xsputn_2(const char * __s1, streamsize __n1, const char * __s2, streamsize __n2); 
+# 115
+streamsize xsgetn(char * __s, streamsize __n); 
+# 118
+streamoff seekoff(streamoff __off, ios_base::seekdir __way) throw(); 
+# 121
+int sync(); 
+# 124
+streamsize showmanyc(); 
+# 125
+}; 
+# 128
+}
+# 47 "/usr/include/c++/8/fstream" 3
+namespace std __attribute((__visibility__("default"))) { 
+# 79 "/usr/include/c++/8/fstream" 3
+template< class _CharT, class _Traits> 
+# 80
+class basic_filebuf : public basic_streambuf< _CharT, _Traits>  { 
+# 83
+template< class _Tp> using __chk_state = __and_< is_copy_assignable< _Tp> , is_copy_constructible< _Tp> , is_default_constructible< _Tp> > ; 
+# 88
+static_assert((__chk_state< typename _Traits::state_type> ::value), "state_type must be CopyAssignable, CopyConstructible and DefaultConstructible");
+# 92
+static_assert((is_same< typename _Traits::pos_type, fpos< typename _Traits::state_type> > ::value), "pos_type must be fpos<state_type>");
+# 98
+public: typedef _CharT char_type; 
+# 99
+typedef _Traits traits_type; 
+# 100
+typedef typename _Traits::int_type int_type; 
+# 101
+typedef typename _Traits::pos_type pos_type; 
+# 102
+typedef typename _Traits::off_type off_type; 
+# 104
+typedef std::basic_streambuf< _CharT, _Traits>  __streambuf_type; 
+# 105
+typedef basic_filebuf __filebuf_type; 
+# 106
+typedef std::__basic_file< char>  __file_type; 
+# 107
+typedef typename _Traits::state_type __state_type; 
+# 108
+typedef codecvt< _CharT, char, typename _Traits::state_type>  __codecvt_type; 
+# 110
+friend class ios_base; 
+# 115
+protected: std::__c_lock _M_lock; 
+# 118
+__file_type _M_file; 
+# 121
+std::ios_base::openmode _M_mode; 
+# 124
+__state_type _M_state_beg; 
+# 129
+__state_type _M_state_cur; 
+# 133
+__state_type _M_state_last; 
+# 136
+char_type *_M_buf; 
+# 143
+std::size_t _M_buf_size; 
+# 146
+bool _M_buf_allocated; 
+# 155 "/usr/include/c++/8/fstream" 3
+bool _M_reading; 
+# 156
+bool _M_writing; 
+# 164
+char_type _M_pback; 
+# 165
+char_type *_M_pback_cur_save; 
+# 166
+char_type *_M_pback_end_save; 
+# 167
+bool _M_pback_init; 
+# 171
+const __codecvt_type *_M_codecvt; 
+# 178
+char *_M_ext_buf; 
+# 183
+std::streamsize _M_ext_buf_size; 
+# 190
+const char *_M_ext_next; 
+# 191
+char *_M_ext_end; 
+# 199
+void _M_create_pback() 
+# 200
+{ 
+# 201
+if (!(_M_pback_init)) 
+# 202
+{ 
+# 203
+(_M_pback_cur_save) = (this->gptr()); 
+# 204
+(_M_pback_end_save) = (this->egptr()); 
+# 205
+(this->setg(&(_M_pback), &(_M_pback), (&(_M_pback)) + 1)); 
+# 206
+(_M_pback_init) = true; 
+# 207
+}  
+# 208
+} 
+# 216
+void _M_destroy_pback() throw() 
+# 217
+{ 
+# 218
+if (_M_pback_init) 
+# 219
+{ 
+# 221
+(_M_pback_cur_save) += ((this->gptr()) != (this->eback())); 
+# 222
+(this->setg(_M_buf, _M_pback_cur_save, _M_pback_end_save)); 
+# 223
+(_M_pback_init) = false; 
+# 224
+}  
+# 225
+} 
+# 235
+public: basic_filebuf(); 
+# 238
+basic_filebuf(const basic_filebuf &) = delete;
+# 239
+basic_filebuf(basic_filebuf &&); 
+# 246
+virtual ~basic_filebuf() 
+# 247
+{ close(); } 
+# 250
+basic_filebuf &operator=(const basic_filebuf &) = delete;
+# 251
+basic_filebuf &operator=(basic_filebuf &&); 
+# 252
+void swap(basic_filebuf &); 
+# 260
+bool is_open() const throw() 
+# 261
+{ return (_M_file).is_open(); } 
+# 305 "/usr/include/c++/8/fstream" 3
+__filebuf_type *open(const char * __s, std::ios_base::openmode __mode); 
+# 315 "/usr/include/c++/8/fstream" 3
+__filebuf_type *open(const __cxx11::string &__s, std::ios_base::openmode __mode) 
+# 316
+{ return open(__s.c_str(), __mode); } 
+# 345 "/usr/include/c++/8/fstream" 3
+__filebuf_type *close(); 
+# 349
+protected: void _M_allocate_internal_buffer(); 
+# 352
+void _M_destroy_internal_buffer() throw(); 
+# 356
+virtual std::streamsize showmanyc(); 
+# 364
+virtual int_type underflow(); 
+# 367
+virtual int_type pbackfail(int_type __c = _Traits::eof()); 
+# 377 "/usr/include/c++/8/fstream" 3
+virtual int_type overflow(int_type __c = _Traits::eof()); 
+# 382
+bool _M_convert_to_external(char_type *, std::streamsize); 
+# 397 "/usr/include/c++/8/fstream" 3
+virtual __streambuf_type *setbuf(char_type * __s, std::streamsize __n); 
+# 400
+virtual pos_type seekoff(off_type __off, std::ios_base::seekdir __way, std::ios_base::openmode __mode = (std::ios_base::in | std::ios_base::out)); 
+# 404
+virtual pos_type seekpos(pos_type __pos, std::ios_base::openmode __mode = (std::ios_base::in | std::ios_base::out)); 
+# 409
+pos_type _M_seek(off_type __off, std::ios_base::seekdir __way, __state_type __state); 
+# 412
+int _M_get_ext_pos(__state_type & __state); 
+# 415
+virtual int sync(); 
+# 418
+virtual void imbue(const std::locale & __loc); 
+# 421
+virtual std::streamsize xsgetn(char_type * __s, std::streamsize __n); 
+# 424
+virtual std::streamsize xsputn(const char_type * __s, std::streamsize __n); 
+# 428
+bool _M_terminate_output(); 
+# 443 "/usr/include/c++/8/fstream" 3
+void _M_set_buffer(std::streamsize __off) 
+# 444
+{ 
+# 445
+const bool __testin = ((_M_mode) & std::ios_base::in); 
+# 446
+const bool __testout = (((_M_mode) & std::ios_base::out)) || (((_M_mode) & std::ios_base::app)); 
+# 449
+if (__testin && (__off > (0))) { 
+# 450
+(this->setg(_M_buf, _M_buf, (_M_buf) + __off)); } else { 
+# 452
+(this->setg(_M_buf, _M_buf, _M_buf)); }  
+# 454
+if (__testout && (__off == (0)) && ((_M_buf_size) > (1))) { 
+# 455
+(this->setp(_M_buf, ((_M_buf) + (_M_buf_size)) - 1)); } else { 
+# 457
+(this->setp(0, 0)); }  
+# 458
+} 
+# 459
+}; 
+# 475 "/usr/include/c++/8/fstream" 3
+template< class _CharT, class _Traits> 
+# 476
+class basic_ifstream : public basic_istream< _CharT, _Traits>  { 
+# 480
+public: typedef _CharT char_type; 
+# 481
+typedef _Traits traits_type; 
+# 482
+typedef typename _Traits::int_type int_type; 
+# 483
+typedef typename _Traits::pos_type pos_type; 
+# 484
+typedef typename _Traits::off_type off_type; 
+# 487
+typedef basic_filebuf< _CharT, _Traits>  __filebuf_type; 
+# 488
+typedef std::basic_istream< _CharT, _Traits>  __istream_type; 
+# 491
+private: __filebuf_type _M_filebuf; 
+# 502 "/usr/include/c++/8/fstream" 3
+public: basic_ifstream() : __istream_type(), _M_filebuf() 
+# 503
+{ (this->init(&(_M_filebuf))); } 
+# 513 "/usr/include/c++/8/fstream" 3
+explicit basic_ifstream(const char *__s, std::ios_base::openmode __mode = ios_base::in) : __istream_type(), _M_filebuf() 
+# 515
+{ 
+# 516
+(this->init(&(_M_filebuf))); 
+# 517
+(this->open(__s, __mode)); 
+# 518
+} 
+# 529 "/usr/include/c++/8/fstream" 3
+explicit basic_ifstream(const __cxx11::string &__s, std::ios_base::openmode 
+# 530
+__mode = ios_base::in) : __istream_type(), _M_filebuf() 
+# 532
+{ 
+# 533
+(this->init(&(_M_filebuf))); 
+# 534
+(this->open(__s, __mode)); 
+# 535
+} 
+# 552 "/usr/include/c++/8/fstream" 3
+basic_ifstream(const basic_ifstream &) = delete;
+# 554
+basic_ifstream(basic_ifstream &&__rhs) : __istream_type(std::move(__rhs)), _M_filebuf(std::move(__rhs._M_filebuf)) 
+# 557
+{ __istream_type::set_rdbuf(&(_M_filebuf)); } 
+# 566 "/usr/include/c++/8/fstream" 3
+~basic_ifstream() 
+# 567
+{ } 
+# 573
+basic_ifstream &operator=(const basic_ifstream &) = delete;
+# 576
+basic_ifstream &operator=(basic_ifstream &&__rhs) 
+# 577
+{ 
+# 578
+std::basic_istream< _CharT, _Traits> ::operator=(std::move(__rhs)); 
+# 579
+(_M_filebuf) = std::move(__rhs._M_filebuf); 
+# 580
+return *this; 
+# 581
+} 
+# 584
+void swap(basic_ifstream &__rhs) 
+# 585
+{ 
+# 586
+__istream_type::swap(__rhs); 
+# 587
+((_M_filebuf).swap(__rhs._M_filebuf)); 
+# 588
+} 
+# 599 "/usr/include/c++/8/fstream" 3
+__filebuf_type *rdbuf() const 
+# 600
+{ return const_cast< __filebuf_type *>(&(_M_filebuf)); } 
+# 607
+bool is_open() 
+# 608
+{ return ((_M_filebuf).is_open()); } 
+# 613
+bool is_open() const 
+# 614
+{ return ((_M_filebuf).is_open()); } 
+# 625 "/usr/include/c++/8/fstream" 3
+void open(const char *__s, std::ios_base::openmode __mode = ios_base::in) 
+# 626
+{ 
+# 627
+if (!((_M_filebuf).open(__s, (__mode | std::ios_base::in)))) { 
+# 628
+(this->setstate(ios_base::failbit)); } else { 
+# 632
+(this->clear()); }  
+# 633
+} 
+# 645 "/usr/include/c++/8/fstream" 3
+void open(const __cxx11::string &__s, std::ios_base::openmode __mode = ios_base::in) 
+# 646
+{ 
+# 647
+if (!((_M_filebuf).open(__s, (__mode | std::ios_base::in)))) { 
+# 648
+(this->setstate(ios_base::failbit)); } else { 
+# 652
+(this->clear()); }  
+# 653
+} 
+# 678 "/usr/include/c++/8/fstream" 3
+void close() 
+# 679
+{ 
+# 680
+if (!((_M_filebuf).close())) { 
+# 681
+(this->setstate(ios_base::failbit)); }  
+# 682
+} 
+# 683
+}; 
+# 700 "/usr/include/c++/8/fstream" 3
+template< class _CharT, class _Traits> 
+# 701
+class basic_ofstream : public basic_ostream< _CharT, _Traits>  { 
+# 705
+public: typedef _CharT char_type; 
+# 706
+typedef _Traits traits_type; 
+# 707
+typedef typename _Traits::int_type int_type; 
+# 708
+typedef typename _Traits::pos_type pos_type; 
+# 709
+typedef typename _Traits::off_type off_type; 
+# 712
+typedef basic_filebuf< _CharT, _Traits>  __filebuf_type; 
+# 713
+typedef std::basic_ostream< _CharT, _Traits>  __ostream_type; 
+# 716
+private: __filebuf_type _M_filebuf; 
+# 727 "/usr/include/c++/8/fstream" 3
+public: basic_ofstream() : __ostream_type(), _M_filebuf() 
+# 728
+{ (this->init(&(_M_filebuf))); } 
+# 738 "/usr/include/c++/8/fstream" 3
+explicit basic_ofstream(const char *__s, std::ios_base::openmode 
+# 739
+__mode = ios_base::out) : __ostream_type(), _M_filebuf() 
+# 741
+{ 
+# 742
+(this->init(&(_M_filebuf))); 
+# 743
+(this->open(__s, __mode)); 
+# 744
+} 
+# 755 "/usr/include/c++/8/fstream" 3
+explicit basic_ofstream(const __cxx11::string &__s, std::ios_base::openmode 
+# 756
+__mode = ios_base::out) : __ostream_type(), _M_filebuf() 
+# 758
+{ 
+# 759
+(this->init(&(_M_filebuf))); 
+# 760
+(this->open(__s, __mode)); 
+# 761
+} 
+# 778 "/usr/include/c++/8/fstream" 3
+basic_ofstream(const basic_ofstream &) = delete;
+# 780
+basic_ofstream(basic_ofstream &&__rhs) : __ostream_type(std::move(__rhs)), _M_filebuf(std::move(__rhs._M_filebuf)) 
+# 783
+{ __ostream_type::set_rdbuf(&(_M_filebuf)); } 
+# 792 "/usr/include/c++/8/fstream" 3
+~basic_ofstream() 
+# 793
+{ } 
+# 799
+basic_ofstream &operator=(const basic_ofstream &) = delete;
+# 802
+basic_ofstream &operator=(basic_ofstream &&__rhs) 
+# 803
+{ 
+# 804
+std::basic_ostream< _CharT, _Traits> ::operator=(std::move(__rhs)); 
+# 805
+(_M_filebuf) = std::move(__rhs._M_filebuf); 
+# 806
+return *this; 
+# 807
+} 
+# 810
+void swap(basic_ofstream &__rhs) 
+# 811
+{ 
+# 812
+__ostream_type::swap(__rhs); 
+# 813
+((_M_filebuf).swap(__rhs._M_filebuf)); 
+# 814
+} 
+# 825 "/usr/include/c++/8/fstream" 3
+__filebuf_type *rdbuf() const 
+# 826
+{ return const_cast< __filebuf_type *>(&(_M_filebuf)); } 
+# 833
+bool is_open() 
+# 834
+{ return ((_M_filebuf).is_open()); } 
+# 839
+bool is_open() const 
+# 840
+{ return ((_M_filebuf).is_open()); } 
+# 851 "/usr/include/c++/8/fstream" 3
+void open(const char *__s, std::ios_base::openmode __mode = ios_base::out) 
+# 852
+{ 
+# 853
+if (!((_M_filebuf).open(__s, (__mode | std::ios_base::out)))) { 
+# 854
+(this->setstate(ios_base::failbit)); } else { 
+# 858
+(this->clear()); }  
+# 859
+} 
+# 871 "/usr/include/c++/8/fstream" 3
+void open(const __cxx11::string &__s, std::ios_base::openmode __mode = ios_base::out) 
+# 872
+{ 
+# 873
+if (!((_M_filebuf).open(__s, (__mode | std::ios_base::out)))) { 
+# 874
+(this->setstate(ios_base::failbit)); } else { 
+# 878
+(this->clear()); }  
+# 879
+} 
+# 904 "/usr/include/c++/8/fstream" 3
+void close() 
+# 905
+{ 
+# 906
+if (!((_M_filebuf).close())) { 
+# 907
+(this->setstate(ios_base::failbit)); }  
+# 908
+} 
+# 909
+}; 
+# 926 "/usr/include/c++/8/fstream" 3
+template< class _CharT, class _Traits> 
+# 927
+class basic_fstream : public basic_iostream< _CharT, _Traits>  { 
+# 931
+public: typedef _CharT char_type; 
+# 932
+typedef _Traits traits_type; 
+# 933
+typedef typename _Traits::int_type int_type; 
+# 934
+typedef typename _Traits::pos_type pos_type; 
+# 935
+typedef typename _Traits::off_type off_type; 
+# 938
+typedef basic_filebuf< _CharT, _Traits>  __filebuf_type; 
+# 939
+typedef std::basic_ios< _CharT, _Traits>  __ios_type; 
+# 940
+typedef std::basic_iostream< _CharT, _Traits>  __iostream_type; 
+# 943
+private: __filebuf_type _M_filebuf; 
+# 954 "/usr/include/c++/8/fstream" 3
+public: basic_fstream() : __iostream_type(), _M_filebuf() 
+# 956
+{ (this->init(&(_M_filebuf))); } 
+# 964
+explicit basic_fstream(const char *__s, std::ios_base::openmode 
+# 965
+__mode = (std::ios_base::in | std::ios_base::out)) : __iostream_type(0), _M_filebuf() 
+# 967
+{ 
+# 968
+(this->init(&(_M_filebuf))); 
+# 969
+(this->open(__s, __mode)); 
+# 970
+} 
+# 979
+explicit basic_fstream(const __cxx11::string &__s, std::ios_base::openmode 
+# 980
+__mode = (std::ios_base::in | std::ios_base::out)) : __iostream_type(0), _M_filebuf() 
+# 982
+{ 
+# 983
+(this->init(&(_M_filebuf))); 
+# 984
+(this->open(__s, __mode)); 
+# 985
+} 
+# 1000 "/usr/include/c++/8/fstream" 3
+basic_fstream(const basic_fstream &) = delete;
+# 1002
+basic_fstream(basic_fstream &&__rhs) : __iostream_type(std::move(__rhs)), _M_filebuf(std::move(__rhs._M_filebuf)) 
+# 1005
+{ __iostream_type::set_rdbuf(&(_M_filebuf)); } 
+# 1014 "/usr/include/c++/8/fstream" 3
+~basic_fstream() 
+# 1015
+{ } 
+# 1021
+basic_fstream &operator=(const basic_fstream &) = delete;
+# 1024
+basic_fstream &operator=(basic_fstream &&__rhs) 
+# 1025
+{ 
+# 1026
+std::basic_iostream< _CharT, _Traits> ::operator=(std::move(__rhs)); 
+# 1027
+(_M_filebuf) = std::move(__rhs._M_filebuf); 
+# 1028
+return *this; 
+# 1029
+} 
+# 1032
+void swap(basic_fstream &__rhs) 
+# 1033
+{ 
+# 1034
+__iostream_type::swap(__rhs); 
+# 1035
+((_M_filebuf).swap(__rhs._M_filebuf)); 
+# 1036
+} 
+# 1047 "/usr/include/c++/8/fstream" 3
+__filebuf_type *rdbuf() const 
+# 1048
+{ return const_cast< __filebuf_type *>(&(_M_filebuf)); } 
+# 1055
+bool is_open() 
+# 1056
+{ return ((_M_filebuf).is_open()); } 
+# 1061
+bool is_open() const 
+# 1062
+{ return ((_M_filebuf).is_open()); } 
+# 1073 "/usr/include/c++/8/fstream" 3
+void open(const char *__s, std::ios_base::openmode 
+# 1074
+__mode = (std::ios_base::in | std::ios_base::out)) 
+# 1075
+{ 
+# 1076
+if (!((_M_filebuf).open(__s, __mode))) { 
+# 1077
+(this->setstate(ios_base::failbit)); } else { 
+# 1081
+(this->clear()); }  
+# 1082
+} 
+# 1094 "/usr/include/c++/8/fstream" 3
+void open(const __cxx11::string &__s, std::ios_base::openmode 
+# 1095
+__mode = (std::ios_base::in | std::ios_base::out)) 
+# 1096
+{ 
+# 1097
+if (!((_M_filebuf).open(__s, __mode))) { 
+# 1098
+(this->setstate(ios_base::failbit)); } else { 
+# 1102
+(this->clear()); }  
+# 1103
+} 
+# 1129 "/usr/include/c++/8/fstream" 3
+void close() 
+# 1130
+{ 
+# 1131
+if (!((_M_filebuf).close())) { 
+# 1132
+(this->setstate(ios_base::failbit)); }  
+# 1133
+} 
+# 1134
+}; 
+# 1138
+template< class _CharT, class _Traits> inline void 
+# 1140
+swap(basic_filebuf< _CharT, _Traits>  &__x, basic_filebuf< _CharT, _Traits>  &
+# 1141
+__y) 
+# 1142
+{ (__x.swap(__y)); } 
+# 1145
+template< class _CharT, class _Traits> inline void 
+# 1147
+swap(basic_ifstream< _CharT, _Traits>  &__x, basic_ifstream< _CharT, _Traits>  &
+# 1148
+__y) 
+# 1149
+{ (__x.swap(__y)); } 
+# 1152
+template< class _CharT, class _Traits> inline void 
+# 1154
+swap(basic_ofstream< _CharT, _Traits>  &__x, basic_ofstream< _CharT, _Traits>  &
+# 1155
+__y) 
+# 1156
+{ (__x.swap(__y)); } 
+# 1159
+template< class _CharT, class _Traits> inline void 
+# 1161
+swap(basic_fstream< _CharT, _Traits>  &__x, basic_fstream< _CharT, _Traits>  &
+# 1162
+__y) 
+# 1163
+{ (__x.swap(__y)); } 
+# 1167
+}
+# 42 "/usr/include/c++/8/bits/fstream.tcc" 3
+namespace std __attribute((__visibility__("default"))) { 
+# 46
+template< class _CharT, class _Traits> void 
+# 49
+basic_filebuf< _CharT, _Traits> ::_M_allocate_internal_buffer() 
+# 50
+{ 
+# 53
+if ((!(_M_buf_allocated)) && (!(_M_buf))) 
+# 54
+{ 
+# 55
+(_M_buf) = (new char_type [_M_buf_size]); 
+# 56
+(_M_buf_allocated) = true; 
+# 57
+}  
+# 58
+} 
+# 60
+template< class _CharT, class _Traits> void 
+# 63
+basic_filebuf< _CharT, _Traits> ::_M_destroy_internal_buffer() throw() 
+# 64
+{ 
+# 65
+if (_M_buf_allocated) 
+# 66
+{ 
+# 67
+delete [] (_M_buf); 
+# 68
+(_M_buf) = 0; 
+# 69
+(_M_buf_allocated) = false; 
+# 70
+}  
+# 71
+delete [] (_M_ext_buf); 
+# 72
+(_M_ext_buf) = (0); 
+# 73
+(_M_ext_buf_size) = (0); 
+# 74
+(_M_ext_next) = (0); 
+# 75
+(_M_ext_end) = (0); 
+# 76
+} 
+# 78
+template< class _CharT, class _Traits> 
+# 80
+basic_filebuf< _CharT, _Traits> ::basic_filebuf() : __streambuf_type(), _M_lock(), _M_file(&(_M_lock)), _M_mode(((std::ios_base::openmode)0)), _M_state_beg(), _M_state_cur(), _M_state_last(), _M_buf((0)), _M_buf_size((8192)), _M_buf_allocated(false), _M_reading(false), _M_writing(false), _M_pback(), _M_pback_cur_save((0)), _M_pback_end_save((0)), _M_pback_init(false), _M_codecvt((0)), _M_ext_buf((0)), _M_ext_buf_size((0)), _M_ext_next((0)), _M_ext_end((0)) 
+# 87
+{ 
+# 88
+if (has_facet< __codecvt_type> ((this->_M_buf_locale))) { 
+# 89
+(_M_codecvt) = (&use_facet< __codecvt_type> ((this->_M_buf_locale))); }  
+# 90
+} 
+# 93
+template< class _CharT, class _Traits> 
+# 95
+basic_filebuf< _CharT, _Traits> ::basic_filebuf(basic_filebuf &&__rhs) : __streambuf_type(__rhs), _M_lock(), _M_file(std::move(__rhs._M_file), &(_M_lock)), _M_mode(std::__exchange(__rhs._M_mode, (std::ios_base::openmode)0)), _M_state_beg(std::move(__rhs._M_state_beg)), _M_state_cur(std::move(__rhs._M_state_cur)), _M_state_last(std::move(__rhs._M_state_last)), _M_buf(std::__exchange(__rhs._M_buf, nullptr)), _M_buf_size(std::__exchange(__rhs._M_buf_size, 1)), _M_buf_allocated(std::__exchange(__rhs._M_buf_allocated, false)), _M_reading(std::__exchange(__rhs._M_reading, false)), _M_writing(std::__exchange(__rhs._M_writing, false)), _M_pback(__rhs._M_pback), _M_pback_cur_save(std::__exchange(__rhs._M_pback_cur_save, nullptr)), _M_pback_end_save(std::__exchange(__rhs._M_pback_end_save, nullptr)), _M_pback_init(std::__exchange(__rhs._M_pback_init, false)), _M_codecvt(__rhs._M_codecvt), _M_ext_buf(std::__exchange(__rhs._M_ext_buf, nullptr)), _M_ext_buf_size(std::__exchange(__rhs._M_ext_buf_size, 0)), _M_ext_next(std::__exchange(__rhs._M_ext_next, nullptr)), _M_ext_end(std::__exchange(__rhs._M_ext_end, nullptr)) 
+# 116
+{ 
+# 117
+__rhs._M_set_buffer(-1); 
+# 118
+(__rhs._M_state_last) = ((__rhs._M_state_cur) = (__rhs._M_state_beg)); 
+# 119
+} 
+# 121
+template< class _CharT, class _Traits> basic_filebuf< _CharT, _Traits>  &
+# 124
+basic_filebuf< _CharT, _Traits> ::operator=(basic_filebuf &&__rhs) 
+# 125
+{ 
+# 126
+close(); 
+# 127
+std::basic_streambuf< _CharT, _Traits> ::operator=(__rhs); 
+# 128
+(_M_file).swap(__rhs._M_file); 
+# 129
+(_M_mode) = std::__exchange(__rhs._M_mode, (std::ios_base::openmode)0); 
+# 130
+(_M_state_beg) = std::move(__rhs._M_state_beg); 
+# 131
+(_M_state_cur) = std::move(__rhs._M_state_cur); 
+# 132
+(_M_state_last) = std::move(__rhs._M_state_last); 
+# 133
+(_M_buf) = std::__exchange(__rhs._M_buf, nullptr); 
+# 134
+(_M_buf_size) = std::__exchange(__rhs._M_buf_size, 1); 
+# 135
+(_M_buf_allocated) = std::__exchange(__rhs._M_buf_allocated, false); 
+# 136
+(_M_ext_buf) = std::__exchange(__rhs._M_ext_buf, nullptr); 
+# 137
+(_M_ext_buf_size) = std::__exchange(__rhs._M_ext_buf_size, 0); 
+# 138
+(_M_ext_next) = std::__exchange(__rhs._M_ext_next, nullptr); 
+# 139
+(_M_ext_end) = std::__exchange(__rhs._M_ext_end, nullptr); 
+# 140
+(_M_reading) = std::__exchange(__rhs._M_reading, false); 
+# 141
+(_M_writing) = std::__exchange(__rhs._M_writing, false); 
+# 142
+(_M_pback_cur_save) = std::__exchange(__rhs._M_pback_cur_save, nullptr); 
+# 143
+(_M_pback_end_save) = std::__exchange(__rhs._M_pback_end_save, nullptr); 
+# 144
+(_M_pback_init) = std::__exchange(__rhs._M_pback_init, false); 
+# 145
+__rhs._M_set_buffer(-1); 
+# 146
+(__rhs._M_state_last) = ((__rhs._M_state_cur) = (__rhs._M_state_beg)); 
+# 147
+return *this; 
+# 148
+} 
+# 150
+template< class _CharT, class _Traits> void 
+# 153
+basic_filebuf< _CharT, _Traits> ::swap(basic_filebuf &__rhs) 
+# 154
+{ 
+# 155
+__streambuf_type::swap(__rhs); 
+# 156
+(_M_file).swap(__rhs._M_file); 
+# 157
+std::swap(_M_mode, __rhs._M_mode); 
+# 158
+std::swap(_M_state_beg, __rhs._M_state_beg); 
+# 159
+std::swap(_M_state_cur, __rhs._M_state_cur); 
+# 160
+std::swap(_M_state_last, __rhs._M_state_last); 
+# 161
+std::swap(_M_buf, __rhs._M_buf); 
+# 162
+std::swap(_M_buf_size, __rhs._M_buf_size); 
+# 163
+std::swap(_M_buf_allocated, __rhs._M_buf_allocated); 
+# 164
+std::swap(_M_ext_buf, __rhs._M_ext_buf); 
+# 165
+std::swap(_M_ext_buf_size, __rhs._M_ext_buf_size); 
+# 166
+std::swap(_M_ext_next, __rhs._M_ext_next); 
+# 167
+std::swap(_M_ext_end, __rhs._M_ext_end); 
+# 168
+std::swap(_M_reading, __rhs._M_reading); 
+# 169
+std::swap(_M_writing, __rhs._M_writing); 
+# 170
+std::swap(_M_pback_cur_save, __rhs._M_pback_cur_save); 
+# 171
+std::swap(_M_pback_end_save, __rhs._M_pback_end_save); 
+# 172
+std::swap(_M_pback_init, __rhs._M_pback_init); 
+# 173
+} 
+# 176
+template< class _CharT, class _Traits> typename basic_filebuf< _CharT, _Traits> ::__filebuf_type *
+# 179
+basic_filebuf< _CharT, _Traits> ::open(const char *__s, std::ios_base::openmode __mode) 
+# 180
+{ 
+# 181
+__filebuf_type *__ret = (0); 
+# 182
+if (!is_open()) 
+# 183
+{ 
+# 184
+(_M_file).open(__s, __mode); 
+# 185
+if (is_open()) 
+# 186
+{ 
+# 187
+_M_allocate_internal_buffer(); 
+# 188
+(_M_mode) = __mode; 
+# 191
+(_M_reading) = false; 
+# 192
+(_M_writing) = false; 
+# 193
+_M_set_buffer(-1); 
+# 196
+(_M_state_last) = ((_M_state_cur) = (_M_state_beg)); 
+# 199
+if (((__mode & std::ios_base::ate)) && (seekoff(0, std::ios_base::end, __mode) == ((pos_type)((off_type)(-1))))) { 
+# 202
+close(); } else { 
+# 204
+__ret = this; }  
+# 205
+}  
+# 206
+}  
+# 207
+return __ret; 
+# 208
+} 
+# 210
+template< class _CharT, class _Traits> typename basic_filebuf< _CharT, _Traits> ::__filebuf_type *
+# 213
+basic_filebuf< _CharT, _Traits> ::close() 
+# 214
+{ 
+# 215
+if (!is_open()) { 
+# 216
+return 0; }  
+# 218
+bool __testfail = false; 
+# 219
+{ 
+# 221
+struct __close_sentry { 
+# 223
+basic_filebuf *__fb; 
+# 224
+__close_sentry(basic_filebuf *__fbi) : __fb(__fbi) { } 
+# 225
+~__close_sentry() 
+# 226
+{ 
+# 227
+((__fb)->_M_mode) = ((std::ios_base::openmode)0); 
+# 228
+((__fb)->_M_pback_init) = false; 
+# 229
+(__fb)->_M_destroy_internal_buffer(); 
+# 230
+((__fb)->_M_reading) = false; 
+# 231
+((__fb)->_M_writing) = false; 
+# 232
+(__fb)->_M_set_buffer(-1); 
+# 233
+((__fb)->_M_state_last) = (((__fb)->_M_state_cur) = ((__fb)->_M_state_beg)); 
+# 234
+} 
+# 235
+} __cs(this); 
+# 237
+try 
+# 238
+{ 
+# 239
+if (!_M_terminate_output()) { 
+# 240
+__testfail = true; }  
+# 241
+} 
+# 242
+catch (__cxxabiv1::__forced_unwind &) 
+# 243
+{ 
+# 244
+(_M_file).close(); 
+# 245
+throw; 
+# 246
+} 
+# 247
+catch (...) 
+# 248
+{ __testfail = true; }  
+# 249
+} 
+# 251
+if (!((_M_file).close())) { 
+# 252
+__testfail = true; }  
+# 254
+if (__testfail) { 
+# 255
+return 0; } else { 
+# 257
+return this; }  
+# 258
+} 
+# 260
+template< class _CharT, class _Traits> streamsize 
+# 263
+basic_filebuf< _CharT, _Traits> ::showmanyc() 
+# 264
+{ 
+# 265
+std::streamsize __ret = (-1); 
+# 266
+const bool __testin = ((_M_mode) & std::ios_base::in); 
+# 267
+if (__testin && is_open()) 
+# 268
+{ 
+# 271
+__ret = ((this->egptr()) - (this->gptr())); 
+# 279
+if ((__check_facet(_M_codecvt).encoding()) >= 0) { 
+# 281
+__ret += ((_M_file).showmanyc() / ((_M_codecvt)->max_length())); }  
+# 282
+}  
+# 283
+return __ret; 
+# 284
+} 
+# 286
+template< class _CharT, class _Traits> typename basic_filebuf< _CharT, _Traits> ::int_type 
+# 289
+basic_filebuf< _CharT, _Traits> ::underflow() 
+# 290
+{ 
+# 291
+int_type __ret = traits_type::eof(); 
+# 292
+const bool __testin = ((_M_mode) & std::ios_base::in); 
+# 293
+if (__testin) 
+# 294
+{ 
+# 295
+if (_M_writing) 
+# 296
+{ 
+# 297
+if (overflow() == traits_type::eof()) { 
+# 298
+return __ret; }  
+# 299
+_M_set_buffer(-1); 
+# 300
+(_M_writing) = false; 
+# 301
+}  
+# 305
+_M_destroy_pback(); 
+# 307
+if ((this->gptr()) < (this->egptr())) { 
+# 308
+return traits_type::to_int_type(*(this->gptr())); }  
+# 311
+const std::size_t __buflen = ((_M_buf_size) > (1)) ? (_M_buf_size) - (1) : (1); 
+# 314
+bool __got_eof = false; 
+# 316
+std::streamsize __ilen = (0); 
+# 317
+std::codecvt_base::result __r = codecvt_base::ok; 
+# 318
+if ((__check_facet(_M_codecvt).always_noconv())) 
+# 319
+{ 
+# 320
+__ilen = (_M_file).xsgetn(reinterpret_cast< char *>((this->eback())), __buflen); 
+# 322
+if (__ilen == (0)) { 
+# 323
+__got_eof = true; }  
+# 324
+} else 
+# 326
+{ 
+# 329
+const int __enc = ((_M_codecvt)->encoding()); 
+# 330
+std::streamsize __blen; 
+# 331
+std::streamsize __rlen; 
+# 332
+if (__enc > 0) { 
+# 333
+__blen = (__rlen = (__buflen * __enc)); } else 
+# 335
+{ 
+# 336
+__blen = ((__buflen + ((_M_codecvt)->max_length())) - 1); 
+# 337
+__rlen = __buflen; 
+# 338
+}  
+# 339
+const std::streamsize __remainder = (_M_ext_end) - (_M_ext_next); 
+# 340
+__rlen = ((__rlen > __remainder) ? __rlen - __remainder : (0)); 
+# 344
+if ((_M_reading) && ((this->egptr()) == (this->eback())) && __remainder) { 
+# 345
+__rlen = (0); }  
+# 349
+if ((_M_ext_buf_size) < __blen) 
+# 350
+{ 
+# 351
+char *__buf = new char [__blen]; 
+# 352
+if (__remainder) { 
+# 353
+__builtin_memcpy(__buf, _M_ext_next, __remainder); }  
+# 355
+delete [] (_M_ext_buf); 
+# 356
+(_M_ext_buf) = __buf; 
+# 357
+(_M_ext_buf_size) = __blen; 
+# 358
+} else { 
+# 359
+if (__remainder) { 
+# 360
+__builtin_memmove(_M_ext_buf, _M_ext_next, __remainder); }  }  
+# 362
+(_M_ext_next) = (_M_ext_buf); 
+# 363
+(_M_ext_end) = ((_M_ext_buf) + __remainder); 
+# 364
+(_M_state_last) = (_M_state_cur); 
+# 366
+do 
+# 367
+{ 
+# 368
+if (__rlen > (0)) 
+# 369
+{ 
+# 373
+if ((((_M_ext_end) - (_M_ext_buf)) + __rlen) > (_M_ext_buf_size)) 
+# 374
+{ 
+# 375
+__throw_ios_failure("basic_filebuf::underflow codecvt::max_length() is not valid"); 
+# 378
+}  
+# 379
+std::streamsize __elen = (_M_file).xsgetn(_M_ext_end, __rlen); 
+# 380
+if (__elen == (0)) { 
+# 381
+__got_eof = true; } else { 
+# 382
+if (__elen == (-1)) { 
+# 383
+break; }  }  
+# 384
+(_M_ext_end) += __elen; 
+# 385
+}  
+# 387
+char_type *__iend = (this->eback()); 
+# 388
+if ((_M_ext_next) < (_M_ext_end)) { 
+# 389
+__r = ((_M_codecvt)->in(_M_state_cur, _M_ext_next, _M_ext_end, _M_ext_next, (this->eback()), (this->eback()) + __buflen, __iend)); }  
+# 393
+if (__r == (codecvt_base::noconv)) 
+# 394
+{ 
+# 395
+std::size_t __avail = (_M_ext_end) - (_M_ext_buf); 
+# 396
+__ilen = (std::min(__avail, __buflen)); 
+# 397
+traits_type::copy((this->eback()), reinterpret_cast< char_type *>(_M_ext_buf), __ilen); 
+# 400
+(_M_ext_next) = ((_M_ext_buf) + __ilen); 
+# 401
+} else { 
+# 403
+__ilen = (__iend - (this->eback())); }  
+# 408
+if (__r == (codecvt_base::error)) { 
+# 409
+break; }  
+# 411
+__rlen = (1); 
+# 412
+} 
+# 413
+while ((__ilen == (0)) && (!__got_eof)); 
+# 414
+}  
+# 416
+if (__ilen > (0)) 
+# 417
+{ 
+# 418
+_M_set_buffer(__ilen); 
+# 419
+(_M_reading) = true; 
+# 420
+__ret = traits_type::to_int_type(*(this->gptr())); 
+# 421
+} else { 
+# 422
+if (__got_eof) 
+# 423
+{ 
+# 427
+_M_set_buffer(-1); 
+# 428
+(_M_reading) = false; 
+# 431
+if (__r == (codecvt_base::partial)) { 
+# 432
+__throw_ios_failure("basic_filebuf::underflow incomplete character in file"); }  
+# 434
+} else { 
+# 435
+if (__r == (codecvt_base::error)) { 
+# 436
+__throw_ios_failure("basic_filebuf::underflow invalid byte sequence in file"); } else { 
+# 439
+__throw_ios_failure("basic_filebuf::underflow error reading the file"); }  }  }  
+# 441
+}  
+# 442
+return __ret; 
+# 443
+} 
+# 445
+template< class _CharT, class _Traits> typename basic_filebuf< _CharT, _Traits> ::int_type 
+# 448
+basic_filebuf< _CharT, _Traits> ::pbackfail(int_type __i) 
+# 449
+{ 
+# 450
+int_type __ret = traits_type::eof(); 
+# 451
+const bool __testin = ((_M_mode) & std::ios_base::in); 
+# 452
+if (__testin) 
+# 453
+{ 
+# 454
+if (_M_writing) 
+# 455
+{ 
+# 456
+if (overflow() == traits_type::eof()) { 
+# 457
+return __ret; }  
+# 458
+_M_set_buffer(-1); 
+# 459
+(_M_writing) = false; 
+# 460
+}  
+# 463
+const bool __testpb = _M_pback_init; 
+# 464
+const bool __testeof = traits_type::eq_int_type(__i, __ret); 
+# 465
+int_type __tmp; 
+# 466
+if ((this->eback()) < (this->gptr())) 
+# 467
+{ 
+# 468
+(this->gbump(-1)); 
+# 469
+__tmp = traits_type::to_int_type(*(this->gptr())); 
+# 470
+} else { 
+# 471
+if (seekoff(-1, std::ios_base::cur) != ((pos_type)((off_type)(-1)))) 
+# 472
+{ 
+# 473
+__tmp = underflow(); 
+# 474
+if (traits_type::eq_int_type(__tmp, __ret)) { 
+# 475
+return __ret; }  
+# 476
+} else 
+# 478
+{ 
+# 484
+return __ret; 
+# 485
+}  }  
+# 489
+if ((!__testeof) && traits_type::eq_int_type(__i, __tmp)) { 
+# 490
+__ret = __i; } else { 
+# 491
+if (__testeof) { 
+# 492
+__ret = traits_type::not_eof(__i); } else { 
+# 493
+if (!__testpb) 
+# 494
+{ 
+# 495
+_M_create_pback(); 
+# 496
+(_M_reading) = true; 
+# 497
+(*(this->gptr())) = traits_type::to_char_type(__i); 
+# 498
+__ret = __i; 
+# 499
+}  }  }  
+# 500
+}  
+# 501
+return __ret; 
+# 502
+} 
+# 504
+template< class _CharT, class _Traits> typename basic_filebuf< _CharT, _Traits> ::int_type 
+# 507
+basic_filebuf< _CharT, _Traits> ::overflow(int_type __c) 
+# 508
+{ 
+# 509
+int_type __ret = traits_type::eof(); 
+# 510
+const bool __testeof = traits_type::eq_int_type(__c, __ret); 
+# 511
+const bool __testout = (((_M_mode) & std::ios_base::out)) || (((_M_mode) & std::ios_base::app)); 
+# 513
+if (__testout) 
+# 514
+{ 
+# 515
+if (_M_reading) 
+# 516
+{ 
+# 517
+_M_destroy_pback(); 
+# 518
+const int __gptr_off = _M_get_ext_pos(_M_state_last); 
+# 519
+if (_M_seek(__gptr_off, ios_base::cur, _M_state_last) == ((pos_type)((off_type)(-1)))) { 
+# 521
+return __ret; }  
+# 522
+}  
+# 523
+if ((this->pbase()) < (this->pptr())) 
+# 524
+{ 
+# 526
+if (!__testeof) 
+# 527
+{ 
+# 528
+(*(this->pptr())) = traits_type::to_char_type(__c); 
+# 529
+(this->pbump(1)); 
+# 530
+}  
+# 534
+if (_M_convert_to_external((this->pbase()), (this->pptr()) - (this->pbase()))) 
+# 536
+{ 
+# 537
+_M_set_buffer(0); 
+# 538
+__ret = traits_type::not_eof(__c); 
+# 539
+}  
+# 540
+} else { 
+# 541
+if ((_M_buf_size) > (1)) 
+# 542
+{ 
+# 546
+_M_set_buffer(0); 
+# 547
+(_M_writing) = true; 
+# 548
+if (!__testeof) 
+# 549
+{ 
+# 550
+(*(this->pptr())) = traits_type::to_char_type(__c); 
+# 551
+(this->pbump(1)); 
+# 552
+}  
+# 553
+__ret = traits_type::not_eof(__c); 
+# 554
+} else 
+# 556
+{ 
+# 558
+char_type __conv = traits_type::to_char_type(__c); 
+# 559
+if (__testeof || _M_convert_to_external(&__conv, 1)) 
+# 560
+{ 
+# 561
+(_M_writing) = true; 
+# 562
+__ret = traits_type::not_eof(__c); 
+# 563
+}  
+# 564
+}  }  
+# 565
+}  
+# 566
+return __ret; 
+# 567
+} 
+# 569
+template< class _CharT, class _Traits> bool 
+# 572
+basic_filebuf< _CharT, _Traits> ::_M_convert_to_external(_CharT *__ibuf, std::streamsize __ilen) 
+# 573
+{ 
+# 575
+std::streamsize __elen; 
+# 576
+std::streamsize __plen; 
+# 577
+if ((__check_facet(_M_codecvt).always_noconv())) 
+# 578
+{ 
+# 579
+__elen = (_M_file).xsputn(reinterpret_cast< char *>(__ibuf), __ilen); 
+# 580
+__plen = __ilen; 
+# 581
+} else 
+# 583
+{ 
+# 586
+std::streamsize __blen = __ilen * ((_M_codecvt)->max_length()); 
+# 587
+char *__buf = static_cast< char *>(__builtin_alloca(__blen)); 
+# 589
+char *__bend; 
+# 590
+const char_type *__iend; 
+# 591
+std::codecvt_base::result __r; 
+# 592
+__r = ((_M_codecvt)->out(_M_state_cur, __ibuf, __ibuf + __ilen, __iend, __buf, __buf + __blen, __bend)); 
+# 595
+if ((__r == (codecvt_base::ok)) || (__r == (codecvt_base::partial))) { 
+# 596
+__blen = (__bend - __buf); } else { 
+# 597
+if (__r == (codecvt_base::noconv)) 
+# 598
+{ 
+# 600
+__buf = (reinterpret_cast< char *>(__ibuf)); 
+# 601
+__blen = __ilen; 
+# 602
+} else { 
+# 604
+__throw_ios_failure("basic_filebuf::_M_convert_to_external conversion error"); }  }  
+# 607
+__elen = (_M_file).xsputn(__buf, __blen); 
+# 608
+__plen = __blen; 
+# 611
+if ((__r == (codecvt_base::partial)) && (__elen == __plen)) 
+# 612
+{ 
+# 613
+const char_type *__iresume = __iend; 
+# 614
+std::streamsize __rlen = (this->pptr()) - __iend; 
+# 615
+__r = ((_M_codecvt)->out(_M_state_cur, __iresume, __iresume + __rlen, __iend, __buf, __buf + __blen, __bend)); 
+# 618
+if (__r != (codecvt_base::error)) 
+# 619
+{ 
+# 620
+__rlen = (__bend - __buf); 
+# 621
+__elen = (_M_file).xsputn(__buf, __rlen); 
+# 622
+__plen = __rlen; 
+# 623
+} else { 
+# 625
+__throw_ios_failure("basic_filebuf::_M_convert_to_external conversion error"); }  
+# 627
+}  
+# 628
+}  
+# 629
+return __elen == __plen; 
+# 630
+} 
+# 632
+template< class _CharT, class _Traits> streamsize 
+# 635
+basic_filebuf< _CharT, _Traits> ::xsgetn(_CharT *__s, std::streamsize __n) 
+# 636
+{ 
+# 638
+std::streamsize __ret = (0); 
+# 639
+if (_M_pback_init) 
+# 640
+{ 
+# 641
+if ((__n > (0)) && ((this->gptr()) == (this->eback()))) 
+# 642
+{ 
+# 643
+(*(__s++)) = (*(this->gptr())); 
+# 644
+(this->gbump(1)); 
+# 645
+__ret = (1); 
+# 646
+--__n; 
+# 647
+}  
+# 648
+_M_destroy_pback(); 
+# 649
+} else { 
+# 650
+if (_M_writing) 
+# 651
+{ 
+# 652
+if (overflow() == traits_type::eof()) { 
+# 653
+return __ret; }  
+# 654
+_M_set_buffer(-1); 
+# 655
+(_M_writing) = false; 
+# 656
+}  }  
+# 661
+const bool __testin = ((_M_mode) & std::ios_base::in); 
+# 662
+const std::streamsize __buflen = ((_M_buf_size) > (1)) ? (_M_buf_size) - (1) : (1); 
+# 664
+if ((__n > __buflen) && (__check_facet(_M_codecvt).always_noconv()) && __testin) 
+# 666
+{ 
+# 668
+const std::streamsize __avail = (this->egptr()) - (this->gptr()); 
+# 669
+if (__avail != (0)) 
+# 670
+{ 
+# 671
+traits_type::copy(__s, (this->gptr()), __avail); 
+# 672
+__s += __avail; 
+# 673
+(this->setg((this->eback()), (this->gptr()) + __avail, (this->egptr()))); 
+# 674
+__ret += __avail; 
+# 675
+__n -= __avail; 
+# 676
+}  
+# 680
+std::streamsize __len; 
+# 681
+for (; ;) 
+# 682
+{ 
+# 683
+__len = (_M_file).xsgetn(reinterpret_cast< char *>(__s), __n); 
+# 684
+if (__len == (-1)) { 
+# 685
+__throw_ios_failure("basic_filebuf::xsgetn error reading the file"); }  
+# 687
+if (__len == (0)) { 
+# 688
+break; }  
+# 690
+__n -= __len; 
+# 691
+__ret += __len; 
+# 692
+if (__n == (0)) { 
+# 693
+break; }  
+# 695
+__s += __len; 
+# 696
+}  
+# 698
+if (__n == (0)) 
+# 699
+{ 
+# 701
+(_M_reading) = true; 
+# 702
+} else { 
+# 703
+if (__len == (0)) 
+# 704
+{ 
+# 708
+_M_set_buffer(-1); 
+# 709
+(_M_reading) = false; 
+# 710
+}  }  
+# 711
+} else { 
+# 713
+__ret += __streambuf_type::xsgetn(__s, __n); }  
+# 715
+return __ret; 
+# 716
+} 
+# 718
+template< class _CharT, class _Traits> streamsize 
+# 721
+basic_filebuf< _CharT, _Traits> ::xsputn(const _CharT *__s, std::streamsize __n) 
+# 722
+{ 
+# 723
+std::streamsize __ret = (0); 
+# 727
+const bool __testout = (((_M_mode) & std::ios_base::out)) || (((_M_mode) & std::ios_base::app)); 
+# 729
+if ((__check_facet(_M_codecvt).always_noconv()) && __testout && (!(_M_reading))) 
+# 731
+{ 
+# 733
+const std::streamsize __chunk = (1UL << 10); 
+# 734
+std::streamsize __bufavail = (this->epptr()) - (this->pptr()); 
+# 737
+if ((!(_M_writing)) && ((_M_buf_size) > (1))) { 
+# 738
+__bufavail = ((_M_buf_size) - (1)); }  
+# 740
+const std::streamsize __limit = std::min(__chunk, __bufavail); 
+# 741
+if (__n >= __limit) 
+# 742
+{ 
+# 743
+const std::streamsize __buffill = (this->pptr()) - (this->pbase()); 
+# 744
+const char *__buf = reinterpret_cast< const char *>((this->pbase())); 
+# 745
+__ret = (_M_file).xsputn_2(__buf, __buffill, reinterpret_cast< const char *>(__s), __n); 
+# 748
+if (__ret == (__buffill + __n)) 
+# 749
+{ 
+# 750
+_M_set_buffer(0); 
+# 751
+(_M_writing) = true; 
+# 752
+}  
+# 753
+if (__ret > __buffill) { 
+# 754
+__ret -= __buffill; } else { 
+# 756
+__ret = (0); }  
+# 757
+} else { 
+# 759
+__ret = __streambuf_type::xsputn(__s, __n); }  
+# 760
+} else { 
+# 762
+__ret = __streambuf_type::xsputn(__s, __n); }  
+# 763
+return __ret; 
+# 764
+} 
+# 766
+template< class _CharT, class _Traits> typename basic_filebuf< _CharT, _Traits> ::__streambuf_type *
+# 769
+basic_filebuf< _CharT, _Traits> ::setbuf(char_type *__s, std::streamsize __n) 
+# 770
+{ 
+# 771
+if (!is_open()) 
+# 772
+{ 
+# 773
+if ((__s == 0) && (__n == (0))) { 
+# 774
+(_M_buf_size) = (1); } else { 
+# 775
+if (__s && (__n > (0))) 
+# 776
+{ 
+# 785 "/usr/include/c++/8/bits/fstream.tcc" 3
+(_M_buf) = __s; 
+# 786
+(_M_buf_size) = __n; 
+# 787
+}  }  
+# 788
+}  
+# 789
+return this; 
+# 790
+} 
+# 795
+template< class _CharT, class _Traits> typename basic_filebuf< _CharT, _Traits> ::pos_type 
+# 798
+basic_filebuf< _CharT, _Traits> ::seekoff(off_type __off, std::ios_base::seekdir __way, std::ios_base::openmode) 
+# 799
+{ 
+# 800
+int __width = 0; 
+# 801
+if (_M_codecvt) { 
+# 802
+__width = ((_M_codecvt)->encoding()); }  
+# 803
+if (__width < 0) { 
+# 804
+__width = 0; }  
+# 806
+pos_type __ret = ((pos_type)((off_type)(-1))); 
+# 807
+const bool __testfail = (__off != 0) && (__width <= 0); 
+# 808
+if (is_open() && (!__testfail)) 
+# 809
+{ 
+# 814
+bool __no_movement = (__way == std::ios_base::cur) && (__off == 0) && ((!(_M_writing)) || ((_M_codecvt)->always_noconv())); 
+# 818
+if (!__no_movement) { 
+# 819
+_M_destroy_pback(); }  
+# 826
+__state_type __state = _M_state_beg; 
+# 827
+off_type __computed_off = __off * __width; 
+# 828
+if ((_M_reading) && (__way == std::ios_base::cur)) 
+# 829
+{ 
+# 830
+__state = (_M_state_last); 
+# 831
+__computed_off += _M_get_ext_pos(__state); 
+# 832
+}  
+# 833
+if (!__no_movement) { 
+# 834
+__ret = _M_seek(__computed_off, __way, __state); } else 
+# 836
+{ 
+# 837
+if (_M_writing) { 
+# 838
+__computed_off = ((this->pptr()) - (this->pbase())); }  
+# 840
+off_type __file_off = (_M_file).seekoff(0, std::ios_base::cur); 
+# 841
+if (__file_off != ((off_type)(-1))) 
+# 842
+{ 
+# 843
+__ret = (__file_off + __computed_off); 
+# 844
+(__ret.state(__state)); 
+# 845
+}  
+# 846
+}  
+# 847
+}  
+# 848
+return __ret; 
+# 849
+} 
+# 855
+template< class _CharT, class _Traits> typename basic_filebuf< _CharT, _Traits> ::pos_type 
+# 858
+basic_filebuf< _CharT, _Traits> ::seekpos(pos_type __pos, std::ios_base::openmode) 
+# 859
+{ 
+# 860
+pos_type __ret = ((pos_type)((off_type)(-1))); 
+# 861
+if (is_open()) 
+# 862
+{ 
+# 864
+_M_destroy_pback(); 
+# 865
+__ret = _M_seek((off_type)__pos, ios_base::beg, (__pos.state())); 
+# 866
+}  
+# 867
+return __ret; 
+# 868
+} 
+# 870
+template< class _CharT, class _Traits> typename basic_filebuf< _CharT, _Traits> ::pos_type 
+# 873
+basic_filebuf< _CharT, _Traits> ::_M_seek(off_type __off, std::ios_base::seekdir __way, __state_type __state) 
+# 874
+{ 
+# 875
+pos_type __ret = ((pos_type)((off_type)(-1))); 
+# 876
+if (_M_terminate_output()) 
+# 877
+{ 
+# 878
+off_type __file_off = (_M_file).seekoff(__off, __way); 
+# 879
+if (__file_off != ((off_type)(-1))) 
+# 880
+{ 
+# 881
+(_M_reading) = false; 
+# 882
+(_M_writing) = false; 
+# 883
+(_M_ext_next) = ((_M_ext_end) = (_M_ext_buf)); 
+# 884
+_M_set_buffer(-1); 
+# 885
+(_M_state_cur) = __state; 
+# 886
+__ret = __file_off; 
+# 887
+(__ret.state(_M_state_cur)); 
+# 888
+}  
+# 889
+}  
+# 890
+return __ret; 
+# 891
+} 
+# 896
+template< class _CharT, class _Traits> int 
+# 898
+basic_filebuf< _CharT, _Traits> ::_M_get_ext_pos(__state_type &__state) 
+# 899
+{ 
+# 900
+if (((_M_codecvt)->always_noconv())) { 
+# 901
+return (this->gptr()) - (this->egptr()); } else 
+# 903
+{ 
+# 907
+const int __gptr_off = ((_M_codecvt)->length(__state, _M_ext_buf, _M_ext_next, (this->gptr()) - (this->eback()))); 
+# 910
+return ((_M_ext_buf) + __gptr_off) - (_M_ext_end); 
+# 911
+}  
+# 912
+} 
+# 914
+template< class _CharT, class _Traits> bool 
+# 917
+basic_filebuf< _CharT, _Traits> ::_M_terminate_output() 
+# 918
+{ 
+# 920
+bool __testvalid = true; 
+# 921
+if ((this->pbase()) < (this->pptr())) 
+# 922
+{ 
+# 923
+const int_type __tmp = overflow(); 
+# 924
+if (traits_type::eq_int_type(__tmp, traits_type::eof())) { 
+# 925
+__testvalid = false; }  
+# 926
+}  
+# 929
+if ((_M_writing) && (!(__check_facet(_M_codecvt).always_noconv())) && __testvalid) 
+# 931
+{ 
+# 935
+const std::size_t __blen = (128); 
+# 936
+char __buf[__blen]; 
+# 937
+std::codecvt_base::result __r; 
+# 938
+std::streamsize __ilen = (0); 
+# 940
+do 
+# 941
+{ 
+# 942
+char *__next; 
+# 943
+__r = ((_M_codecvt)->unshift(_M_state_cur, __buf, __buf + __blen, __next)); 
+# 945
+if (__r == (codecvt_base::error)) { 
+# 946
+__testvalid = false; } else { 
+# 947
+if ((__r == (codecvt_base::ok)) || (__r == (codecvt_base::partial))) 
+# 949
+{ 
+# 950
+__ilen = (__next - __buf); 
+# 951
+if (__ilen > (0)) 
+# 952
+{ 
+# 953
+const std::streamsize __elen = (_M_file).xsputn(__buf, __ilen); 
+# 954
+if (__elen != __ilen) { 
+# 955
+__testvalid = false; }  
+# 956
+}  
+# 957
+}  }  
+# 958
+} 
+# 959
+while ((__r == (codecvt_base::partial)) && (__ilen > (0)) && __testvalid); 
+# 961
+if (__testvalid) 
+# 962
+{ 
+# 967
+const int_type __tmp = overflow(); 
+# 968
+if (traits_type::eq_int_type(__tmp, traits_type::eof())) { 
+# 969
+__testvalid = false; }  
+# 970
+}  
+# 971
+}  
+# 972
+return __testvalid; 
+# 973
+} 
+# 975
+template< class _CharT, class _Traits> int 
+# 978
+basic_filebuf< _CharT, _Traits> ::sync() 
+# 979
+{ 
+# 982
+int __ret = 0; 
+# 983
+if ((this->pbase()) < (this->pptr())) 
+# 984
+{ 
+# 985
+const int_type __tmp = overflow(); 
+# 986
+if (traits_type::eq_int_type(__tmp, traits_type::eof())) { 
+# 987
+__ret = (-1); }  
+# 988
+}  
+# 989
+return __ret; 
+# 990
+} 
+# 992
+template< class _CharT, class _Traits> void 
+# 995
+basic_filebuf< _CharT, _Traits> ::imbue(const std::locale &__loc) 
+# 996
+{ 
+# 997
+bool __testvalid = true; 
+# 999
+const __codecvt_type *_M_codecvt_tmp = (0); 
+# 1000
+if (__builtin_expect(has_facet< __codecvt_type> (__loc), true)) { 
+# 1001
+_M_codecvt_tmp = (&use_facet< __codecvt_type> (__loc)); }  
+# 1003
+if (is_open()) 
+# 1004
+{ 
+# 1006
+if (((_M_reading) || (_M_writing)) && ((__check_facet(_M_codecvt).encoding()) == (-1))) { 
+# 1008
+__testvalid = false; } else 
+# 1010
+{ 
+# 1011
+if (_M_reading) 
+# 1012
+{ 
+# 1013
+if ((__check_facet(_M_codecvt).always_noconv())) 
+# 1014
+{ 
+# 1015
+if (_M_codecvt_tmp && (!(__check_facet(_M_codecvt_tmp).always_noconv()))) { 
+# 1017
+__testvalid = (seekoff(0, std::ios_base::cur, _M_mode) != ((pos_type)((off_type)(-1)))); }  
+# 1019
+} else 
+# 1021
+{ 
+# 1023
+(_M_ext_next) = ((_M_ext_buf) + ((_M_codecvt)->length(_M_state_last, _M_ext_buf, _M_ext_next, (this->gptr()) - (this->eback())))); 
+# 1027
+const std::streamsize __remainder = (_M_ext_end) - (_M_ext_next); 
+# 1028
+if (__remainder) { 
+# 1029
+__builtin_memmove(_M_ext_buf, _M_ext_next, __remainder); }  
+# 1031
+(_M_ext_next) = (_M_ext_buf); 
+# 1032
+(_M_ext_end) = ((_M_ext_buf) + __remainder); 
+# 1033
+_M_set_buffer(-1); 
+# 1034
+(_M_state_last) = ((_M_state_cur) = (_M_state_beg)); 
+# 1035
+}  
+# 1036
+} else { 
+# 1037
+if ((_M_writing) && (__testvalid = _M_terminate_output())) { 
+# 1038
+_M_set_buffer(-1); }  }  
+# 1039
+}  
+# 1040
+}  
+# 1042
+if (__testvalid) { 
+# 1043
+(_M_codecvt) = _M_codecvt_tmp; } else { 
+# 1045
+(_M_codecvt) = 0; }  
+# 1046
+} 
+# 1051
+extern template class basic_filebuf< char, char_traits< char> > ;
+# 1052
+extern template class basic_ifstream< char, char_traits< char> > ;
+# 1053
+extern template class basic_ofstream< char, char_traits< char> > ;
+# 1054
+extern template class basic_fstream< char, char_traits< char> > ;
+# 1057
+extern template class basic_filebuf< wchar_t, char_traits< wchar_t> > ;
+# 1058
+extern template class basic_ifstream< wchar_t, char_traits< wchar_t> > ;
+# 1059
+extern template class basic_ofstream< wchar_t, char_traits< wchar_t> > ;
+# 1060
+extern template class basic_fstream< wchar_t, char_traits< wchar_t> > ;
+# 1065
+}
 # 6 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu.h"
 void adaptiveEqualizationGPU(unsigned char * img_in, unsigned char * img_out, int width, int height); 
 # 5 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/utils.h"
@@ -48206,353 +50650,269 @@ __y) noexcept(noexcept((__x.swap(__y))))
 { (__x.swap(__y)); } 
 # 1179 "/usr/include/c++/8/bits/stl_multimap.h" 3
 }
-# 7 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
-static int Width[1]; 
-# 8 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
-static int Heigth[1]; 
-# 10 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
-static int Ntiles_x[1]; 
-# 11 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
-static int Ntiles_y[1]; 
-# 14 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
-void ahe_GPU1(unsigned char *img_in, unsigned char *mappings) ;
-#if 0
+# 9 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
+template< class T> void 
+# 10
+print_mappings(T *d_mappings, int mapping_size, std::__cxx11::string filename) { 
+# 11
+T *mappings = new T [mapping_size]; 
+# 12
+int mapping_size_bytes = mapping_size * sizeof(T); 
+# 13
+my_errno = cudaMemcpy((void *)mappings, (void *)d_mappings, mapping_size_bytes, cudaMemcpyDeviceToHost); if (my_errno != (cudaSuccess)) { (((((std::cerr << ("\nFile : "))) << ("/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"))) << ('\n')); (((std::cerr << ("Function : "))) << __func__) << '\n'; (((((std::cerr << ("Line : "))) << (13))) << ('\n')); (((((std::cerr << ("Cuda error : "))) << (cudaGetErrorString(my_errno)))) << (" !\n\n")); exit(1); 
+# 13 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
+}  
 # 15
-{ 
+std::map< int, int, std::less< int> , std::allocator< std::pair< const int, int> > >  counts; 
 # 16
-int x = (((__device_builtin_variable_blockDim.x) * (__device_builtin_variable_blockIdx.x)) + (__device_builtin_variable_threadIdx.x)) * (256); 
+(std::cout << ("Printing mappings on GPU\n")); 
 # 17
-int y = (((__device_builtin_variable_blockDim.y) * (__device_builtin_variable_blockIdx.y)) + (__device_builtin_variable_threadIdx.y)) * (256); 
+for (int i = 0; i < mapping_size; i++) { { 
 # 18
-int width = Width[0]; 
+int i__ = mappings[i]; 
 # 19
-if ((x < width) && (y < (Heigth[0]))) { 
+if (((counts.find(i__)) == (counts.end()))) { 
+# 20
+counts[i__] = 1; 
 # 21
-int pdf[256], cdf[256]; 
+continue; 
+# 22
+}  
 # 23
-for (int i = 0; i < 256; i++) { 
+counts[i__]++; 
 # 24
-(pdf[i]) = 0; 
+} }  
 # 25
-}  
+std::ofstream MyFile((filename + (".txt"))); 
+# 26
+for (auto &p : counts) { 
 # 27
-for (int j = y; j < (y + 256); j++) { 
+(((((((MyFile << (p.first))) << (':'))) << (p.second))) << ('\n')); 
 # 28
-for (int i = x; i < (x + 256); i++) { 
+}  
 # 29
-(pdf[img_in[i + (j * width)]])++; 
+(MyFile << (std::endl)); 
 # 30
-}  
+MyFile.close(); 
 # 31
-}  
-# 33
-(cdf[0]) = (pdf[0]); 
-# 34
-for (int i = 1; i < 256; i++) { 
-# 35
-(cdf[i]) = ((cdf[i - 1]) + (pdf[i])); 
-# 36
-}  
-# 38
-int cdf_min = ((256 * 256) + 1); 
-# 40
-for (int i = 0; i < 256; i++) { 
+delete [] mappings; 
+# 32
+} 
+# 34 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
+static int Width[1]; 
+# 35 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
+static int Heigth[1]; 
+# 37 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
+static int Ntiles_x[1]; 
+# 38 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
+static int Ntiles_y[1]; 
+# 39 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
+static int Numtiles[1]; 
+# 41 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
+void ahe_get_PDF(unsigned char *img_in, int *pdf) ;
+#if 0
 # 41
-if ((cdf[i]) != 0) { 
+{ 
 # 42
-cdf_min = (cdf[i]); 
+int x = ((__device_builtin_variable_blockDim.x) * (__device_builtin_variable_blockIdx.x)) + (__device_builtin_variable_threadIdx.x); 
 # 43
-break; 
+int y = ((__device_builtin_variable_blockDim.y) * (__device_builtin_variable_blockIdx.y)) + (__device_builtin_variable_threadIdx.y); 
 # 44
-}  
+int width = Width[0]; 
 # 45
-}  
+if ((x < width) && (y < (Heigth[0]))) { 
+# 46
+int tile_i = x / 512; 
 # 47
-int tile_i = x / 256; 
+int tile_j = y / 512; 
 # 48
-int tile_j = y / 256; 
-# 49
 int offset = 256 * (tile_i + (tile_j * (Ntiles_x[0]))); 
+# 49
+atomicAdd(&(pdf[offset + (img_in[x + (y * width)])]), 1); 
 # 50
-for (int i = 0; i < 256; i++) { 
+}  
 # 51
-(mappings[i + offset]) = ((unsigned char)round(((255.0) * ((float)((cdf[i]) - cdf_min))) / ((float)((256 * 256) - cdf_min)))); 
-# 52
-}  
-# 53
-}  
-# 54
 } 
 #endif
-# 56 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
-void get_mappings(unsigned char *d_img_in, unsigned char *d_mappings, int width_, int height_) { 
-# 57
-int max_x = (width_ / 256) + 1; 
-# 58
-int max_y = (height_ / 256) + 1; 
-# 60
+# 53 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
+void get_pdf(unsigned char *d_img_in, int *d_pdf, int width, int height) { 
+# 55
 int num_threads_x = 32; 
-# 61
+# 56
 int num_threads_y = 32; 
-# 62
+# 57
 dim3 block_shape = dim3(num_threads_x, num_threads_y, 1); 
-# 64
-int num_blocks_x = (max_x / num_threads_x) + 1; 
-# 65
-int num_blocks_y = (max_y / num_threads_y) + 1; 
-# 66
+# 59
+int num_blocks_x = (width / num_threads_x) + 1; 
+# 60
+int num_blocks_y = (height / num_threads_y) + 1; 
+# 62
 dim3 grid_shape = dim3(num_blocks_x, num_blocks_y, 1); 
+# 64
+printf("\nStep 1 (Get pdf): Grid : {%d, %d, %d} blocks. Blocks : {%d, %d, %d} threads.\n", grid_shape.x, grid_shape.y, grid_shape.z, block_shape.x, block_shape.y, block_shape.z); 
+# 67
+(__cudaPushCallConfiguration(grid_shape, block_shape)) ? (void)0 : ahe_get_PDF(d_img_in, d_pdf); 
 # 68
-printf("\nStep 1 : Grid : {%d, %d, %d} blocks. Blocks : {%d, %d, %d} threads.\n", grid_shape.x, grid_shape.y, grid_shape.z, block_shape.x, block_shape.y, block_shape.z); 
-# 71
-(__cudaPushCallConfiguration(grid_shape, block_shape)) ? (void)0 : ahe_GPU1(d_img_in, d_mappings); 
-# 72
 } 
+# 70 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
+void ahe_get_mappings(int *pdf_global, unsigned char *mappings) ;
+#if 0
+# 70
+{ 
+# 71 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
+__attribute__((unused)) static int cdf[256]; 
+# 72 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
+__attribute__((unused)) static int pdf[256]; 
 # 74
-void print_mappings(unsigned char *d_mappings, int mapping_size) { 
+int i = __device_builtin_variable_threadIdx.x; 
 # 75
-unsigned char *mappings = new unsigned char [mapping_size]; 
+int global_i = i + ((__device_builtin_variable_blockIdx.x) * (__device_builtin_variable_blockDim.x)); 
 # 76
-int mapping_size_bytes = mapping_size * sizeof(unsigned char); 
+if (global_i < ((Numtiles[0]) * 256)) { 
 # 77
-my_errno = cudaMemcpy((void *)mappings, (void *)d_mappings, mapping_size_bytes, cudaMemcpyDeviceToHost); if (my_errno != (cudaSuccess)) { (((((std::cerr << ("\nFile : "))) << ("/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"))) << ('\n')); (((((std::cerr << ("Function : "))) << __func__)) << ('\n')); (((((std::cerr << ("Line : "))) << (77))) << ('\n')); (((((std::cerr << ("Cuda error : "))) << (cudaGetErrorString(my_errno)))) << (" !\n\n")); exit(1); 
-# 77 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
-}  
-# 79
-std::map< int, int, std::less< int> , std::allocator< std::pair< const int, int> > >  counts; 
+(pdf[i]) = (pdf_global[global_i]); 
+# 78
+__syncthreads(); 
 # 80
-(std::cout << ("Printing mappings on GPU\n")); 
+int cdf_i = pdf[i]; 
 # 81
-for (int i = 0; i < mapping_size; i++) { { 
+for (int j = 0; j < i; j++) { 
 # 82
-int i__ = mappings[i]; 
+cdf_i += (pdf[j]); 
 # 83
-if (((counts.find(i__)) == (counts.end()))) { 
-# 84
-counts[i__] = 1; 
-# 85
-continue; 
-# 86
 }  
+# 84
+(cdf[i]) = cdf_i; 
+# 85
+__syncthreads(); 
+# 86
+int cdf_min = ((512 * 512) + 1); 
 # 87
-counts[i__]++; 
+for (int j = 0; j < 256; j++) { 
 # 88
-} }  
+if ((cdf[j]) != 0) { 
 # 89
-for (auto &p : counts) { 
+cdf_min = (cdf[j]); 
 # 90
-(((((((std::cout << (p.first))) << (':'))) << (p.second))) << ('\n')); 
+break; 
 # 91
 }  
 # 92
-(std::cout << (std::endl)); 
+}  
 # 93
-delete [] mappings; 
+float val = ((255.0) * ((float)((cdf[i]) - cdf_min))) / ((float)((512 * 512) - cdf_min)); 
 # 94
-} 
-# 96 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
-void ahe_GPU2(unsigned char *img_in, unsigned char *img_out, unsigned char *mappings) ;
-#if 0
+(mappings[global_i]) = ((unsigned char)val); 
+# 95
+}  
 # 96
-{ 
-# 97
-int x = ((__device_builtin_variable_blockDim.x) * (__device_builtin_variable_blockIdx.x)) + (__device_builtin_variable_threadIdx.x); 
-# 98
-int y = ((__device_builtin_variable_blockDim.y) * (__device_builtin_variable_blockIdx.y)) + (__device_builtin_variable_threadIdx.y); 
-# 99
-int width = Width[0]; 
-# 100
-if ((x < width) && (y < (Heigth[0]))) { 
-# 102
-int ntiles_x = Ntiles_x[0]; 
-# 103
-int ntiles_y = Ntiles_y[0]; 
-# 105
-int tile_i0, tile_j0, tile_i1, tile_j1; 
-# 106
-tile_i0 = ((x - (256 / 2)) / 256); 
-# 107
-if (tile_i0 < 0) { 
-# 108
-tile_i0 = 0; 
-# 109
-}  
-# 111
-tile_j0 = ((y - (256 / 2)) / 256); 
-# 112
-if (tile_j0 < 0) { 
-# 113
-tile_j0 = 0; 
-# 114
-}  
-# 116
-tile_i1 = ((x + (256 / 2)) / 256); 
-# 117
-if (tile_i1 >= ntiles_x) { 
-# 118
-tile_i1 = (ntiles_x - 1); 
-# 119
-}  
-# 121
-tile_j1 = ((y + (256 / 2)) / 256); 
-# 122
-if (tile_j1 >= ntiles_y) { 
-# 123
-tile_j1 = (ntiles_y - 1); 
-# 124
-}  
-# 127
-int offset00 = 256 * (tile_i0 + (tile_j0 * ntiles_x)); 
-# 128
-int offset01 = 256 * (tile_i0 + (tile_j1 * ntiles_x)); 
-# 129
-int offset10 = 256 * (tile_i1 + (tile_j0 * ntiles_x)); 
-# 130
-int offset11 = 256 * (tile_i1 + (tile_j1 * ntiles_x)); 
-# 133
-unsigned char v00, v01, v10, v11; 
-# 134
-v00 = (mappings[(img_in[x + (y * width)]) + offset00]); 
-# 135
-v01 = (mappings[(img_in[x + (y * width)]) + offset01]); 
-# 136
-v10 = (mappings[(img_in[x + (y * width)]) + offset10]); 
-# 137
-v11 = (mappings[(img_in[x + (y * width)]) + offset11]); 
-# 138
-float x_frac = ((float)((x - (tile_i0 * 256)) - (256 / 2))) / ((float)256); 
-# 139
-float y_frac = ((float)((y - (tile_j0 * 256)) - (256 / 2))) / ((float)256); 
-# 140
-float v0 = (v00 * ((1) - x_frac)) + (v10 * x_frac); 
-# 141
-float v1 = (v01 * ((1) - x_frac)) + (v11 * x_frac); 
-# 142
-float v = (v0 * ((1) - y_frac)) + (v1 * y_frac); 
-# 144
-if (v < (0)) { 
-# 145
-v = (0); 
-# 146
-}  
-# 148
-if (v > (255)) { 
-# 149
-v = (255); 
-# 150
-}  
-# 151
-(img_out[x + (y * width)]) = v; 
-# 152
-}  
-# 153
 } 
 #endif
-# 155 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
-void adaptive_equalization(unsigned char *d_img_in, unsigned char *d_img_out, unsigned char *d_mappings, int width_, int height_) { 
-# 157
-int num_threads_x = 32; 
-# 158
-int num_threads_y = 32; 
-# 159
-dim3 block_shape = dim3(num_threads_x, num_threads_y, 1); 
-# 161
-int num_blocks_x = (width_ / num_threads_x) + 1; 
-# 162
-int num_blocks_y = (height_ / num_threads_y) + 1; 
-# 164
-dim3 grid_shape = dim3(num_blocks_x, num_blocks_y, 1); 
-# 166
-printf("Step 2 : Grid : {%d, %d, %d} blocks. Blocks : {%d, %d, %d} threads.\n", grid_shape.x, grid_shape.y, grid_shape.z, block_shape.x, block_shape.y, block_shape.z); 
-# 169
-(__cudaPushCallConfiguration(grid_shape, block_shape)) ? (void)0 : ahe_GPU2(d_img_in, d_img_out, d_mappings); 
-# 170
+# 98 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
+void get_mappings(int *d_pdf, unsigned char *d_mappings, int num_tiles) { 
+# 100
+int num_threads = 256; 
+# 101
+int num_blocks = num_tiles; 
+# 103
+printf("Step 2 (Get mappings): Grid : {%d} blocks. Blocks : {%d} threads.\n", num_blocks, num_threads); 
+# 106
+(__cudaPushCallConfiguration(num_blocks, num_threads)) ? (void)0 : ahe_get_mappings(d_pdf, d_mappings); 
+# 107
 } 
-# 173
-extern "C" void run_ahe_GPU(unsigned char *img_in, unsigned char *img_out, int width_, int height_) { 
-# 175
-int ntiles_x_ = width_ / 256; 
-# 176
-int ntiles_y_ = height_ / 256; 
-# 178
-my_errno = cudaMemcpyToSymbol(Width, &width_, sizeof width_); if (my_errno != (cudaSuccess)) { (((((std::cerr << ("\nFile : "))) << ("/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"))) << ('\n')); (((((std::cerr << ("Function : "))) << __func__)) << ('\n')); (((((std::cerr << ("Line : "))) << (178))) << ('\n')); (((((std::cerr << ("Cuda error : "))) << (cudaGetErrorString(my_errno)))) << (" !\n\n")); exit(1); 
-# 178 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
+# 110
+extern "C" void run_ahe_GPU(unsigned char *img_in, unsigned char *img_out, int width, int height) { 
+# 112
+int ntiles_x = width / 512; 
+# 113
+int ntiles_y = height / 512; 
+# 114
+int num_tiles = ntiles_x * ntiles_y; 
+# 116
+my_errno = cudaMemcpyToSymbol(Width, &width, sizeof width); if (my_errno != (cudaSuccess)) { (((((std::cerr << ("\nFile : "))) << ("/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"))) << ('\n')); (((((std::cerr << ("Function : "))) << __func__)) << ('\n')); (((((std::cerr << ("Line : "))) << (116))) << ('\n')); (((((std::cerr << ("Cuda error : "))) << (cudaGetErrorString(my_errno)))) << (" !\n\n")); exit(1); 
+# 116 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
 }  
-# 179
-my_errno = cudaMemcpyToSymbol(Heigth, &height_, sizeof height_); if (my_errno != (cudaSuccess)) { (((((std::cerr << ("\nFile : "))) << ("/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"))) << ('\n')); (((((std::cerr << ("Function : "))) << __func__)) << ('\n')); (((((std::cerr << ("Line : "))) << (179))) << ('\n')); (((((std::cerr << ("Cuda error : "))) << (cudaGetErrorString(my_errno)))) << (" !\n\n")); exit(1); 
-# 179 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
+# 117
+my_errno = cudaMemcpyToSymbol(Heigth, &height, sizeof height); if (my_errno != (cudaSuccess)) { (((((std::cerr << ("\nFile : "))) << ("/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"))) << ('\n')); (((((std::cerr << ("Function : "))) << __func__)) << ('\n')); (((((std::cerr << ("Line : "))) << (117))) << ('\n')); (((((std::cerr << ("Cuda error : "))) << (cudaGetErrorString(my_errno)))) << (" !\n\n")); exit(1); 
+# 117 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
 }  
-# 180
-my_errno = cudaMemcpyToSymbol(Ntiles_x, &ntiles_x_, sizeof ntiles_x_); if (my_errno != (cudaSuccess)) { (((((std::cerr << ("\nFile : "))) << ("/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"))) << ('\n')); (((((std::cerr << ("Function : "))) << __func__)) << ('\n')); (((((std::cerr << ("Line : "))) << (180))) << ('\n')); (((((std::cerr << ("Cuda error : "))) << (cudaGetErrorString(my_errno)))) << (" !\n\n")); exit(1); 
-# 180 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
+# 118
+my_errno = cudaMemcpyToSymbol(Ntiles_x, &ntiles_x, sizeof ntiles_x); if (my_errno != (cudaSuccess)) { (((((std::cerr << ("\nFile : "))) << ("/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"))) << ('\n')); (((((std::cerr << ("Function : "))) << __func__)) << ('\n')); (((((std::cerr << ("Line : "))) << (118))) << ('\n')); (((((std::cerr << ("Cuda error : "))) << (cudaGetErrorString(my_errno)))) << (" !\n\n")); exit(1); 
+# 118 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
 }  
-# 181
-my_errno = cudaMemcpyToSymbol(Ntiles_y, &ntiles_y_, sizeof ntiles_y_); if (my_errno != (cudaSuccess)) { (((((std::cerr << ("\nFile : "))) << ("/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"))) << ('\n')); (((((std::cerr << ("Function : "))) << __func__)) << ('\n')); (((((std::cerr << ("Line : "))) << (181))) << ('\n')); (((((std::cerr << ("Cuda error : "))) << (cudaGetErrorString(my_errno)))) << (" !\n\n")); exit(1); 
-# 181 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
+# 119
+my_errno = cudaMemcpyToSymbol(Ntiles_y, &ntiles_y, sizeof ntiles_y); if (my_errno != (cudaSuccess)) { (((((std::cerr << ("\nFile : "))) << ("/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"))) << ('\n')); (((((std::cerr << ("Function : "))) << __func__)) << ('\n')); (((((std::cerr << ("Line : "))) << (119))) << ('\n')); (((((std::cerr << ("Cuda error : "))) << (cudaGetErrorString(my_errno)))) << (" !\n\n")); exit(1); 
+# 119 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
 }  
-# 183
-auto img_size_bytes = (height_ * width_) * sizeof(unsigned char); 
-# 185
+# 120
+my_errno = cudaMemcpyToSymbol(Numtiles, &num_tiles, sizeof num_tiles); if (my_errno != (cudaSuccess)) { (((((std::cerr << ("\nFile : "))) << ("/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"))) << ('\n')); (((((std::cerr << ("Function : "))) << __func__)) << ('\n')); (((((std::cerr << ("Line : "))) << (120))) << ('\n')); (((((std::cerr << ("Cuda error : "))) << (cudaGetErrorString(my_errno)))) << (" !\n\n")); exit(1); 
+# 120 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
+}  
+# 122
+int img_size = height * width; 
+# 125
+int img_size_bytes = img_size * sizeof(unsigned char); 
+# 126
 unsigned char *d_img_in; 
-# 186
-my_errno = cudaMalloc((void **)(&d_img_in), img_size_bytes); if (my_errno != (cudaSuccess)) { (((((std::cerr << ("\nFile : "))) << ("/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"))) << ('\n')); (((((std::cerr << ("Function : "))) << __func__)) << ('\n')); (((((std::cerr << ("Line : "))) << (186))) << ('\n')); (((((std::cerr << ("Cuda error : "))) << (cudaGetErrorString(my_errno)))) << (" !\n\n")); exit(1); 
-# 186 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
+# 127
+my_errno = cudaMalloc((void **)(&d_img_in), img_size_bytes); if (my_errno != (cudaSuccess)) { (((((std::cerr << ("\nFile : "))) << ("/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"))) << ('\n')); (((((std::cerr << ("Function : "))) << __func__)) << ('\n')); (((((std::cerr << ("Line : "))) << (127))) << ('\n')); (((((std::cerr << ("Cuda error : "))) << (cudaGetErrorString(my_errno)))) << (" !\n\n")); exit(1); 
+# 127 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
 }  
-# 187
-my_errno = cudaMemcpy((void *)d_img_in, (void *)img_in, img_size_bytes, cudaMemcpyHostToDevice); if (my_errno != (cudaSuccess)) { (((((std::cerr << ("\nFile : "))) << ("/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"))) << ('\n')); (((((std::cerr << ("Function : "))) << __func__)) << ('\n')); (((((std::cerr << ("Line : "))) << (187))) << ('\n')); (((((std::cerr << ("Cuda error : "))) << (cudaGetErrorString(my_errno)))) << (" !\n\n")); exit(1); 
-# 187 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
+# 128
+my_errno = cudaMemcpy((void *)d_img_in, (void *)img_in, img_size_bytes, cudaMemcpyHostToDevice); if (my_errno != (cudaSuccess)) { (((((std::cerr << ("\nFile : "))) << ("/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"))) << ('\n')); (((((std::cerr << ("Function : "))) << __func__)) << ('\n')); (((((std::cerr << ("Line : "))) << (128))) << ('\n')); (((((std::cerr << ("Cuda error : "))) << (cudaGetErrorString(my_errno)))) << (" !\n\n")); exit(1); 
+# 128 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
 }  
-# 191
+# 130
+int pdf_size = num_tiles * 256; 
+# 131
+int pdf_size_bytes = pdf_size * sizeof(int); 
+# 132
+int *d_pdf; 
+# 133
+my_errno = cudaMalloc((void **)(&d_pdf), pdf_size_bytes); if (my_errno != (cudaSuccess)) { (((((std::cerr << ("\nFile : "))) << ("/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"))) << ('\n')); (((((std::cerr << ("Function : "))) << __func__)) << ('\n')); (((((std::cerr << ("Line : "))) << (133))) << ('\n')); (((((std::cerr << ("Cuda error : "))) << (cudaGetErrorString(my_errno)))) << (" !\n\n")); exit(1); 
+# 133 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
+}  
+# 134
+my_errno = cudaMemset((void *)d_pdf, 0, pdf_size_bytes); if (my_errno != (cudaSuccess)) { (((((std::cerr << ("\nFile : "))) << ("/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"))) << ('\n')); (((((std::cerr << ("Function : "))) << __func__)) << ('\n')); (((((std::cerr << ("Line : "))) << (134))) << ('\n')); (((((std::cerr << ("Cuda error : "))) << (cudaGetErrorString(my_errno)))) << (" !\n\n")); exit(1); 
+# 134 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
+}  
+# 135
+get_pdf(d_img_in, d_pdf, width, height); 
+# 136
+my_errno = cudaDeviceSynchronize(); if (my_errno != (cudaSuccess)) { (((((std::cerr << ("\nFile : "))) << ("/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"))) << ('\n')); (((((std::cerr << ("Function : "))) << __func__)) << ('\n')); (((((std::cerr << ("Line : "))) << (136))) << ('\n')); (((((std::cerr << ("Cuda error : "))) << (cudaGetErrorString(my_errno)))) << (" !\n\n")); exit(1); 
+# 136 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
+}  
+# 138
 unsigned char *d_mappings; 
-# 192
-auto mapping_size = (ntiles_x_ * ntiles_y_) * 256; 
-# 193
-auto mapping_size_bytes = mapping_size * sizeof(unsigned char); 
-# 194
-my_errno = cudaMalloc((void **)(&d_mappings), mapping_size_bytes); if (my_errno != (cudaSuccess)) { (((((std::cerr << ("\nFile : "))) << ("/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"))) << ('\n')); (((((std::cerr << ("Function : "))) << __func__)) << ('\n')); (((((std::cerr << ("Line : "))) << (194))) << ('\n')); (((((std::cerr << ("Cuda error : "))) << (cudaGetErrorString(my_errno)))) << (" !\n\n")); exit(1); 
-# 194 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
+# 139
+int mappings_size = num_tiles * 256; 
+# 140
+int mappings_size_bytes = pdf_size * sizeof(unsigned char); 
+# 141
+my_errno = cudaMalloc((void **)(&d_mappings), mappings_size_bytes); if (my_errno != (cudaSuccess)) { (((((std::cerr << ("\nFile : "))) << ("/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"))) << ('\n')); (((((std::cerr << ("Function : "))) << __func__)) << ('\n')); (((((std::cerr << ("Line : "))) << (141))) << ('\n')); (((((std::cerr << ("Cuda error : "))) << (cudaGetErrorString(my_errno)))) << (" !\n\n")); exit(1); 
+# 141 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
 }  
-# 195
-get_mappings(d_img_in, d_mappings, width_, height_); 
-# 196
-my_errno = cudaDeviceSynchronize(); if (my_errno != (cudaSuccess)) { (((((std::cerr << ("\nFile : "))) << ("/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"))) << ('\n')); (((((std::cerr << ("Function : "))) << __func__)) << ('\n')); (((((std::cerr << ("Line : "))) << (196))) << ('\n')); (((((std::cerr << ("Cuda error : "))) << (cudaGetErrorString(my_errno)))) << (" !\n\n")); exit(1); 
-# 196 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
+# 142
+get_mappings(d_pdf, d_mappings, num_tiles); 
+# 143
+my_errno = cudaDeviceSynchronize(); if (my_errno != (cudaSuccess)) { (((((std::cerr << ("\nFile : "))) << ("/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"))) << ('\n')); (((((std::cerr << ("Function : "))) << __func__)) << ('\n')); (((((std::cerr << ("Line : "))) << (143))) << ('\n')); (((((std::cerr << ("Cuda error : "))) << (cudaGetErrorString(my_errno)))) << (" !\n\n")); exit(1); 
+# 143 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
 }  
-# 197
-print_mappings(d_mappings, mapping_size); 
-# 198
-unsigned char *d_img_out; 
-# 199
-my_errno = cudaMalloc((void **)(&d_img_out), img_size_bytes); if (my_errno != (cudaSuccess)) { (((((std::cerr << ("\nFile : "))) << ("/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"))) << ('\n')); (((((std::cerr << ("Function : "))) << __func__)) << ('\n')); (((((std::cerr << ("Line : "))) << (199))) << ('\n')); (((((std::cerr << ("Cuda error : "))) << (cudaGetErrorString(my_errno)))) << (" !\n\n")); exit(1); 
-# 199 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
+# 145
+print_mappings(d_mappings, mappings_size, "mappings_GPU"); 
+# 146
+my_errno = cudaFree(d_img_in); if (my_errno != (cudaSuccess)) { (((((std::cerr << ("\nFile : "))) << ("/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"))) << ('\n')); (((((std::cerr << ("Function : "))) << __func__)) << ('\n')); (((((std::cerr << ("Line : "))) << (146))) << ('\n')); (((((std::cerr << ("Cuda error : "))) << (cudaGetErrorString(my_errno)))) << (" !\n\n")); exit(1); 
+# 146 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
 }  
-# 200
-adaptive_equalization(d_img_in, d_img_out, d_mappings, width_, height_); 
-# 201
-my_errno = cudaDeviceSynchronize(); if (my_errno != (cudaSuccess)) { (((((std::cerr << ("\nFile : "))) << ("/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"))) << ('\n')); (((((std::cerr << ("Function : "))) << __func__)) << ('\n')); (((((std::cerr << ("Line : "))) << (201))) << ('\n')); (((((std::cerr << ("Cuda error : "))) << (cudaGetErrorString(my_errno)))) << (" !\n\n")); exit(1); 
-# 201 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
+# 147
+my_errno = cudaFree(d_mappings); if (my_errno != (cudaSuccess)) { (((((std::cerr << ("\nFile : "))) << ("/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"))) << ('\n')); (((((std::cerr << ("Function : "))) << __func__)) << ('\n')); (((((std::cerr << ("Line : "))) << (147))) << ('\n')); (((((std::cerr << ("Cuda error : "))) << (cudaGetErrorString(my_errno)))) << (" !\n\n")); exit(1); 
+# 147 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
 }  
-# 203
-my_errno = cudaMemcpy((void *)img_out, (void *)d_img_out, img_size_bytes, cudaMemcpyDeviceToHost); if (my_errno != (cudaSuccess)) { (((((std::cerr << ("\nFile : "))) << ("/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"))) << ('\n')); (((((std::cerr << ("Function : "))) << __func__)) << ('\n')); (((((std::cerr << ("Line : "))) << (203))) << ('\n')); (((((std::cerr << ("Cuda error : "))) << (cudaGetErrorString(my_errno)))) << (" !\n\n")); exit(1); 
-# 203 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
-}  
-# 205
-my_errno = cudaFree(d_img_in); if (my_errno != (cudaSuccess)) { (((((std::cerr << ("\nFile : "))) << ("/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"))) << ('\n')); (((((std::cerr << ("Function : "))) << __func__)) << ('\n')); (((((std::cerr << ("Line : "))) << (205))) << ('\n')); (((((std::cerr << ("Cuda error : "))) << (cudaGetErrorString(my_errno)))) << (" !\n\n")); exit(1); 
-# 205 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
-}  
-# 206
-my_errno = cudaFree(d_mappings); if (my_errno != (cudaSuccess)) { (((((std::cerr << ("\nFile : "))) << ("/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"))) << ('\n')); (((((std::cerr << ("Function : "))) << __func__)) << ('\n')); (((((std::cerr << ("Line : "))) << (206))) << ('\n')); (((((std::cerr << ("Cuda error : "))) << (cudaGetErrorString(my_errno)))) << (" !\n\n")); exit(1); 
-# 206 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
-}  
-# 207
-my_errno = cudaFree(d_img_out); if (my_errno != (cudaSuccess)) { (((((std::cerr << ("\nFile : "))) << ("/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"))) << ('\n')); (((((std::cerr << ("Function : "))) << __func__)) << ('\n')); (((((std::cerr << ("Line : "))) << (207))) << ('\n')); (((((std::cerr << ("Cuda error : "))) << (cudaGetErrorString(my_errno)))) << (" !\n\n")); exit(1); 
-# 207 "/home/aditya/Desktop/GPU_computing/Assignments/Assignment_1/src/ahe_gpu_kernels.cu"
-}  
-# 208
+# 149
 } 
 
 # 1 "ahe_gpu_kernels.cudafe1.stub.c"
-#define _NV_ANON_NAMESPACE _GLOBAL__N__23_ahe_gpu_kernels_cpp1_ii_4145e07c
+#define _NV_ANON_NAMESPACE _GLOBAL__N__23_ahe_gpu_kernels_cpp1_ii_b5fb546c
 # 1 "ahe_gpu_kernels.cudafe1.stub.c"
 #include "ahe_gpu_kernels.cudafe1.stub.c"
 # 1 "ahe_gpu_kernels.cudafe1.stub.c"

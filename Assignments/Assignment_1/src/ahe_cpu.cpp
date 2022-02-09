@@ -3,6 +3,9 @@
 #include <cmath>
 #include<iostream>
 #include<map>
+#include<vector>
+#include <fstream>
+
 // Histogram equalization: https://en.wikipedia.org/wiki/Histogram_equalization
 // Adaptive Histogram equalization: https://en.wikipedia.org/wiki/Adaptive_histogram_equalization
 
@@ -18,7 +21,8 @@ unsigned char interp2(unsigned char v00, unsigned char v01, unsigned char v10, u
 	return (unsigned char)(v);
 }
 
-void print_mapping(unsigned char* mappings, int mapping_size){
+template<typename T>
+void print_mapping(T* mappings, int mapping_size, std::string filename){
 	std::map<int, int> counts;
 	std::cout << "Printing mappings on CPU\n";
     for(int i = 0; i < mapping_size; i++){
@@ -29,11 +33,14 @@ void print_mapping(unsigned char* mappings, int mapping_size){
 		}
 		counts[i__]++;
     }
+	std::ofstream MyFile(filename+".txt");
 	for(auto& p : counts){
-		std::cout << p.first << ':' << p.second << '\n';
+		MyFile << p.first << ':' << p.second << '\n';
 	}
-    std::cout << std::endl;
+    MyFile << std::endl;
+	MyFile.close();
 }
+
 void adaptiveEqualizationCPU(unsigned char* img_in, unsigned char* img_out, int width, int height)
 {
   	int pdf[256], cdf[256];
@@ -41,6 +48,7 @@ void adaptiveEqualizationCPU(unsigned char* img_in, unsigned char* img_out, int 
 	int ntiles_x = width / TILE_SIZE_X;
 	int ntiles_y = height / TILE_SIZE_Y;
 
+	std::vector<int> global_pdf;
   // Step 1: Caculate equalization mapping for each tile
 	int mapping_size = ntiles_x*ntiles_y*256;
 	unsigned char *mappings = new unsigned char[mapping_size];
@@ -59,8 +67,10 @@ void adaptiveEqualizationCPU(unsigned char* img_in, unsigned char* img_out, int 
 
 			// Compute CDF
 			cdf[0] = pdf[0];
+			global_pdf.push_back(pdf[0]);
 			for(int i=1; i< 256; i++){
 				cdf[i] = cdf[i-1] + pdf[i];
+				global_pdf.push_back(pdf[i]);
 			}
 			
 			int cdf_min = pixels_per_tile+1; // minimum non-zero value of the CDF
@@ -77,10 +87,13 @@ void adaptiveEqualizationCPU(unsigned char* img_in, unsigned char* img_out, int 
 			int tile_j = y / TILE_SIZE_Y;
 			int offset = 256*(tile_i + tile_j*ntiles_x);
 			for(int i=0; i< 256; i++){
-				mappings[i+ offset] = (unsigned char)round(255.0 * float(cdf[i] - cdf_min)/float(pixels_per_tile - cdf_min));
+				auto val = (255.0 * float(cdf[i] - cdf_min)/float(pixels_per_tile - cdf_min));
+				mappings[i+ offset] = (unsigned char)val;
+				// mappings[i+ offset] = (unsigned char)cdf[i];
 			}
 		}
 	}
+	print_mapping(mappings, mapping_size, "mappings_CPU");
   // Step 2: Perform adaptive equalization. For each pixel in a tile, interpolate results from neighbouring mappings
   	int tile_i0, tile_j0, tile_i1, tile_j1; // tile IDs
   	for(int y = 0; y < height; y++){

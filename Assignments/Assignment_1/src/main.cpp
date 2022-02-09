@@ -22,7 +22,7 @@ int main(int argc, char **argv) {
     cout<<"Usage: " << argv[0] << " <image_file>\n";
     return 1;
     }
-
+  std::cout << "Tile Size : " << TILE_SIZE_X << std::endl;
   // Read input image
   int width, height, nchannels;
 	cout<<"Reading "<<argv[1]<<"... "<<flush;
