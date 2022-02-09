@@ -4,7 +4,7 @@
 #include <iostream>
 #include <ctime>
 #include <cuda_runtime.h>
-
+#include <sstream>
 #include "stb_image.h"
 #include "stb_image_write.h"
 #include "ahe_cpu.h"
@@ -54,8 +54,13 @@ int main(int argc, char **argv) {
   cout<<"done.\n"<<flush;
 #endif
 #if ENABLE_SAVE_IMAGE
-  cout<<"Saving output to out_CPU.png..."<<flush;
-  stbi_write_png("out_CPU.png", width, height, 1, img_out_cpu, width);
+  std::stringstream ss_cpu;
+  ss_cpu << TILE_SIZE_X << "out_CPU.png";
+  std::string filename_cpu(ss_cpu.str());
+
+  cout<<"Saving output to " << filename_cpu <<endl;
+  
+  stbi_write_png(filename_cpu.c_str(), width, height, 1, img_out_cpu, width);
 	cout<<"done.\n"<<flush;
 #endif
 
@@ -81,8 +86,13 @@ int main(int argc, char **argv) {
   cout<<"done.\n"<<flush;
 #endif
 #if ENABLE_SAVE_IMAGE
-  cout<<"Saving output to out_GPU.png..."<<flush;
-  stbi_write_png("out_GPU.png", width, height, 1, img_out_gpu, width);
+  std::stringstream ss_gpu;
+  ss_gpu << TILE_SIZE_X << "out_GPU.png";
+  std::string filename_gpu(ss_gpu.str());
+
+  cout<<"Saving output to " << filename_gpu<<endl;
+  
+  stbi_write_png(filename_gpu.c_str(), width, height, 1, img_out_gpu, width);
 	cout<<"done.\n"<<flush;
 #endif
   
@@ -102,11 +112,15 @@ void verifyCPUGPU(unsigned char* out_cpu, unsigned char* out_gpu, size_t length)
 
 	double rms = 0.0;
 	int diff;
+  double abs_diff =0.0;
 	for(size_t i=0; i<length; i++) {
     diff = out_cpu[i] - out_gpu[i];
+    abs_diff += std::abs(diff);
 		rms += diff*diff;
 	}
 
 	rms  = sqrt(rms / length);
-  cout<<" RMS error: "<< rms << "\n" << flush;
+  abs_diff = abs_diff / length;
+  cout<<" RMS error: "<< rms << endl;
+  cout<<" Mean absolute pixel error: "<< abs_diff << endl;
 }
