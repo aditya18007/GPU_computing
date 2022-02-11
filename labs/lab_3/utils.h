@@ -1,6 +1,7 @@
 #ifndef MY_GPU_UTILS_H
 #define MY_GPU_UTILS_H
 #include <cuda_runtime.h>
+#include <fstream>
 
 cudaError_t my_errno ;
 #define SAFE_CALL( f_call, ... ) \
@@ -79,5 +80,21 @@ public:
         return m_size;
     }
 };
+
+template<typename T>
+void write_to_file(CPU_array<T>& A, std::string filename){
+    std::ofstream MyFile(filename+".txt");
+	for(int i=0; i < A.get_size(); i++){
+        MyFile << A(i) << "\n";
+    }
+    MyFile << std::endl;
+	MyFile.close();
+}
+
+template<typename T>
+void write_to_file(GPU_array<T>& d_A, std::string filename){
+    CPU_array<T> A(d_A);
+    write_to_file<T>(A, filename);
+}
 
 #endif //MY_GPU_UTILS_H

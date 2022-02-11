@@ -1,9 +1,11 @@
 #include <chrono>
 #include <vector>
 #include <iostream>
+#include <fstream>
 
+#include "defines.h"
 
-constexpr size_t M = 100;
+constexpr size_t M = DIM;
 
 using namespace std;
 using namespace std::chrono;
@@ -18,6 +20,15 @@ void matmul(vector<int>& A, vector<int>& B, vector<int>& C ){
             C[ row*M + col] = result;
         }
     }
+}
+
+void write_to_file(vector<int>& A, std::string filename){
+    std::ofstream MyFile(filename+".txt");
+	for(auto & x : A){
+        MyFile << x << "\n";
+    }
+    MyFile << std::endl;
+	MyFile.close();
 }
 
 int main(){
@@ -40,4 +51,5 @@ int main(){
     cout << "~~~~~~~~~~~~~~CPU EXECUTION~~~~~~~~~~~~~~\n";
     cout << "Dimension size = " << M << '\n';
     cout << "Time taken = " << time << "ms" << endl;
+    write_to_file(C, "CPU");
 }
