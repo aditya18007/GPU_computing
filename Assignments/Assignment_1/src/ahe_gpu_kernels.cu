@@ -38,7 +38,9 @@ __constant__ int Ntiles_x[1];
 __constant__ int Ntiles_y[1];
 __constant__ int Numtiles[1];
 
-__constant__ unsigned char Mappings[32*32*256];
+#if USE_CONST
+__constant__ unsigned char Mappings[8*8*256];
+#endif
 
 __global__ void ahe_get_PDF(unsigned char* img_in, int* pdf){
     int x = blockDim.x*blockIdx.x + threadIdx.x;
@@ -105,6 +107,7 @@ void get_mappings( int* d_pdf, unsigned char* d_mappings, int num_tiles){
     ahe_get_mappings<<< num_blocks, num_threads>>>(d_pdf, d_mappings);
 }
 
+#if !USE_CONST
 __global__ void ahe_equalize(unsigned char* img_in, unsigned char* img_out, unsigned char* mappings){
     int x = blockDim.x*blockIdx.x + threadIdx.x;
     int y = blockDim.y*blockIdx.y + threadIdx.y;
@@ -165,6 +168,25 @@ __global__ void ahe_equalize(unsigned char* img_in, unsigned char* img_out, unsi
     }
 }
 
+void adaptive_equalization( unsigned char* d_img_in, unsigned char* d_img_out, unsigned char* d_mappings, int width_, int height_ ){
+    
+    int num_threads_x = 32;
+    int num_threads_y = 32;
+    dim3 block_shape = dim3( num_threads_x, num_threads_y ,1);  
+
+    int num_blocks_x = (width_ / num_threads_x) + 1; 
+    int num_blocks_y = (height_ / num_threads_y) + 1;
+
+    dim3 grid_shape = dim3( num_blocks_x, num_blocks_y , 1); 
+
+    printf("Step 3 : Grid : {%d, %d, %d} blocks. Blocks : {%d, %d, %d} threads.\n",
+    grid_shape.x, grid_shape.y, grid_shape.z, block_shape.x, block_shape.y, block_shape.z);
+    
+    ahe_equalize<<< grid_shape, block_shape>>>(d_img_in, d_img_out, d_mappings);
+}
+#endif 
+
+#if USE_CONST
 __global__ void ahe_equalize_const_map(unsigned char* img_in, unsigned char* img_out){
     int x = blockDim.x*blockIdx.x + threadIdx.x;
     int y = blockDim.y*blockIdx.y + threadIdx.y;
@@ -225,23 +247,6 @@ __global__ void ahe_equalize_const_map(unsigned char* img_in, unsigned char* img
     }
 }
 
-void adaptive_equalization( unsigned char* d_img_in, unsigned char* d_img_out, unsigned char* d_mappings, int width_, int height_ ){
-    
-    int num_threads_x = 32;
-    int num_threads_y = 32;
-    dim3 block_shape = dim3( num_threads_x, num_threads_y ,1);  
-
-    int num_blocks_x = (width_ / num_threads_x) + 1; 
-    int num_blocks_y = (height_ / num_threads_y) + 1;
-
-    dim3 grid_shape = dim3( num_blocks_x, num_blocks_y , 1); 
-
-    printf("Step 3 : Grid : {%d, %d, %d} blocks. Blocks : {%d, %d, %d} threads.\n",
-    grid_shape.x, grid_shape.y, grid_shape.z, block_shape.x, block_shape.y, block_shape.z);
-    
-    ahe_equalize<<< grid_shape, block_shape>>>(d_img_in, d_img_out, d_mappings);
-}
-
 void adaptive_equalization_const_mapping( unsigned char* d_img_in, unsigned char* d_img_out, unsigned char* d_mappings, int width_, int height_ , int mapping_size_bytes ){
     
     int num_threads_x = 32;
@@ -259,6 +264,11 @@ void adaptive_equalization_const_mapping( unsigned char* d_img_in, unsigned char
     SAFE_CALL (cudaMemcpyToSymbol, Mappings, d_mappings, mapping_size_bytes, 0, cudaMemcpyDeviceToDevice)
     ahe_equalize_const_map<<< grid_shape, block_shape>>>(d_img_in, d_img_out);
 }
+
+#endif
+
+
+
 
 
 extern "C" void run_ahe_GPU(unsigned char* img_in, unsigned char* img_out, int width, int height){
@@ -296,12 +306,17 @@ extern "C" void run_ahe_GPU(unsigned char* img_in, unsigned char* img_out, int w
     get_mappings(d_pdf, d_mappings, num_tiles);
     SAFE_CALL( cudaDeviceSynchronize )
 
-    print_mappings(d_mappings, mappings_size, "mappings_GPU");
-    
     unsigned char *d_img_out;
     SAFE_CALL( cudaMalloc, (void**)&d_img_out, img_size_bytes)
-    // adaptive_equalization(d_img_in, d_img_out, d_mappings, width, height);
+    
+#if !USE_CONST
+    adaptive_equalization(d_img_in, d_img_out, d_mappings, width, height);
+#endif
+
+#if USE_CONST
     adaptive_equalization_const_mapping(d_img_in, d_img_out, d_mappings, width, height, mappings_size_bytes);
+#endif
+
     SAFE_CALL(cudaDeviceSynchronize)
 
     SAFE_CALL(cudaMemcpy, (void*)img_out, (void*)d_img_out,img_size_bytes, cudaMemcpyDeviceToHost)

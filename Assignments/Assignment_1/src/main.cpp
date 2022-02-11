@@ -9,6 +9,7 @@
 #include "stb_image_write.h"
 #include "ahe_cpu.h"
 #include "ahe_gpu.h"
+#include "defines.h"
 
 #define ENABLE_TIMER 1
 #define ENABLE_SAVE_IMAGE 1
@@ -22,6 +23,13 @@ int main(int argc, char **argv) {
     cout<<"Usage: " << argv[0] << " <image_file>\n";
     return 1;
     }
+#if USE_CONST
+  std::cout << "Using const\n";
+#endif
+#if !USE_CONST
+  std::cout << "Not Using const\n";
+#endif
+
   std::cout << "Tile Size : " << TILE_SIZE_X << std::endl;
   // Read input image
   int width, height, nchannels;
@@ -55,6 +63,9 @@ int main(int argc, char **argv) {
 #endif
 #if ENABLE_SAVE_IMAGE
   std::stringstream ss_cpu;
+#if USE_CONST
+  ss_cpu << "CONST";
+#endif
   ss_cpu << TILE_SIZE_X << "out_CPU.png";
   std::string filename_cpu(ss_cpu.str());
 
@@ -87,6 +98,9 @@ int main(int argc, char **argv) {
 #endif
 #if ENABLE_SAVE_IMAGE
   std::stringstream ss_gpu;
+#if USE_CONST
+  ss_gpu << "CONST";
+#endif
   ss_gpu << TILE_SIZE_X << "out_GPU.png";
   std::string filename_gpu(ss_gpu.str());
 
