@@ -1,8 +1,8 @@
 
 #define TEN 0
-#define HUNDRED 1
+#define HUNDRED 0
 #define THOUSAND 0
-#define TEN_THOUSAND 0
+#define TEN_THOUSAND 1
 
 #if TEN
 #define DIM 10

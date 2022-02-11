@@ -5,6 +5,7 @@
 
 #define M DIM
 
+
 __global__ 
 void matmul_basic(int* A, int* B, int* C){
     int x = threadIdx.x  + blockDim.x*blockIdx.x;
