@@ -10,7 +10,6 @@ using namespace std::chrono;
 
 void matmul(vector<int>& A, vector<int>& B, vector<int>& C ){
     for( int row = 0; row < M; row++ ){
-        cout << row << "\n";
         for( int col = 0; col < M; col++){
             int result = 0;
             for( int k = 0; k < M; k++){
