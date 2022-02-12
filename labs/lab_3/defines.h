@@ -1,8 +1,14 @@
 
+#define FOUR 0
 #define TEN 0
 #define HUNDRED 0
 #define THOUSAND 0
 #define TEN_THOUSAND 1
+
+#if FOUR
+#define DIM 4
+#define TILE 2
+#endif
 
 #if TEN
 #define DIM 10
