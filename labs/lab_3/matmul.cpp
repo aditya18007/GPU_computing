@@ -51,5 +51,7 @@ int main(){
     cout << "~~~~~~~~~~~~~~CPU EXECUTION~~~~~~~~~~~~~~\n";
     cout << "Dimension size = " << M << '\n';
     cout << "Time taken = " << time << "ms" << endl;
+#if SAVE_OUTPUT 
     write_to_file(C, "CPU");
+#endif
 }

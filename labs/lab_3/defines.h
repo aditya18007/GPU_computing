@@ -1,4 +1,6 @@
 
+#define SAVE_OUTPUT 0
+
 #define FOUR 0
 #define TEN 0
 #define HUNDRED 0

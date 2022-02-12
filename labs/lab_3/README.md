@@ -1,10 +1,14 @@
 # Lab 3 : Shared Memory
 
+|  Roll No  |          Name          |
+| :-------: | :--------------------: |
+| $2018007$ | $Aditya Singh Rathore$ |
+
+
+
 ## Results
 
-### GPU Specs
-
-* $\text{NVIDIA 1050 Ti}$
+* GPU : $\text{NVIDIA 1050 Ti}$
 
 | Matrix Dimension     | CPU Time (ms) | Basic GPU (ms) | GPU with shared memory (ms) |
 | -------------------- | ------------- | -------------- | --------------------------- |

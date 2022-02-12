@@ -91,5 +91,7 @@ int main(){
     cout << "Dimension size = " << M << '\n';
     cout << "Grid Dim = " << ((M/TILE)+1) << '\n';
     cout << "Time taken = " << time << "ms" << endl;
+#if SAVE_OUTPUT    
     write_to_file(d_C, "GPU");
+#endif
 }
