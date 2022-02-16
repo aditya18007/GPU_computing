@@ -27,7 +27,7 @@ __global__ void vector_add(SoA a, SoA b, SoA c){
 
 
 int main(){
-    struct SoA SoA_data1, SoA_data2, SoA_data3 ,d_SoA_data1, d_SoA_data2, d_SoA_data3;
+    struct SoA SoA_data1, SoA_data2, d_SoA_data1, d_SoA_data2, d_SoA_data3;
     
     // malloc SoAdata1.keys, SoAdata1.values SoA_data2.keys, SoAdata3.keys etc
     SoA_data1.keys = new int[ARRAY_SIZE];

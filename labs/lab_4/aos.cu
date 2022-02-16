@@ -12,7 +12,7 @@ using namespace std;
 
 struct record
 {
-    int A, B, C;
+    int key, value;
 };
 
 
@@ -21,9 +21,8 @@ __global__ void vector_add(struct record* a, struct record* b, struct record* c)
 	if (i >= ARRAY_SIZE){
         return;
     }
-    c[i].A = a[i].A + b[i].A;
-    c[i].B = a[i].B + b[i].B;
-    c[i].C = a[i].C + b[i].C;
+    c[i].key = a[i].key + b[i].key;
+    c[i].value = a[i].value + b[i].value;
 }
 
 
@@ -32,13 +31,11 @@ int main(){
     CPU_array<struct record> AoS_data1(ARRAY_SIZE), AoS_data2(ARRAY_SIZE);
     
     for(int i = 0; i < ARRAY_SIZE; i++){
-        AoS_data1(i).A = i;
-        AoS_data1(i).B = i;
-        AoS_data1(i).C = i;
+        AoS_data1(i).key = i;
+        AoS_data1(i).value = i;
 
-        AoS_data2(i).A = i;
-        AoS_data2(i).B = i;
-        AoS_data2(i).C = i;
+        AoS_data2(i).key = i;
+        AoS_data2(i).value = i;
     }
 
     // cudaMalloc
