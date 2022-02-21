@@ -1,0 +1,22 @@
+Reading ../images/tree_256.png... Width: 256 Height: 256 Channels: 1
+Computing SDT on CPU... 
+	Computation took 275.818 milliseconds.
+	Saving output to sdt_CPU.png... done.
+
+
+Reading ../images/tree_512.png... Width: 512 Height: 512 Channels: 1
+Computing SDT on CPU... 
+	Computation took 4474.67 milliseconds.
+	Saving output to sdt_CPU.png... done.
+
+
+Reading ../images/tree_1024.png... Width: 1024 Height: 1024 Channels: 1
+Computing SDT on CPU... 
+	Computation took 71157 milliseconds.
+	Saving output to sdt_CPU.png... done.
+
+
+Reading ../images/tree_2048.png... Width: 2048 Height: 2048 Channels: 1
+Computing SDT on CPU... 
+	Computation took 757062 milliseconds.
+	Saving output to sdt_CPU.png... done.

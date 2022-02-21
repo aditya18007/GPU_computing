@@ -74,7 +74,6 @@ extern "C" void gpu_main(unsigned char* bitmap, float *sdt, int width, int heigh
 	const auto chunk_size = 1024;
 	const auto num_chunks = sz_edge/chunk_size;
 	const auto last_chunk = sz_edge%chunk_size;
-	printf("Num chunks = %d\nChunk Size = %d\n", num_chunks, chunk_size);
 	
 	const auto block_size = chunk_size;
 	const auto grid_size = (sz/block_size) + 1;

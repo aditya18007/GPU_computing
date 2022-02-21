@@ -1,38 +1,21 @@
- ./Assignment02 ../images/tree_256.png 
 Reading ../images/tree_256.png... Width: 256 Height: 256 Channels: 1
-Computing SDT on CPU... 	Computation took 8.6e-05 milliseconds.
-	Saving output to sdt_CPU.png... done.
 Computing SDT on GPU... 
 	Computation took 7.05322 milliseconds.
 	Saving output to sdt_GPU.png... done.
-CPU-GPU Mean Square Error (MSE): 12.4104
- aditya  ... | Assignments | Assignment_2 | bin  1  ./Assignment02 ../images/tree_512.png 
+
+
 Reading ../images/tree_512.png... Width: 512 Height: 512 Channels: 1
-Computing SDT on CPU... 
-	Computation took 0.000169 milliseconds.
-	Saving output to sdt_CPU.png... done.
 Computing SDT on GPU... 
 	Computation took 107.066 milliseconds.
 	Saving output to sdt_GPU.png... done.
-CPU-GPU Mean Square Error (MSE): 18.7295
- aditya  ... | Assignments | Assignment_2 | bin  1  ./Assignment02 ../images/tree_1024.png 
+
+
 Reading ../images/tree_1024.png... Width: 1024 Height: 1024 Channels: 1
-Computing SDT on CPU... 
-	Computation took 0.000136 milliseconds.
-	Saving output to sdt_CPU.png... done.
 Computing SDT on GPU... 
 	Computation took 1462.88 milliseconds.
 	Saving output to sdt_GPU.png... done.
-CPU-GPU Mean Square Error (MSE): 30.2262
- aditya  ... | Assignments | Assignment_2 | bin  1  ./Assignment02 ../images/tree_2
-tree_2048.png  tree_256.png   
- aditya  ... | Assignments | Assignment_2 | bin  1  ./Assignment02 ../images/tree_2048.png 
+
+
 Reading ../images/tree_2048.png... Width: 2048 Height: 2048 Channels: 1
-Computing SDT on CPU... 
-	Computation took 0.000173 milliseconds.
-	Saving output to sdt_CPU.png... done.
-Computing SDT on GPU... 
 	Computation took 15873.7 milliseconds.
 	Saving output to sdt_GPU.png... done.
-CPU-GPU Mean Square Error (MSE): 135.524
- aditya  ... | Assignments | Assignment_2 | bin  1  
