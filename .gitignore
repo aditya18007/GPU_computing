@@ -355,3 +355,4 @@ TSWLatexianTemp*
 *.out
 *.app
 Assignments/Assignment_1/build/ahe_gpu_kernels.module_id
+Assignments/Assignment_2/.vscode/settings.json
