@@ -1,0 +1,4 @@
+Reading ../images/tree_256.png... Width: 256 Height: 256 Channels: 1
+Computing SDT on GPU... 
+	Computation took 3.96077 milliseconds.
+	Saving output to sdt_GPU.png... done.
