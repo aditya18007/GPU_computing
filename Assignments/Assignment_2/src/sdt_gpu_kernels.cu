@@ -3,16 +3,33 @@
 #include <fstream>
 
 cudaError_t my_errno;
+#define EDGES 2881
 
 __constant__ int Width[1];
 __constant__ int Height[1];
 __constant__ int Sz[1];
 __constant__ int Sz_edge[1];
+__constant__ int Edges[3*EDGES];
 
-__global__ void init_memory(float *min_dist, int size){
+__global__ void compute_dist_const(float* min_dist, int start){
 	int i = threadIdx.x + blockIdx.x*blockDim.x;
-	if (i >= size) return;
-	min_dist[i] = FLT_MAX;
+	if (i >= Sz[0]) return;
+	int x = i%Width[0];
+	int y = i/Width[0];
+
+	float min = min_dist[i];
+
+	float dist2, _x, _y, dx, dy;
+
+	for(int k = 0; k< blockDim.x; k++){
+		_x = Edges[k+start] % Width[0];
+        _y = Edges[k+start] / Width[0];
+        dx = _x - x;
+        dy = _y - y;
+        dist2 = dx*dx + dy*dy;
+		if(dist2 < min) min = dist2;
+	}
+	min_dist[i] = min;
 }
 
 __global__ void compute_dist(float* min_dist, int* global_edges,int start)
@@ -27,8 +44,7 @@ __global__ void compute_dist(float* min_dist, int* global_edges,int start)
 	edges[3*threadIdx.x+2] = _x*_x + _y*_y;
 	__syncthreads();
 
-	int sz = Sz[0];
-	if (i >= sz) return;
+	if (i >= Sz[0]) return;
 	
 	int x = i%Width[0];
 	int y = i/Width[0];
@@ -57,12 +73,28 @@ extern "C" void gpu_main(unsigned char* bitmap, float *sdt, int width, int heigh
 
 	int sz_edge = 0;
   	for(int i = 0; i<sz; i++) if(bitmap[i] == 255) sz_edge++;
-  	int *edge_pixels = new int[sz_edge];
-  	for(int i = 0, j = 0; i<sz; i++) if(bitmap[i] == 255) edge_pixels[j++] = i;
+	if(EDGES == sz_edge){
+		printf("Bingo\n");
+	}
+	int *edge_pixels = new int[3*sz_edge];
+  	for(int i = 0, j = 0; i<sz; i++) {
+		if(bitmap[i] == 255) {
+			// int x = i % width;
+			// int y = i / width;
+			edge_pixels[j] = i;
+			// edge_pixels[3*j+1] = y;
+			// edge_pixels[3*j+2] = x*x + y*y;
+			j+=1;
+		}
+	}
+	
+	// int *edge_pixels = new int[sz_edge];
+  	// for(int i = 0, j = 0; i<sz; i++) if(bitmap[i] == 255) edge_pixels[j++] = i;
 	SAFE_CALL( cudaMemcpyToSymbol, Width, &width, sizeof(width))
 	SAFE_CALL( cudaMemcpyToSymbol, Height, &height, sizeof(height))
 	SAFE_CALL( cudaMemcpyToSymbol, Sz, &sz, sizeof(sz))
 	SAFE_CALL( cudaMemcpyToSymbol, Sz_edge, &sz, sizeof(sz_edge))
+	SAFE_CALL( cudaMemcpyToSymbol, Edges, edge_pixels, EDGES*sizeof(int))
 
 	GPU_array<int> d_edges(edge_pixels, sz_edge);
 	CPU_array<float> min_dist(sz);
@@ -79,16 +111,16 @@ extern "C" void gpu_main(unsigned char* bitmap, float *sdt, int width, int heigh
 	const auto grid_size = (sz/block_size) + 1;
 	const auto grid_last_chunk = (sz/last_chunk) + 1;
 	for(int i = 0; i < num_chunks; i++){
-		compute_dist<<< grid_size, block_size, 3*chunk_size*sizeof(int)>>>(d_min_dist.arr(), 
-		d_edges.arr(), 
+		compute_dist_const<<< grid_size, block_size>>>(d_min_dist.arr(), 
 		i*chunk_size);
+		std::cout << i*chunk_size << std::endl;
 	}
 	if (last_chunk != 0){
-		compute_dist<<< grid_last_chunk, last_chunk, 3*last_chunk*sizeof(int)>>>(d_min_dist.arr(),
-			d_edges.arr(),
+		compute_dist_const<<< grid_last_chunk, last_chunk>>>(d_min_dist.arr(),
 			num_chunks*chunk_size);
+		std::cout << num_chunks*chunk_size << std::endl;
 	}
-		
+	
 	GPU_array<unsigned char> d_bitmap(bitmap, sz);
 	GPU_array<float> d_sdt(sz);
 	compute_sdt<<< grid_size, block_size >>>(d_bitmap.arr(), d_min_dist.arr(), d_sdt.arr());
