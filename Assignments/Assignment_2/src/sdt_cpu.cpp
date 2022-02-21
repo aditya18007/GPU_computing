@@ -18,8 +18,6 @@ void computeSDT_CPU(unsigned char * bitmap, float *sdt, int width, int height)
   for(int i = 0; i<sz; i++) if(bitmap[i] == 255) sz_edge++;
   int *edge_pixels = new int[sz_edge];
   for(int i = 0, j = 0; i<sz; i++) if(bitmap[i] == 255) edge_pixels[j++] = i;
-  std::cout<< "\t"<<sz_edge << " edge pixels in the image of size " << width << " x " << height << "\n"<<std::flush;
-
   //Compute the SDT
   float min_dist, dist2;
   float _x, _y;

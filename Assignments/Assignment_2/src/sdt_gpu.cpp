@@ -3,10 +3,11 @@
 
 #include "sdt_gpu.h"
 
-extern "C" void run_SDT_Kernel();
+extern "C" void gpu_main(unsigned char* bitmap_raw, float *sdt, int width, int height);
 
-void computeSDT_GPU(unsigned char * bitmap, float *sdt, int width, int height)
+void computeSDT_GPU(unsigned char * bitmap_raw, float *sdt, int width, int height)
 {
-  run_SDT_Kernel();
+    size_t sz = width*height;
+    gpu_main(bitmap_raw, sdt, width, height);
 }
 
