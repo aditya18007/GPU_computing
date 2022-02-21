@@ -11,7 +11,6 @@ void computeSDT_CPU(unsigned char * bitmap, float *sdt, int width, int height)
 {
   //In the input image 'bitmap' a value of 255 represents edge pixel,
   // and a value of 127 represents interior.
-
   //Collect all edge pixels in an array
   int sz = width*height;
   int sz_edge = 0;
