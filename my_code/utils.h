@@ -5,7 +5,7 @@
 #include <cuda_runtime.h>
 #include <iostream>
 
-cudaError_t my_errno ;
+extern cudaError_t my_errno ;
 
 #define SAFE_CALL( f_call, ... ) \
     my_errno = f_call(__VA_ARGS__); \

@@ -2,6 +2,8 @@
 #include <float.h>
 #include <fstream>
 
+cudaError_t my_errno;
+
 __global__ void compute_sdt(float* sdt, unsigned char* bitmap, int* edges, int height, int width, int edge_size)
 {
 	int x = threadIdx.x + blockIdx.x*blockDim.x;
