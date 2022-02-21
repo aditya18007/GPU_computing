@@ -19,26 +19,22 @@ __global__ void compute_dist(float* min_dist, int* global_edges,int start)
 {
 	extern __shared__ int edges[];
 	int i = threadIdx.x + blockIdx.x*blockDim.x;
-
-	edges[threadIdx.x] = global_edges[threadIdx.x+start];
+	int edge = global_edges[threadIdx.x+start];
+	edges[2*threadIdx.x] = edge % Width[0];
+	edges[2*threadIdx.x+1] = edge / Width[0];
 	__syncthreads();
 
 	int sz = Sz[0];
 	if (i >= sz) return;
 	
-	int width = Width[0];
-	
-	int x = i%width;
-	int y = i/width;
+	int x = i%Width[0];
+	int y = i/Width[0];
 	float min = min_dist[i];
-	float _x, _y, dx, dy, dist2;
+	float _x, _y, dist2;
 	for(int k = 0; k < blockDim.x; k++){
-		int edge = edges[k];
-		_x = edge % width;
-		_y = edge / width;
-		dx = _x - x;
-		dy = _y - y;
-		dist2 = dx*dx + dy*dy;
+		_x = edges[2*k];
+		_y = edges[2*k+1];
+		dist2 = hypot(_x - x, _y - y);
 		if(dist2 < min) min = dist2;
 	}
 	min_dist[i] = min;
@@ -48,7 +44,7 @@ __global__ void compute_sdt(unsigned char* bitmap, float* min_dist, float* sdt){
 	int i = threadIdx.x + blockDim.x*blockIdx.x;
 	if(i >= Sz[0]) return;
 	float sign  = (bitmap[i] >= 127)? 1.0f : -1.0f;
-    sdt[i] = sign * sqrtf(min_dist[i]);
+    sdt[i] = sign * min_dist[i];
 }
 
 extern "C" void gpu_main(unsigned char* bitmap, float *sdt, int width, int height)
@@ -81,12 +77,12 @@ extern "C" void gpu_main(unsigned char* bitmap, float *sdt, int width, int heigh
 	const auto grid_size = (sz/block_size) + 1;
 	const auto grid_last_chunk = (sz/last_chunk) + 1;
 	for(int i = 0; i < num_chunks; i++){
-		compute_dist<<< grid_size, block_size, chunk_size*sizeof(int)>>>(d_min_dist.arr(), 
+		compute_dist<<< grid_size, block_size, 2*chunk_size*sizeof(int)>>>(d_min_dist.arr(), 
 		d_edges.arr(), 
 		i*chunk_size);
 	}
 	if (last_chunk != 0){
-		compute_dist<<< grid_last_chunk, last_chunk, last_chunk*sizeof(int)>>>(d_min_dist.arr(),
+		compute_dist<<< grid_last_chunk, last_chunk, 2*last_chunk*sizeof(int)>>>(d_min_dist.arr(),
 			d_edges.arr(),
 			num_chunks*chunk_size);
 	}
