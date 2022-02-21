@@ -5,10 +5,7 @@
 cudaError_t my_errno;
 
 __constant__ int Width[1];
-__constant__ int Height[1];
 __constant__ int Sz[1];
-__constant__ int Sz_edge[1];
-
 
 __global__ void compute_dist(float* min_dist, int* global_edges,int start)
 {
@@ -54,10 +51,9 @@ extern "C" void gpu_main(unsigned char* bitmap, float *sdt, int width, int heigh
   	for(int i = 0; i<sz; i++) if(bitmap[i] == 255) sz_edge++;
   	int *edge_pixels = new int[sz_edge];
   	for(int i = 0, j = 0; i<sz; i++) if(bitmap[i] == 255) edge_pixels[j++] = i;
+	
 	SAFE_CALL( cudaMemcpyToSymbol, Width, &width, sizeof(width))
-	SAFE_CALL( cudaMemcpyToSymbol, Height, &height, sizeof(height))
 	SAFE_CALL( cudaMemcpyToSymbol, Sz, &sz, sizeof(sz))
-	SAFE_CALL( cudaMemcpyToSymbol, Sz_edge, &sz, sizeof(sz_edge))
 
 	GPU_array<int> d_edges(edge_pixels, sz_edge);
 	CPU_array<float> min_dist(sz);
