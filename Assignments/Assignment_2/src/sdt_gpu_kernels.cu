@@ -22,8 +22,9 @@ __global__ void compute_dist(float* min_dist, int* global_edges, int height, int
 	float min = min_dist[i];
 	float _x, _y, dx, dy, dist2;
 	for(int k = 0; k < chunk_size; k++){
-		_x = edges[k] % width;
-		_y = edges[k] / width;
+		int edge = edges[k];
+		_x = edge % width;
+		_y = edge / width;
 		dx = _x - x;
 		dy = _y - y;
 		dist2 = dx*dx + dy*dy;
