@@ -300,6 +300,91 @@
 > (b) Document  your  optimization  strategies.  Compare  and  plot  new  speedups  (kernel 
 > and overall).
 
+### Kernel-1 -> Kernel-2
+
+* Compute minimum distance for each pixel in different kernel.
+* Compute `sdt` for each pixel in a different Kernel .
+* For computing minimum distance, we will store the edges in shared memory because each pixel reads all edges, each block can store in shared memory which will be faster.
+* We cannot store entire edge array in shared memory as it gets very large, so we will divide it into chunks, say 25 and call the kernel multiple times.  
+* For each pixel, we will initialise minimum distance to `FLT_MAX`.
+* We will find the minimum distance with each chunk, first with chunk-1. Then with chunk-2 and so on. This way we will have the global minimum distance. 
+
+
+
+### Kernel-2 -> Kernel-3
+
+* The problem was low global load efficiency because a single thread was copying from global memory to shared memory. 
+* We fixed the chunk size = block size = 1024.
+* Each thread in block copies from global memory to local memory
+
+```c++
+__global__ void compute_dist(float* min_dist, int* global_edges,int start)
+{
+	extern __shared__ int edges[];
+	int i = threadIdx.x + blockIdx.x*blockDim.x;
+
+	edges[threadIdx.x] = global_edges[threadIdx.x+start];
+	__syncthreads();
+	...	
+}
+```
+
+![](/home/aditya/Desktop/GPU_computing/Assignments/Assignment_2/analysis/iteration_2/improved_global_load_efficiency.png)
+
+* Global load efficiency is 100%
+
+### Kernel-3 -> Kernel-4
+
+* Kernel is computation intensive.
+* Simplified calculation by calculating edge variables once per block and pixel variable once
+
+```c++
+__global__ void compute_dist(float* min_dist, int* global_edges,int start)
+{
+	...
+    // Once per block
+	int edge = global_edges[threadIdx.x+start];
+	int _x = edge % Width[0];
+	int _y = edge / Width[0];
+	edges[3*threadIdx.x] = _x;
+	edges[3*threadIdx.x+1] = _y;
+	edges[3*threadIdx.x+2] = _x*_x + _y*_y;
+	
+    ...
+    //Once per pixel
+	int x = i%Width[0];
+	int y = i/Width[0];
+	float sqr = x*x + y*y;
+	...
+	for(int k = 0; k < blockDim.x; k++){
+		dist2 =  edges[3*k+2] + sqr -2*(x*edges[3*k] + y*edges[3*k+1]);
+		if(dist2 < min) min = dist2;
+	}
+	...
+}
+```
+
+
+
+![](/home/aditya/Desktop/GPU_computing/Assignments/Assignment_2/analysis/iteration_3/effective_compute_memory_utilization.png)
+
+### Kernel-4 -> Kernel-5
+
+* Added Kernel to do edge computations only once/
+
+
+
+### Results 
+
+* On NVIDIA GTX 1050 Ti
+
+| Size | Kernel-1 | Kernel-3 | Kernel-4 | Kernel-5 |
+| :------: | :------: | :------: | :------: | :------: |
+| 256 | 7.05322 | 6.42819 | 3.36058 | 3.14413 |
+| 512 | 107.066 | 95.9526 | 44.8349 | 39.7117 |
+| 1024 | 1462.88 | 1399.2 | 560.283 | 527.827 |
+| 2048 | 15873.7 | 14311.8 | 5474.75 | 5165.55 |
+
 
 
 
