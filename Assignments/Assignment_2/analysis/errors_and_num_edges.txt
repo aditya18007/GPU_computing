@@ -4,3 +4,9 @@ Mean squared error between CPU and GPU outputs
 512:0
 1024:0
 2048:0
+
+Edges: 
+256:2881
+512:12069
+1024:46300
+2048:120734

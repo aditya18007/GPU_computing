@@ -7,6 +7,25 @@ cudaError_t my_errno;
 __constant__ int Width[1];
 __constant__ int Sz[1];
 
+__global__ void count_edge_pixels(unsigned char* bitmap, int* sz_edges){
+	__shared__ int num_edges;
+	int i = threadIdx.x + blockDim.x*blockIdx.x;
+	if(i >= Sz[0]) return;
+
+	if (threadIdx.x == 0){
+		num_edges = 0;
+	}
+	__syncthreads();
+	
+	if (bitmap[i] == 255){
+		atomicAdd(&num_edges, 1);
+	}
+	__syncthreads();
+	if (threadIdx.x == 0){
+		atomicAdd(sz_edges, num_edges);
+	}
+}
+
 __global__ void compute_dist(float* min_dist, int* global_edges,int start)
 {
 	extern __shared__ int edges[];
@@ -44,16 +63,20 @@ __global__ void compute_sdt(unsigned char* bitmap, float* min_dist, float* sdt){
 
 extern "C" void gpu_main(unsigned char* bitmap, float *sdt, int width, int height)
 {
-	size_t sz = width*height;
-    
-
+	int sz = width*height;
+    SAFE_CALL( cudaMemcpyToSymbol, Width, &width, sizeof(width))
+	SAFE_CALL( cudaMemcpyToSymbol, Sz, &sz, sizeof(sz))
+	GPU_array<unsigned char> d_bitmap(bitmap, sz);
+	CPU_array<int> sz_edges(1);
+	sz_edges(0) = 0;
+	GPU_array<int> d_sz_edges(sz_edges);
+	count_edge_pixels<<<(sz/1024) + 1, 1024>>>(d_bitmap.arr(), d_sz_edges.arr());
 	int sz_edge = 0;
-  	for(int i = 0; i<sz; i++) if(bitmap[i] == 255) sz_edge++;
+	d_sz_edges.write_to_ptr(&sz_edge);
+	
   	int *edge_pixels = new int[sz_edge];
   	for(int i = 0, j = 0; i<sz; i++) if(bitmap[i] == 255) edge_pixels[j++] = i;
 	
-	SAFE_CALL( cudaMemcpyToSymbol, Width, &width, sizeof(width))
-	SAFE_CALL( cudaMemcpyToSymbol, Sz, &sz, sizeof(sz))
 
 	GPU_array<int> d_edges(edge_pixels, sz_edge);
 	CPU_array<float> min_dist(sz);
@@ -80,7 +103,7 @@ extern "C" void gpu_main(unsigned char* bitmap, float *sdt, int width, int heigh
 			num_chunks*chunk_size);
 	}
 		
-	GPU_array<unsigned char> d_bitmap(bitmap, sz);
+	
 	GPU_array<float> d_sdt(sz);
 	compute_sdt<<< grid_size, block_size >>>(d_bitmap.arr(), d_min_dist.arr(), d_sdt.arr());
 	cudaDeviceSynchronize();

@@ -14,13 +14,18 @@
 > 2048).  Tabulate  CPU  and  GPU  (kernel  and  overall)  timing  results,  plot  speedups 
 > (kernel and overall),  and report the`MSE` error in each case.
 
+**Note** : Most optimised approach explained here.
 
+* The idea is compute minimum distances of each pixel from edge in one kernel and compute SDT from those minimum distances in second kernel.
+* Edge pixels are computed on the CPU. We cannot have multiple pixels  
 
 ## Part 2
 
 > How  will  you  modify  your  approach  to  use  constant  memory  instead  of  shared 
 > memory? Explain why using constant memory instead of shared memory is a good/bad 
 > choice in this case.
+
+**Note** : Done for the most optimised approach.
 
 
 
@@ -202,10 +207,30 @@ if (last_chunk != 0){
 ### Kernel-4
 
 * When computing `dist2`, each thread will be computing some computations that can be done only once at block level (explained in Kernel Optimization).
+* The counting of edge pixels is done on the GPU.
 
 #### Kernel
 
 ```c++
+__global__ void count_edge_pixels(unsigned char* bitmap, int* sz_edges){
+	__shared__ int num_edges;
+	int i = threadIdx.x + blockDim.x*blockIdx.x;
+	if(i >= Sz[0]) return;
+
+	if (threadIdx.x == 0){
+		num_edges = 0;
+	}
+	__syncthreads();
+	
+	if (bitmap[i] == 255){
+		atomicAdd(&num_edges, 1);
+	}
+	__syncthreads();
+	if (threadIdx.x == 0){
+		atomicAdd(sz_edges, num_edges);
+	}
+}
+
 __global__ void compute_dist(float* min_dist, int* global_edges,int start)
 {
 	extern __shared__ int edges[];
