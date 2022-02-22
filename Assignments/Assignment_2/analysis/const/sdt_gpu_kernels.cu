@@ -3,18 +3,47 @@
 #include <fstream>
 
 cudaError_t my_errno;
-#define EDGES 2881
 
-struct edge{
-	int x,y;
-	float sqr;
+struct Edge{
+	float x, y, sqr;
 };
 
+#define EDGES 2881
 __constant__ int Width[1];
-__constant__ int Height[1];
 __constant__ int Sz[1];
-__constant__ int Sz_edge[1];
-__constant__ struct edge Edges[EDGES];
+__constant__ int Sz_edges[1];
+__constant__ struct Edge Edges[EDGES];
+
+
+__global__ void count_edge_pixels(unsigned char* bitmap, int* sz_edges){
+	__shared__ int num_edges;
+	int i = threadIdx.x + blockDim.x*blockIdx.x;
+	if(i >= Sz[0]) return;
+
+	if (threadIdx.x == 0){
+		num_edges = 0;
+	}
+	__syncthreads();
+	
+	if (bitmap[i] == 255){
+		atomicAdd(&num_edges, 1);
+	}
+	__syncthreads();
+	if (threadIdx.x == 0){
+		atomicAdd(sz_edges, num_edges);
+	}
+}
+
+__global__ void compute_edge_pixels(struct Edge* edges, int* edge_indices){
+	int i = threadIdx.x + blockDim.x*blockIdx.x;
+	if(i >= Sz_edges[0]) return;
+	int edge = edge_indices[i];
+	int _x = edge % Width[0];
+	int _y = edge / Width[0];
+	edges[i].x = _x;
+	edges[i].y = _y;
+	edges[i].sqr = _x*_x + _y*_y;
+}
 
 __global__ void compute_dist_const(float* min_dist, int start){
 	int i = threadIdx.x + blockIdx.x*blockDim.x;
@@ -40,33 +69,32 @@ __global__ void compute_sdt(unsigned char* bitmap, float* min_dist, float* sdt){
 
 extern "C" void gpu_main(unsigned char* bitmap, float *sdt, int width, int height)
 {
-	size_t sz = width*height;
-    
-
-	int sz_edge = 0;
-  	for(int i = 0; i<sz; i++) if(bitmap[i] == 255) sz_edge++;
-	if(EDGES == sz_edge){
-		printf("Bingo\n");
-	}
-	struct edge *edge_pixels = new struct edge[sz_edge];
-  	for(int i = 0, j = 0; i<sz; i++) {
-		if(bitmap[i] == 255) {
-			int x = i % width;
-			int y = i / width;
-			edge_pixels[j].x = x;
-			edge_pixels[j].y = y;
-			edge_pixels[j].sqr = x*x + y*y;
-			j++;
-		}
-	}
-	
-	SAFE_CALL( cudaMemcpyToSymbol, Width, &width, sizeof(width))
-	SAFE_CALL( cudaMemcpyToSymbol, Height, &height, sizeof(height))
+	int sz = width*height;
+    SAFE_CALL( cudaMemcpyToSymbol, Width, &width, sizeof(width))
 	SAFE_CALL( cudaMemcpyToSymbol, Sz, &sz, sizeof(sz))
-	SAFE_CALL( cudaMemcpyToSymbol, Sz_edge, &sz, sizeof(sz_edge))
-	SAFE_CALL( cudaMemcpyToSymbol, Edges, edge_pixels, EDGES*sizeof(struct edge))
+	GPU_array<unsigned char> d_bitmap(bitmap, sz);
+	
+	//Count edge pixels
+	CPU_array<int> sz_edges(1);
+	sz_edges(0) = 0;
+	GPU_array<int> d_sz_edges(sz_edges);
+	count_edge_pixels<<<(sz/1024) + 1, 1024>>>(d_bitmap.arr(), d_sz_edges.arr());
+	int sz_edge = 0;
 
-	GPU_array<struct edge> d_edges(edge_pixels, sz_edge);
+	d_sz_edges.write_to_ptr(&sz_edge);
+	SAFE_CALL( cudaMemcpyToSymbol, Sz_edges, &sz_edge, sizeof(sz_edge))
+  	
+	//Record edge pixels
+	int *edge_pixels = new int[sz_edge];
+  	for(int i = 0, j = 0; i<sz; i++) if(bitmap[i] == 255) edge_pixels[j++] = i;
+	
+	//Calculate the x, y and sqr
+	GPU_array<int> d_edge_indices(edge_pixels, sz_edge);
+	GPU_array<struct Edge> d_edges(sz_edge);
+	compute_edge_pixels<<< (sz_edge/1024)+1, 1024>>>(d_edges.arr(), d_edge_indices.arr());
+
+	cudaMemcpyToSymbol( Edges, d_edges.arr(), EDGES*sizeof(struct Edge), cudaMemcpyDeviceToDevice);
+	//Compute minimum distance
 	CPU_array<float> min_dist(sz);
 	for(int i = 0; i < sz; i++){
 		min_dist(i) = FLT_MAX;
@@ -81,17 +109,18 @@ extern "C" void gpu_main(unsigned char* bitmap, float *sdt, int width, int heigh
 	const auto grid_size = (sz/block_size) + 1;
 	const auto grid_last_chunk = (sz/last_chunk) + 1;
 	for(int i = 0; i < num_chunks; i++){
-		compute_dist_const<<< grid_size, block_size>>>(d_min_dist.arr(), 
+		compute_dist_const<<< grid_size, block_size, chunk_size*sizeof(struct Edge)>>>(d_min_dist.arr(), 
 		i*chunk_size);
 	}
 	if (last_chunk != 0){
-		compute_dist_const<<< grid_last_chunk, last_chunk>>>(d_min_dist.arr(),
+		compute_dist_const<<< grid_last_chunk, last_chunk, last_chunk*sizeof(struct Edge)>>>(d_min_dist.arr(),
 			num_chunks*chunk_size);
 	}
-	
-	GPU_array<unsigned char> d_bitmap(bitmap, sz);
+		
+	//Compute SDT
 	GPU_array<float> d_sdt(sz);
 	compute_sdt<<< grid_size, block_size >>>(d_bitmap.arr(), d_min_dist.arr(), d_sdt.arr());
-	cudaDeviceSynchronize();
+	
+	SAFE_CALL(cudaDeviceSynchronize)
 	d_sdt.write_to_ptr(sdt);
 }

@@ -14,7 +14,7 @@
 > 2048).  Tabulate  CPU  and  GPU  (kernel  and  overall)  timing  results,  plot  speedups 
 > (kernel and overall),  and report the`MSE` error in each case.
 
-**Note** : Most optimised approach explained here.
+**Note** : Most optimised approach explained here. [Appendix, Kernel 5]
 
 * The idea is compute minimum distances of each pixel from edge in one kernel and compute SDT from those minimum distances in second kernel.
 
@@ -106,6 +106,15 @@
 
 
 
+### Results
+
+| Image Size | CPU time(Inter i7 8th generation, 16 GB Ram) | GPU time (IIITD server, NVIDIA1080) [Kernel-5] | Speed up | MSE  |
+| ---------- | -------------------------------------------- | ---------------------------------------------- | -------- | ---- |
+| 256        | 275.818 ms                                   | 1.25133 ms                                     | 220.419  | 0    |
+| 512        | 4474.67 ms                                   | 9.26115 ms                                     | 483.16   | 0    |
+| 1024       | 71157 ms                                     | 110.456 ms                                     | 644.2    | 0    |
+| 2048       | 757062 ms                                    | 974.297 ms                                     | 777.03   | 0    |
+
 
 
 ## Part 2
@@ -114,9 +123,15 @@
 > memory? Explain why using constant memory instead of shared memory is a good/bad 
 > choice in this case.
 
-**Note** : Done for the most optimised approach.
+**Note** : Done for the most optimised approach. [Appendix, Kernel 5]
 
-
+* We can store the computed edges in constant memory.
+* But the constant memory is limited, we cannot do it for all images. 
+* I was able to compute for image size `256x256` where number of edges was 2881.
+* For this image, constant memory did not improve the performance.
+  * Shared memory : 3.15299 ms
+  * Constant memory : 3.45699 ms
+* 
 
 ## Part 3 (Kernel Analysis)
 
