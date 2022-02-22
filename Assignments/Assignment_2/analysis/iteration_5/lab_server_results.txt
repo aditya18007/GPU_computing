@@ -1,17 +1,18 @@
 Reading ../images/tree_256.png... Width: 256 Height: 256 Channels: 1
 Computing SDT on GPU... 
-	Computation took 7.05322 milliseconds
+	Computation took 1.25133 milliseconds.
 
 
 Reading ../images/tree_512.png... Width: 512 Height: 512 Channels: 1
 Computing SDT on GPU... 
-	Computation took 107.066 milliseconds
+	Computation took 9.26115 milliseconds.
 
 
 Reading ../images/tree_1024.png... Width: 1024 Height: 1024 Channels: 1
 Computing SDT on GPU... 
-	Computation took 1462.88 milliseconds
+	Computation took 110.456 milliseconds.
 
 
 Reading ../images/tree_2048.png... Width: 2048 Height: 2048 Channels: 1
-	Computation took 15873.7 milliseconds
+Computing SDT on GPU... 
+	Computation took 974.297 milliseconds.
