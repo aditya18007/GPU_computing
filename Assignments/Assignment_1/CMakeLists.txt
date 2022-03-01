@@ -16,7 +16,7 @@ set(SOURCES
 add_executable(${PROJECT_NAME} ${SOURCES})
 target_include_directories(${PROJECT_NAME} PRIVATE ${CUDAToolkit_INCLUDE_DIRS})
 set_target_properties(${PROJECT_NAME} PROPERTIES 
-											CUDA_SEPERABLE_COMPILATION ON
+											CUDA_SEPARABLE_COMPILATION ON
 											CUDA_ARCHITECTURES 60)
 target_compile_options(${PROJECT_NAME} PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:
 											--keep # Keep PTX code 
